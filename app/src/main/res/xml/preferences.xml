@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/settings">
+
+    <PreferenceCategory
+        android:title="@string/game_play">
+
+        <com.productions.gizzmoo.pokemonpuzzleleague.SeekBarPreference
+            android:key="pref_speed_key"
+            android:title="Speed"
+            android:summary="Select the game speed"
+            android:dialogTitle="Game Speed"
+            android:persistent="true"/>
+
+        <com.productions.gizzmoo.pokemonpuzzleleague.LineNumberPreference
+            android:key="pref_lines_key"
+            android:title="Line Count"
+            android:summary="Select the number of lines to win"
+            android:dialogTitle="Line Count"
+            android:persistent="true"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/aesthetics">
+
+        <com.productions.gizzmoo.pokemonpuzzleleague.TrainerPreference
+            android:key="pref_trainer_key"
+            android:title="Trainer"
+            android:summary="Select your trainer"
+            android:dialogTitle="Trainers"
+            android:persistent="true"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/sound">
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
