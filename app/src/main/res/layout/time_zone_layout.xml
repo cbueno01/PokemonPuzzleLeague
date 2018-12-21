@@ -68,7 +68,8 @@
         </LinearLayout>
 
     </LinearLayout>
-    <com.productions.gizzmoo.pokemonpuzzleleague.PuzzleBoardView
+
+    <fragment android:name="com.productions.gizzmoo.pokemonpuzzleleague.GameFragment"
         android:id="@+id/puzzleBoard"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

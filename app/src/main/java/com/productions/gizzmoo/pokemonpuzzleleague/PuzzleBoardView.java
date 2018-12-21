@@ -61,7 +61,7 @@ public class PuzzleBoardView extends View {
 
     private boolean mShouldAnimatingUp;
 
-    private TimeZoneActivity.GameStatus mCurrentStatus;
+    private GameStatus mCurrentStatus;
 
     private int mWinLine;
     private boolean mShouldShowWinLine;
@@ -152,7 +152,7 @@ public class PuzzleBoardView extends View {
         mShouldAnimatingUp = false;
     }
 
-    public void statusChanged(TimeZoneActivity.GameStatus status) {
+    public void statusChanged(GameStatus status) {
         mCurrentStatus = status;
     }
 
@@ -386,7 +386,7 @@ public class PuzzleBoardView extends View {
     }
 
     private boolean doesStatusAllowAnimation() {
-        return (mCurrentStatus == TimeZoneActivity.GameStatus.Running) || (mCurrentStatus == TimeZoneActivity.GameStatus.Panic);
+        return (mCurrentStatus == GameStatus.Running) || (mCurrentStatus == GameStatus.Panic);
     }
 
     private void drawBlock(Canvas canvas, Block block, Rect position, float heightRatio) {
@@ -487,7 +487,7 @@ public class PuzzleBoardView extends View {
                             isReallyMoving = false;
                         }
 
-                        if ((mCurrentStatus == TimeZoneActivity.GameStatus.Running || mCurrentStatus == TimeZoneActivity.GameStatus.Panic) && newP.y == 0) {
+                        if ((mCurrentStatus == GameStatus.Running || mCurrentStatus == GameStatus.Panic) && newP.y == 0) {
                             newP.y = 1;
                             isReallyMoving = false;
                         }
@@ -503,7 +503,7 @@ public class PuzzleBoardView extends View {
                             isReallyMoving = false;
                         }
 
-                        if ((mCurrentStatus == TimeZoneActivity.GameStatus.Running || mCurrentStatus == TimeZoneActivity.GameStatus.Panic) && newP.y == 0) {
+                        if ((mCurrentStatus == GameStatus.Running || mCurrentStatus == GameStatus.Panic) && newP.y == 0) {
                             newP.y = 1;
                             isReallyMoving = false;
                         }
