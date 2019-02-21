@@ -28,69 +28,25 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
 
     private long mStartTime;
     private long mElapsedTime;
-    private Context mContext;
 
     protected Block[][] mGrid;
+    protected GameLoopListener mListener;
     private ArrayList<Block> mBlockMatch;
-    private SwitchBlocks mBlockSwitcher;
+    protected SwitchBlocks mBlockSwitcher;
     private GameStatus mStatus;
     protected boolean mDidWin;
 //    private Block[] mNewRow;
 
-    private int POKEMON_SOUND_PRIORITY = 4;
-    private int TRAINER_SOUND_PRIORITY = 3;
-    private int POP_SOUND_PRIORITY = 2;
-    private int SWITCH_SOUND_PRIORITY = 1;
-    private int MOVE_SOUND_PRIORITY = 0;
+    private int comboCount;
 
-    private final int[] popSoundResources = {R.raw.pop_sound_1, R.raw.pop_sound_2, R.raw.pop_sound_3, R.raw.pop_sound_4};
-    private final int[] pokemonSoundResources = {R.raw.pikachu_sound_1, R.raw.pikachu_sound_2, R.raw.pikachu_sound_3, R.raw.pikachu_sound_4};
-
-    private SoundPool mSoundPool;
-    private boolean mLoadedSoundPool;
-    private int mTrainerSoundID;
-    private int mMoveSoundID;
-    private int mSwitchSoundID;
-    private int[] mPopSoundIDs = new int[4];
-    private int[] mPokemonSoundIDs = new int[4];
-
-    private int comboCount = 0;
-
-    private Random rand;
 
     public GameLoop(Block[][] grid) {
         mDidWin = false;
         mGrid = grid;
-//        mContext = context;
-//        mLoadedSoundPool = false;
-//        mSoundPool = new SoundPool(2, STREAM_MUSIC, 0);
-//        mSoundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
-//            @Override
-//            public void onLoadComplete(SoundPool soundPool, int i, int i1) {
-//                mLoadedSoundPool = true;
-//            }
-//        });
-
-
-//        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-//        int currentTrainer = settings.getInt("pref_trainer_key", 0);
-//        mTrainerSoundID = mSoundPool.load(mContext, TrainerResources.getTrainerComboSound(currentTrainer), 1);
-//        mSwitchSoundID = mSoundPool.load(mContext, R.raw.switch_sound, 1);
-//        mMoveSoundID = mSoundPool.load(mContext, R.raw.move_sound, 1);
-//
-//        for (int i = 0; i < pokemonSoundResources.length; i++) {
-//            mPokemonSoundIDs[i] = mSoundPool.load(mContext, pokemonSoundResources[i], 1);
-//        }
-//
-//        for (int i = 0; i < popSoundResources.length; i++) {
-//            mPopSoundIDs[i] = mSoundPool.load(mContext, popSoundResources[i], 1);
-//        }
+        mBlockMatch = new ArrayList<>();
+        mBlockSwitcher = new SwitchBlocks(2, 9, 3, 9);
+        comboCount = 0;
     }
-
-    public GameLoop() throws Exception {
-        throw new Exception("Cannot create a GameLoop without a board");
-    }
-
 
     @Override
     protected Void doInBackground(Void... voids) {
@@ -132,14 +88,10 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected void onPreExecute() {
-        rand = new Random();
-
         mElapsedTime = 0;
         mStartTime = System.nanoTime() / 1000000;
-
         changeGameStatus(mStatus);
-
-        mBlockSwitcher = new SwitchBlocks(2, 9, 3, 9);
+        mBlockMatch.clear();
 //        if (mNumOfLinesLeft <= NUM_OF_ROWS) {
 //            mBoardView.winLineAt(mNumOfLinesLeft);
 //        }
@@ -147,9 +99,11 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected void onProgressUpdate(Void... values) {
+        if (mListener != null) {
+            mListener.updateBoardView();
+        }
 //        mTimeView.setText(String.format(Locale.US, "%04d", (int)(mElapsedTime / 1000)));
 //        mSpeedView.setText(String.format(Locale.US, "%02d", mGameSpeedLevel));
-//        mBoardView.invalidate();
     }
 
     @Override
@@ -216,21 +170,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
 
             removeDuplicateBlocks();
             startMatchAnimation();
-
-//            boolean playPokemonSound = shouldPlayPokemonSound();
-//            if (playPokemonSound) {
-//                int pokemonSoundID = getPokemonSoundID();
-//                if (mLoadedSoundPool && pokemonSoundID != 0) {
-//                    mSoundPool.play(pokemonSoundID, 1, 1, POKEMON_SOUND_PRIORITY, 0, 1);
-//                }
-//            }
-//
-//
-//            if (mBlockMatch.size() > 3 && !playPokemonSound) {
-//                if (mLoadedSoundPool && mTrainerSoundID != 0) {
-//                    mSoundPool.play(mTrainerSoundID, 1, 1, TRAINER_SOUND_PRIORITY, 0, 1);
-//                }
-//            }
+            playSoundIfNecessary();
 
             mBlockMatch.clear();
         }
@@ -314,30 +254,34 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         return tempList;
     }
 
-//    private boolean shouldPlayPokemonSound() {
-//        for (Block b : mBlockMatch) {
-//            if (b.canCombo) {
-//                comboCount++;
-//                return true;
-//            }
-//        }
-//
-//        return false;
-//    }
-//
-//    private int getPokemonSoundID() {
-//        if (comboCount <= 0) {
-//            return 0;
-//        } else if (comboCount <= 2) {
-//            return mPokemonSoundIDs[0];
-//        } else if (comboCount == 3) {
-//            return mPokemonSoundIDs[1];
-//        } else if (comboCount == 4) {
-//            return mPokemonSoundIDs[2];
-//        } else {
-//            return mPokemonSoundIDs[3];
-//        }
-//    }
+    private void playSoundIfNecessary() {
+        boolean playPokemonSound = shouldPlayPokemonSound();
+        if (playPokemonSound) {
+           if (mListener != null) {
+               mListener.playPokemonSound(comboCount);
+           }
+        }
+
+
+        if (mBlockMatch.size() > 3 && !playPokemonSound) {
+            if (mListener != null) {
+                mListener.playTrainerSound(false);
+            }
+        }
+    }
+
+    private boolean shouldPlayPokemonSound() {
+        for (Block b : mBlockMatch) {
+            if (b.canCombo) {
+                comboCount++;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
 
     private void startMatchAnimation() {
         int matchSize =  mBlockMatch.size();
@@ -446,12 +390,15 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         mGrid[y2][x2].changeCoords(x2,y2);
     }
 
-    private void playSound(int soundID) {
-//        if (mLoadedSoundPool && mTrainerSoundID != 0) {
-//            mSoundPool.play(mTrainerSoundID, 1, 1, TRAINER_SOUND_PRIORITY, 0, 1);
-//        }
+    public void blockFinishedMatchAnimation(int row, int column) {
+        int rowToUpdate = row - 1;
+        while (rowToUpdate >= 0 && !mGrid[rowToUpdate][column].isBlockEmpty()) {
+            if (!mGrid[rowToUpdate][column].hasMatched && !mGrid[rowToUpdate][column].isAnimatingDown && !mGrid[rowToUpdate][column].isBeingSwitched) {
+                mGrid[rowToUpdate][column].canCombo = true;
+            }
+            rowToUpdate--;
+        }
     }
-
 
     public GameStatus getGameStatus() {
         return mStatus;
@@ -461,10 +408,18 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         return  mGrid;
     }
 
+    public SwitchBlocks getBlockSwitcher() {
+        return mBlockSwitcher;
+    }
+
+    public void setGameLoopListener(GameLoopListener listener) {
+        mListener = listener;
+    }
 
     public interface GameLoopListener {
-        void GameStatusChanged(GameStatus newStaus);
-        void PlayPokemonSound(int comboNumber);
-        void PlayTainerSound(boolean isMetallic);
+        void gameStatusChanged(GameStatus newStatus);
+        void playPokemonSound(int comboNumber);
+        void playTrainerSound(boolean isMetallic);
+        void updateBoardView();
     }
 }

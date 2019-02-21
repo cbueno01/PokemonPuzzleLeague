@@ -52,6 +52,10 @@ public class TimeZoneGameFragment extends GameFragment<TimeZoneGameLoop> {
         return new TimeZoneGameLoop(getGameBoard());
     }
 
+    @Override
+    public void gameStatusChanged(GameStatus newStatus){}
+
+
     private Block[][] getGameBoard() {
         Block[][] grid = new Block[NUM_OF_ROWS][NUM_OF_COLS];
         int[] columnCounter = new int[NUM_OF_COLS];

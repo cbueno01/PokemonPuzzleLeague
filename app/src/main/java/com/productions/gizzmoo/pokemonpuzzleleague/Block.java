@@ -105,7 +105,7 @@ public class Block implements Serializable{
         hasPopped = false;
         popPosition = 0;
 
-        canCombo = false;
+//        canCombo = false;
         removeComboFlagOnNextFrame = false;
     }
 

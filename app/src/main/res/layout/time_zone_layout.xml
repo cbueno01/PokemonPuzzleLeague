@@ -69,7 +69,7 @@
 
     </LinearLayout>
 
-    <fragment android:name="com.productions.gizzmoo.pokemonpuzzleleague.GameFragment"
+    <fragment android:name="com.productions.gizzmoo.pokemonpuzzleleague.TimeZoneGameFragment"
         android:id="@+id/puzzleBoard"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

@@ -102,7 +102,9 @@ public class PuzzleBoardView extends View {
         }
 
         mRisingAnimationCounter = 1;
-        mShouldAnimatingUp = true;
+        mNumOfTotalFrames = 1;
+        mRisingAnimationOffset = 0;
+        mShouldAnimatingUp = false;
 
         mWinLine = 0;
         mShouldShowWinLine = false;
