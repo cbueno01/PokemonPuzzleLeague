@@ -1,21 +1,9 @@
 package com.productions.gizzmoo.pokemonpuzzleleague;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Point;
-import android.media.SoundPool;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.support.v4.app.DialogFragment;
-
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Locale;
-import java.util.Random;
 
-import static android.media.AudioManager.STREAM_MUSIC;
 import static com.productions.gizzmoo.pokemonpuzzleleague.PuzzleBoardView.ANIMATION_MATCH_INVERT_FRAMES_NEEDED;
 import static com.productions.gizzmoo.pokemonpuzzleleague.PuzzleBoardView.ANIMATION_MATCH_POP_FRAMES_NEEDED;
 
@@ -27,15 +15,14 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
     private final int FRAME_PERIOD = 1000 / MAX_FPS;
 
     private long mStartTime;
-    private long mElapsedTime;
+    protected long mElapsedTime;
 
     protected Block[][] mGrid;
     protected GameLoopListener mListener;
-    private ArrayList<Block> mBlockMatch;
+    protected ArrayList<Block> mBlockMatch;
     protected SwitchBlocks mBlockSwitcher;
     private GameStatus mStatus;
     protected boolean mDidWin;
-//    private Block[] mNewRow;
 
     private int comboCount;
 
@@ -46,6 +33,8 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         mBlockMatch = new ArrayList<>();
         mBlockSwitcher = new SwitchBlocks(2, 9, 3, 9);
         comboCount = 0;
+        mElapsedTime = 0;
+        mStartTime = System.nanoTime() / 1000000;
     }
 
     @Override
@@ -57,29 +46,12 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
                 Thread.sleep(FRAME_PERIOD);
             } catch (InterruptedException e) {}
 
-//            if (mBlockMatchAnimating <= 0) {
-//                mCurrentFrameCount++;
-//            }
-
-//            if (mNeedNewRowUpdate) {
-//                updateNewRow();
-//                mNeedNewRowUpdate = false;
-//            }
-
             applyGravity();
             checkForMatches();
             checkToResetCombo();
-            checkIfGameWon();
-            updateGameStatusIfNeeded();
-
-//            if (prevStatus == GameStatus.Warning && (mStatus == GameStatus.Running || mStatus == GameStatus.Panic) && mBlockSwitcher.isAtTop()) {
-//                mBlockSwitcher.moveDown();
-//            }
-
-//            if ((mGameSpeedFrames < mCurrentFrameCount) && mBlockMatchAnimating == 0) {
-//                addNewRow();
-//            }
-
+            postGameMechanicHook();
+            getUpdatedGameStatus();
+            checkIfGameEnded();
             publishProgress();
         }
 
@@ -88,13 +60,8 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected void onPreExecute() {
-        mElapsedTime = 0;
-        mStartTime = System.nanoTime() / 1000000;
-        changeGameStatus(mStatus);
+        getUpdatedGameStatus();
         mBlockMatch.clear();
-//        if (mNumOfLinesLeft <= NUM_OF_ROWS) {
-//            mBoardView.winLineAt(mNumOfLinesLeft);
-//        }
     }
 
     @Override
@@ -102,14 +69,13 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         if (mListener != null) {
             mListener.updateBoardView();
         }
-//        mTimeView.setText(String.format(Locale.US, "%04d", (int)(mElapsedTime / 1000)));
-//        mSpeedView.setText(String.format(Locale.US, "%02d", mGameSpeedLevel));
     }
 
     @Override
     protected void onPostExecute(Void result) {
-//        DialogFragment newFragment = GameDialogFragment.newInstance(mDidWin);
-//        newFragment.show(getSupportFragmentManager(), "postDialog");
+        if (mListener != null) {
+            mListener.gameFinished(mDidWin);
+        }
     }
 
     public void startGame() {
@@ -154,31 +120,17 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         }
 
         if (!mBlockMatch.isEmpty()) {
-            Collections.sort(mBlockMatch, new Comparator<Block>() {
-                @Override
-                public int compare(Block block, Block t1) {
-                    Point p1 = block.getCoords();
-                    Point p2 = t1.getCoords();
-
-                    if (p1.y == p2.y) {
-                        return p1.x - p2.x;
-                    } else {
-                        return p1.y - p2.y;
-                    }
-                }
-            });
-
+            Collections.sort(mBlockMatch);
             removeDuplicateBlocks();
             startMatchAnimation();
+            notifyBlocksMatched();
             playSoundIfNecessary();
 
             mBlockMatch.clear();
         }
     }
 
-    private void updateGameStatusIfNeeded() {
-//        GameStatus prevStatus = mStatus;
-
+    private void getUpdatedGameStatus() {
         if (mDidWin) {
             changeGameStatus(GameStatus.Stopped);
         }
@@ -190,18 +142,10 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
             if (mStatus != GameStatus.Panic) {
                 changeGameStatus(GameStatus.Panic);
             }
-
-//                if (prevStatus == GameStatus.Running) {
-//                    changeSong(GameStatus.Panic);
-//                }
         } else {
             if (mStatus != GameStatus.Running) {
                 changeGameStatus(GameStatus.Running);
             }
-
-//                if (prevStatus != GameStatus.Running) {
-//                    changeSong(GameStatus.Running);
-//                }
         }
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -262,7 +206,6 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
            }
         }
 
-
         if (mBlockMatch.size() > 3 && !playPokemonSound) {
             if (mListener != null) {
                 mListener.playTrainerSound(false);
@@ -281,8 +224,6 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         return false;
     }
 
-
-
     private void startMatchAnimation() {
         int matchSize =  mBlockMatch.size();
         for (int i = 0; i < matchSize; i++) {
@@ -294,8 +235,12 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
             b.clearMatchCount = (mBlockMatch.size() - 1) * ANIMATION_MATCH_POP_FRAMES_NEEDED - b.delayMatchAnimationCount + ANIMATION_MATCH_INVERT_FRAMES_NEEDED;
             b.popPosition = i;
             b.matchTotalCount = matchSize;
-//            mBlockMatchAnimating++;
-//            mBoardView.stopAnimatingUp();
+        }
+    }
+
+    protected void notifyBlocksMatched() {
+        if (mListener != null) {
+            mListener.numberOfBlocksMatched();
         }
     }
 
@@ -316,62 +261,18 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         mBlockMatch.addAll(list);
     }
 
-
-//    private void updateNewRow() {
-//        for (int i = 0; i < NUM_OF_COLS; i++) {
-//            mNewRow[i] = new Block(rand.nextInt(7) + 1, i, NUM_OF_ROWS - 1);
-//        }
-//        mBoardView.setNewRow(mNewRow);
-//    }
-
-//    private void addNewRow() {
-//        if (doesRowContainBlock(0)) {
-//            changeGameStatus(GameStatus.Stopped);
-//            return;
-//        }
-//
-//        for (int i = 1; i < NUM_OF_ROWS; i++) {
-//            for (int j = 0; j < NUM_OF_COLS; j++) {
-//                swapBlocks(j, i, j, i-1);
-//            }
-//        }
-//
-//        for (int i = 0; i < NUM_OF_COLS; i++) {
-//            mGrid[NUM_OF_ROWS - 1][i] = mNewRow[i];
-//        }
-//
-//        if (!mBlockSwitcher.isAtTop() || doesRowContainBlock(0)) {
-//            mBlockSwitcher.moveUp();
-//        }
-//
-//        mNeedNewRowUpdate = true;
-//        mBoardView.newRowAdded();
-//        mCurrentFrameCount = 0;
-//
-//        mNumOfLinesLeft--;
-//        if (mNumOfLinesLeft <= NUM_OF_ROWS) {
-//            mBoardView.winLineAt(mNumOfLinesLeft);
-//        }
-//
-//        if (mGameSpeedLevel < 50) {
-//            if (mLinesToNewLevel <= 0) {
-//                mGameSpeedLevel++;
-//                mBoardView.setGameSpeed(normalizeSpeedToFrames(mGameSpeedLevel));
-//                mLinesToNewLevel = getNumOfLinesForLevel();
-//            } else {
-//                mLinesToNewLevel--;
-//            }
-//        }
-//    }
-
     protected void changeGameStatus(GameStatus newStatus) {
         mStatus = newStatus;
-//        mBoardView.statusChanged(newStatus);
+        if (mListener != null) {
+            mListener.gameStatusChanged(newStatus);
+        }
     }
 
-    protected abstract void checkIfGameWon();
+    protected abstract void checkIfGameEnded();
 
-    private boolean doesRowContainBlock(int row) {
+    protected abstract void postGameMechanicHook();
+
+    protected boolean doesRowContainBlock(int row) {
         for (int i = 0; i < NUM_OF_COLS; i++) {
             if (!mGrid[row][i].isBlockEmpty()) {
                 return true;
@@ -400,16 +301,32 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         }
     }
 
+    public void moveBlockSwitcherFromTop() {
+        if (mBlockSwitcher.isAtTop()) {
+            mBlockSwitcher.moveDown();
+        }
+    }
+
     public GameStatus getGameStatus() {
         return mStatus;
     }
 
     public Block[][] getGameGrid() {
-        return  mGrid;
+        return mGrid;
     }
 
     public SwitchBlocks getBlockSwitcher() {
         return mBlockSwitcher;
+    }
+
+    public long getGameStartTime() {
+        return mStartTime;
+    }
+
+    public void setGameProperties(Block[][] grid, SwitchBlocks switcher, long startTime) {
+        mGrid = grid;
+        mBlockSwitcher = switcher;
+        mStartTime = startTime;
     }
 
     public void setGameLoopListener(GameLoopListener listener) {
@@ -421,5 +338,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         void playPokemonSound(int comboNumber);
         void playTrainerSound(boolean isMetallic);
         void updateBoardView();
+        void numberOfBlocksMatched();
+        void gameFinished(boolean didWin);
     }
 }

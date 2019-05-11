@@ -5,7 +5,8 @@ import android.graphics.Point;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +15,22 @@ import static android.media.AudioManager.STREAM_MUSIC;
 
 public abstract class GameFragment <T extends GameLoop> extends Fragment implements BoardListener, GameLoop.GameLoopListener {
 
-    private int POKEMON_SOUND_PRIORITY = 4;
-    private int TRAINER_SOUND_PRIORITY = 3;
-    private int POP_SOUND_PRIORITY = 2;
-    private int SWITCH_SOUND_PRIORITY = 1;
-    private int MOVE_SOUND_PRIORITY = 0;
+    private static final String BOARD_KEY = "BOARD_KEY";
+    private static final String BLOCK_SWITCHER_KEY = "BLOCK_SWITCHER_KEY";
+    private static final String GAME_START_TIME_KEY = "GAME_START_TIME_KEY";
+
+    private final int POKEMON_SOUND_PRIORITY = 4;
+    private final int TRAINER_SOUND_PRIORITY = 3;
+    private final int POP_SOUND_PRIORITY = 2;
+    private final int SWITCH_SOUND_PRIORITY = 1;
+    private final int MOVE_SOUND_PRIORITY = 0;
 
     protected PuzzleBoardView mBoardView;
     protected T mGameLoop;
+
+    private Block[][] mTempGrid;
+    private SwitchBlocks mTempSwitcher;
+    private long mGameStartTime;
 
     private SoundPool mSoundPool;
     private boolean mLoadedSoundPool;
@@ -39,17 +48,20 @@ public abstract class GameFragment <T extends GameLoop> extends Fragment impleme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLoadedSoundPool = false;
+
+        if (savedInstanceState != null) {
+            mTempGrid = (Block[][]) savedInstanceState.getSerializable(BOARD_KEY);
+            mTempSwitcher = (SwitchBlocks) savedInstanceState.getSerializable(BLOCK_SWITCHER_KEY);
+            mGameStartTime = savedInstanceState.getLong(GAME_START_TIME_KEY);
+        }
     }
 
     protected abstract T createGameLoop();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View mainView = inflater.inflate(R.layout.game_fragment_layout, container, false);
-
         mBoardView = mainView.findViewById(R.id.puzzleBoard);
-
         return mainView;
     }
 
@@ -57,7 +69,6 @@ public abstract class GameFragment <T extends GameLoop> extends Fragment impleme
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setGameSound();
-
     }
 
     @Override
@@ -67,6 +78,13 @@ public abstract class GameFragment <T extends GameLoop> extends Fragment impleme
         mGameLoop = createGameLoop();
         mBoardView.setBoardListener(this);
         mGameLoop.setGameLoopListener(this);
+
+        if (mTempSwitcher != null || mTempGrid != null) {
+            mGameLoop.setGameProperties(mTempGrid, mTempSwitcher, mGameStartTime);
+            mTempGrid = null;
+            mTempSwitcher = null;
+        }
+
         mBoardView.setGrid(mGameLoop.getGameGrid(), mGameLoop.getBlockSwitcher());
 
         mGameLoop.startGame();
@@ -76,9 +94,21 @@ public abstract class GameFragment <T extends GameLoop> extends Fragment impleme
     public void onStop() {
         super.onStop();
 
+        mTempGrid = mGameLoop.getGameGrid();
+        mTempSwitcher = mGameLoop.getBlockSwitcher();
+        mGameStartTime = mGameLoop.getGameStartTime();
+
         if (mGameLoop != null) {
             mGameLoop.cancel(true);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(BOARD_KEY, mGameLoop.getGameGrid());
+        outState.putSerializable(BLOCK_SWITCHER_KEY, mGameLoop.getBlockSwitcher());
+        outState.putLong(GAME_START_TIME_KEY, mGameLoop.getGameStartTime());
     }
 
     @Override
@@ -90,23 +120,9 @@ public abstract class GameFragment <T extends GameLoop> extends Fragment impleme
         }
     }
 
-//    @Override
-//    public void addNewRow() {
-//                if (mGameLoop != null && mBlockMatchAnimating == 0) {
-//                    mGameLoop.addNewRow();
-//                }
-//    }
-
     @Override
     public void blockFinishedMatchAnimation(int row, int column) {
         mGameLoop.blockFinishedMatchAnimation(row, column);
-
-//
-//                mBlockMatchAnimating--;
-//
-//                if (mBlockMatchAnimating == 0) {
-//                    mBoardView.startAnimatingUp();
-//                }
     }
 
     @Override
@@ -150,6 +166,7 @@ public abstract class GameFragment <T extends GameLoop> extends Fragment impleme
     public void updateBoardView() {
         mBoardView.invalidate();
     }
+
     private void setGameSound() {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         int trainerID = settings.getInt("pref_trainer_key", 0);
@@ -163,16 +180,16 @@ public abstract class GameFragment <T extends GameLoop> extends Fragment impleme
             }
         });
 
-        mTrainerSoundID = mSoundPool.load(getContext(), TrainerResources.getTrainerComboSound(trainerID), 1);
-        mSwitchSoundID = mSoundPool.load(getContext(), R.raw.switch_sound, 1);
-        mMoveSoundID = mSoundPool.load(getContext(), R.raw.move_sound, 1);
+        mTrainerSoundID = mSoundPool.load(getActivity().getApplicationContext(), TrainerResources.getTrainerComboSound(trainerID), 1);
+        mSwitchSoundID = mSoundPool.load(getActivity().getApplicationContext(), R.raw.switch_sound, 1);
+        mMoveSoundID = mSoundPool.load(getActivity().getApplicationContext(), R.raw.move_sound, 1);
 
         for (int i = 0; i < pokemonSoundResources.length; i++) {
-            mPokemonSoundIDs[i] = mSoundPool.load(getContext(), pokemonSoundResources[i], 1);
+            mPokemonSoundIDs[i] = mSoundPool.load(getActivity().getApplicationContext(), pokemonSoundResources[i], 1);
         }
 
         for (int i = 0; i < popSoundResources.length; i++) {
-            mPopSoundIDs[i] = mSoundPool.load(getContext(), popSoundResources[i], 1);
+            mPopSoundIDs[i] = mSoundPool.load(getActivity().getApplicationContext(), popSoundResources[i], 1);
         }
     }
 
@@ -193,5 +210,9 @@ public abstract class GameFragment <T extends GameLoop> extends Fragment impleme
         } else {
             return mPokemonSoundIDs[3];
         }
+    }
+
+    public T getGameLoop() {
+        return mGameLoop;
     }
 }

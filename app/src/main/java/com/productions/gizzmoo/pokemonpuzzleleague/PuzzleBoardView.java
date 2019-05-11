@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.preference.PreferenceManager;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -142,7 +143,7 @@ public class PuzzleBoardView extends View {
         mRisingAnimationCounter = count;
     }
 
-    public void newRowAdded() {
+    public void resetRisingAnimationCount() {
         mRisingAnimationCounter = 1;
     }
 
@@ -225,6 +226,7 @@ public class PuzzleBoardView extends View {
         if (mShouldAnimatingUp) {
             int bitmapBlockSize = (int)(BoardResources.getBlockHeights() * ((float)mRisingAnimationCounter / mNumOfTotalFrames));
             mRisingAnimationOffset = (int)(mBlockSize * (bitmapBlockSize / (float)BoardResources.getBlockHeights()));
+            mRisingAnimationCounter++;
         }
 
         // Create grid
@@ -382,9 +384,9 @@ public class PuzzleBoardView extends View {
         // Create board border
         drawRectBoarder(canvas, mWidthOffset, mHeightOffset, mBoardWidth + mWidthOffset, mBoardHeight + mHeightOffset);
 
-        if (mShouldAnimatingUp) {
-            mRisingAnimationCounter++;
-        }
+//        if (mShouldAnimatingUp) {
+//            mRisingAnimationCounter++;
+//        }
     }
 
     private boolean doesStatusAllowAnimation() {
@@ -534,7 +536,7 @@ public class PuzzleBoardView extends View {
 
                     if (deltaY >= MIN_SWIPE_DISTANCE) {
                         if (mListener != null) {
-                            mListener.addNewRow();
+                            mListener.boardSwipedUp();
                         }
                     }
                     else if (p.x == mLastTouch.x && p.y == mLastTouch.y) {
@@ -633,7 +635,7 @@ public class PuzzleBoardView extends View {
 
 interface BoardListener {
     void switchBlock(Point switcherLeftBlock);
-    void addNewRow();
+    void boardSwipedUp();
     void blockFinishedMatchAnimation(int row, int column);
     void blockIsPopping(int position, int total);
     void needsBlockSwap(Block b1, Block b2);

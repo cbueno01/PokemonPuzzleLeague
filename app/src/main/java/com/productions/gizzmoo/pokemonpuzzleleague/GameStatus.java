@@ -4,5 +4,5 @@ public enum GameStatus {
     Stopped,
     Running,
     Warning,
-    Panic;
+    Panic
 }

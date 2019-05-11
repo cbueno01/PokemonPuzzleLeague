@@ -1,6 +1,7 @@
 package com.productions.gizzmoo.pokemonpuzzleleague;
 
 import android.graphics.Point;
+import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 
@@ -8,7 +9,7 @@ import java.io.Serializable;
  * Created by Chrystian on 2/10/2018.
  */
 
-public class Block implements Serializable{
+public class Block implements Serializable, Comparable<Block> {
 
     private BlockType type;
     private int xCoor;
@@ -105,10 +106,21 @@ public class Block implements Serializable{
         hasPopped = false;
         popPosition = 0;
 
-//        canCombo = false;
+        canCombo = false;
         removeComboFlagOnNextFrame = false;
     }
 
+    @Override
+    public int compareTo(@NonNull Block otherBlock) {
+        Point p1 = getCoords();
+        Point p2 = otherBlock.getCoords();
+
+        if (p1.y == p2.y) {
+            return p1.x - p2.x;
+        } else {
+            return p1.y - p2.y;
+        }
+    }
 
     public void changeCoords(int newX, int newY) {
         xCoor = newX;
@@ -142,6 +154,10 @@ public class Block implements Serializable{
         isBeingSwitched = false;
         switchAnimationCount = 0;
         leftRightAnimationDirection = -1;
+    }
+
+    public boolean canMatch() {
+        return !isBlockEmpty() && !isAnimatingDown && !hasMatched && !isBeingSwitched;
     }
 
     public enum BlockType {
