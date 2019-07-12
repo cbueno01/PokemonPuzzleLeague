@@ -87,7 +87,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
     private void applyGravity() {
         for (int y = NUM_OF_ROWS - 2; y >= 0; y--) {
             for (int x = 0; x < NUM_OF_COLS; x++) {
-                if (!mGrid[y][x].isBlockEmpty() && !mGrid[y][x].isBeingSwitched && !mGrid[y][x].isAnimatingDown && !mGrid[y][x].hasMatched) {
+                if (mGrid[y][x].canInteract()) {
                     if (((mGrid[y + 1][x].isBlockEmpty()) || (mGrid[y + 1][x].isAnimatingDown)) && !mGrid[y + 1][x].isBeingSwitched && !mGrid[y + 1][x].hasMatched) {
                         mGrid[y][x].startFaillingAnimation();
                         swapBlocks(x, y, x, y + 1);
@@ -112,7 +112,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
     private void checkForMatches() {
         for (int i = 0; i < NUM_OF_ROWS; i++) {
             for (int j = 0; j < NUM_OF_COLS; j++) {
-                if (!mGrid[i][j].hasMatched && !mGrid[i][j].isBlockEmpty() && !mGrid[i][j].isAnimatingDown && !mGrid[i][j].isBeingSwitched) {
+                if (mGrid[i][j].canInteract()) {
                     mBlockMatch.addAll(checkForMatchWithDirection(i, j, 0));
                     mBlockMatch.addAll(checkForMatchWithDirection(i, j, 1));
                 }
@@ -160,14 +160,14 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
             case 0:
                 int pos = i - 1;
                 // Check down
-                while (pos >= 0 && (mGrid[i][j].getBlockType() == mGrid[pos][j].getBlockType()) && !mGrid[pos][j].isAnimatingDown && !mGrid[pos][j].hasMatched && !mGrid[pos][j].isBeingSwitched) {
+                while (pos >= 0 && (mGrid[i][j].getBlockType() == mGrid[pos][j].getBlockType()) && mGrid[pos][j].canInteract()) {
                     tempList.add(mGrid[pos][j]);
                     pos--;
                 }
 
                 pos = i + 1;
                 // Check up
-                while (pos < NUM_OF_ROWS && (mGrid[i][j].getBlockType() == mGrid[pos][j].getBlockType()) && !mGrid[pos][j].isAnimatingDown  && !mGrid[pos][j].hasMatched  && !mGrid[pos][j].isBeingSwitched) {
+                while (pos < NUM_OF_ROWS && (mGrid[i][j].getBlockType() == mGrid[pos][j].getBlockType()) && mGrid[pos][j].canInteract()) {
                     tempList.add(mGrid[pos][j]);
                     pos++;
                 }
@@ -176,14 +176,14 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
             case 1:
                 pos = j - 1;
                 // Check right
-                while (pos >= 0 && (mGrid[i][j].getBlockType() == mGrid[i][pos].getBlockType()) && !mGrid[i][pos].isAnimatingDown  && !mGrid[i][pos].hasMatched && !mGrid[i][pos].isBeingSwitched) {
+                while (pos >= 0 && (mGrid[i][j].getBlockType() == mGrid[i][pos].getBlockType()) && mGrid[i][pos].canInteract()) {
                     tempList.add(mGrid[i][pos]);
                     pos--;
                 }
 
                 pos = j + 1;
                 // Check left
-                while (pos < NUM_OF_COLS && (mGrid[i][j].getBlockType() == mGrid[i][pos].getBlockType()) && !mGrid[i][pos].isAnimatingDown  && !mGrid[i][pos].hasMatched  && !mGrid[i][pos].isBeingSwitched) {
+                while (pos < NUM_OF_COLS && (mGrid[i][j].getBlockType() == mGrid[i][pos].getBlockType()) && mGrid[i][pos].canInteract()) {
                     tempList.add(mGrid[i][pos]);
                     pos++;
                 }
@@ -282,7 +282,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         return false;
     }
 
-    public void swapBlocks(int x1, int y1, int x2, int y2) {
+    public synchronized void swapBlocks(int x1, int y1, int x2, int y2) {
         Block blockHolder = mGrid[y1][x1];
         mGrid[y1][x1] = mGrid[y2][x2];
         mGrid[y2][x2] = blockHolder;
@@ -294,7 +294,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
     public void blockFinishedMatchAnimation(int row, int column) {
         int rowToUpdate = row - 1;
         while (rowToUpdate >= 0 && !mGrid[rowToUpdate][column].isBlockEmpty()) {
-            if (!mGrid[rowToUpdate][column].hasMatched && !mGrid[rowToUpdate][column].isAnimatingDown && !mGrid[rowToUpdate][column].isBeingSwitched) {
+            if (mGrid[rowToUpdate][column].canInteract()) {
                 mGrid[rowToUpdate][column].canCombo = true;
             }
             rowToUpdate--;

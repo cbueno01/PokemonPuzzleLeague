@@ -8,7 +8,6 @@ import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -17,14 +16,10 @@ import android.widget.Toast;
  */
 
 public class TrainerPreference extends DialogPreference {
-    private static final int DEFAULT_VALUE = 0;
-    private int mTrainer = DEFAULT_VALUE;
-    private int mChangedTrainer;
+    private static final int DEFAULT_ID = 0; // Ash
+    private int mTrainerID = DEFAULT_ID;
 
     private GridView mGridView;
-    private Button mAcceptButton;
-    private Button mCancelButton;
-
     private Context mContext;
     private ImageAdapter mAdapter;
 
@@ -52,31 +47,13 @@ public class TrainerPreference extends DialogPreference {
     protected void onBindDialogView(View view) {
         mGridView = view.findViewById(R.id.grid);
         mAdapter = new ImageAdapter(mContext, mBitmaps);
-        mAdapter.positionChosen(mTrainer);
+        mAdapter.positionChosen(mTrainerID);
         mGridView.setAdapter(mAdapter);
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                mChangedTrainer = position;
-                mAdapter.positionChosen(position);
-                mAdapter.notifyDataSetChanged();
+                persistInt(position);
+                mTrainerID = position;
                 Toast.makeText(mContext, "" + mTrainerNames[position], Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        mAcceptButton = view.findViewById(R.id.accept_button);
-        mAcceptButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                persistInt(mChangedTrainer);
-                mTrainer = mChangedTrainer;
-                getDialog().dismiss();
-            }
-        });
-
-        mCancelButton = view.findViewById(R.id.cancel_button);
-        mCancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
                 getDialog().dismiss();
             }
         });
@@ -87,16 +64,16 @@ public class TrainerPreference extends DialogPreference {
     @Override
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
         if (restorePersistedValue) {
-            mTrainer = getPersistedInt(DEFAULT_VALUE);
+            mTrainerID = getPersistedInt(DEFAULT_ID);
         } else {
-            persistInt(mTrainer);
+            persistInt(mTrainerID);
         }
     }
 
     @Override
     protected void onDialogClosed(boolean positiveResult) {
         if (positiveResult) {
-            persistInt(mChangedTrainer);
+            persistInt(mTrainerID);
         }
     }
 
@@ -108,7 +85,7 @@ public class TrainerPreference extends DialogPreference {
         }
 
         final SavedState myState = new SavedState(superState);
-        myState.value = mTrainer;
+        myState.value = mTrainerID;
         return myState;
     }
 
@@ -122,17 +99,17 @@ public class TrainerPreference extends DialogPreference {
         SavedState myState = (SavedState) state;
         super.onRestoreInstanceState(myState.getSuperState());
 
-        mTrainer = myState.value;
+        mTrainerID = myState.value;
     }
 
     private void init() {
-        int[] imageResources = TrainerResources.getAllTrainerPortraits();
+        int[] imageResources = TrainerResources.Companion.getAllTrainerPortraits();
         mBitmaps = new Bitmap[imageResources.length];
 
         for (int i = 0; i < imageResources.length; i++) {
             mBitmaps[i] = BitmapFactory.decodeResource(mContext.getResources(), imageResources[i]);
         }
 
-        mTrainerNames = mContext.getResources().getStringArray(R.array.trainers);
+        mTrainerNames = TrainerResources.Companion.getTrainerNames(mContext);
     }
 }

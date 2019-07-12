@@ -112,12 +112,9 @@ public class PuzzleBoardView extends View {
 
         BoardResources.createImageBitmaps(mContext);
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext());
-        int currentTrainer = settings.getInt("pref_trainer_key", 0);
-        int trainerResource = TrainerResources.getTrainerFullBody(currentTrainer);
-
-        if (trainerResource != -1) {
-            mTrainerBitmap =  BitmapFactory.decodeResource(mContext.getResources(), trainerResource);
-        }
+        Trainer currentTrainer = Trainer.Companion.getTypeByID(settings.getInt("pref_trainer_key", 0));
+        int trainerResource = TrainerResources.Companion.getTrainerFullBody(currentTrainer);
+        mTrainerBitmap =  BitmapFactory.decodeResource(mContext.getResources(), trainerResource);
     }
 
     public void setGrid(Block[][] grid) {

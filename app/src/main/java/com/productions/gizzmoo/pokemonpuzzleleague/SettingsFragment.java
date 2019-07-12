@@ -15,4 +15,15 @@ public class SettingsFragment extends PreferenceFragment {
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
     }
+    @Override
+    public void onPause() {
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener((PokemonPreference)findPreference("pref_pokemon_key"));
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener((PokemonPreference)findPreference("pref_pokemon_key"));
+    }
 }

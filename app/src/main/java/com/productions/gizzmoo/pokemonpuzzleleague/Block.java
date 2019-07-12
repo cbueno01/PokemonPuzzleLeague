@@ -156,7 +156,7 @@ public class Block implements Serializable, Comparable<Block> {
         leftRightAnimationDirection = -1;
     }
 
-    public boolean canMatch() {
+    public boolean canInteract() {
         return !isBlockEmpty() && !isAnimatingDown && !hasMatched && !isBeingSwitched;
     }
 

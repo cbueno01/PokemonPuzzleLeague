@@ -32,6 +32,12 @@
             android:dialogTitle="Trainers"
             android:persistent="true"/>
 
+        <com.productions.gizzmoo.pokemonpuzzleleague.PokemonPreference
+            android:key="pref_pokemon_key"
+            android:title="Pokemon"
+            android:summary="Select your pokemon"
+            android:dialogTitle="Pokemon"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory

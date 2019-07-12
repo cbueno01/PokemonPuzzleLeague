@@ -1,24 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="trainers">
-        <item>Ash</item>
-        <item>Blaine</item>
-        <item>Brock</item>
-        <item>Bruno</item>
-        <item>Erika</item>
-        <item>Gary</item>
-        <item>Giovanni</item>
-        <item>Koga</item>
-        <item>Lorelei</item>
-        <item>Lt. Surge</item>
-        <item>Mewtwo</item>
-        <item>Misty</item>
-        <item>Ritchie</item>
-        <item>Sabrina</item>
-        <item>Team Rocket</item>
-        <item>Tracey</item>
-    </string-array>
-
     <array name="blue_border_colors">
         <item>@color/light_blue_border</item>
         <item>@color/dark_blue_border</item>

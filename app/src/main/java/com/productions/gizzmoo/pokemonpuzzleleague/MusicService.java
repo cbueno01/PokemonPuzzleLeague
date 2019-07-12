@@ -45,9 +45,9 @@ public class MusicService extends Service {
         mediaPlayerIndex = 0;
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(_context.getApplicationContext());
-        int currentTrainer = settings.getInt("pref_trainer_key", 0);
+        Trainer currentTrainer = Trainer.Companion.getTypeByID(settings.getInt("pref_trainer_key", 0));
 
-        resourceId = TrainerResources.getTrainerSong(currentTrainer);
+        resourceId = TrainerResources.Companion.getTrainerSong(currentTrainer);
     }
 
     @Override

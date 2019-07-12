@@ -53,7 +53,7 @@ public class TimeZoneGameLoop extends GameLoop {
     }
 
 
-    public void addNewRow() {
+    public synchronized void addNewRow() {
         if (doesRowContainBlock(0)) {
             changeGameStatus(GameStatus.Stopped);
             return;

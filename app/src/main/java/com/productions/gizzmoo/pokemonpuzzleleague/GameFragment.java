@@ -169,7 +169,7 @@ public abstract class GameFragment <T extends GameLoop> extends Fragment impleme
 
     private void setGameSound() {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        int trainerID = settings.getInt("pref_trainer_key", 0);
+        Trainer trainer = Trainer.Companion.getTypeByID(settings.getInt("pref_trainer_key", 0));
 
 
         mSoundPool = new SoundPool(2, STREAM_MUSIC, 0);
@@ -180,7 +180,7 @@ public abstract class GameFragment <T extends GameLoop> extends Fragment impleme
             }
         });
 
-        mTrainerSoundID = mSoundPool.load(getActivity().getApplicationContext(), TrainerResources.getTrainerComboSound(trainerID), 1);
+        mTrainerSoundID = mSoundPool.load(getActivity().getApplicationContext(), TrainerResources.Companion.getTrainerComboSound(trainer), 1);
         mSwitchSoundID = mSoundPool.load(getActivity().getApplicationContext(), R.raw.switch_sound, 1);
         mMoveSoundID = mSoundPool.load(getActivity().getApplicationContext(), R.raw.move_sound, 1);
 

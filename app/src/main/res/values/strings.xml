@@ -13,5 +13,74 @@
     <string name="lose">You lose!</string>
     <string name="okay">Okay</string>
 
+    <!--Trainers-->
+    <string name="ash">Ash</string>
+    <string name="blaine">Blaine</string>
+    <string name="brock">Brock</string>
+    <string name="bruno">Bruno</string>
+    <string name="erika">Erika</string>
+    <string name="gary">Gary</string>
+    <string name="giovanni">Giovanni</string>
+    <string name="koga">Koga</string>
+    <string name="lorelei">Lorelei</string>
+    <string name="lt_surge">Lt. Surge</string>
+    <string name="mewtwo">Mewtwo</string>
+    <string name="misty">Misty</string>
+    <string name="ritchie">Ritchie</string>
+    <string name="sabrina">Sabrina</string>
+    <string name="team_rocket">Team Rocket</string>
+    <string name="tracey">Tracey</string>
+
+    <!--Pokemon-->
+    <string name="abra">Abra</string>
+    <string name="alakazam">Alakazam</string>
+    <string name="arbok">Arbok</string>
+    <string name="arcanine">Arcanine</string>
+    <string name="bulbasaur">Bulbasaur</string>
+    <string name="bulbasaur_clone">Bulbasaur</string>
+    <string name="charmeleon">Charmeleon</string>
+    <string name="cloyster">Cloyster</string>
+    <string name="dewgong">Dewgong</string>
+    <string name="geodude">Geodude</string>
+    <string name="gloom">Gloom</string>
+    <string name="golbat">Golbat</string>
+    <string name="growlithe">Growlithe</string>
+    <string name="happy">Happy</string>
+    <string name="hitmonchan">Hitmonchan</string>
+    <string name="horsea">Horse</string>
+    <string name="hypno">Hypno</string>
+    <string name="jolteon">Jolteon</string>
+    <string name="kingler">Kingler</string>
+    <string name="krabby">Krabby</string>
+    <string name="magmar">Magmar</string>
+    <string name="magneton">Magneton</string>
+    <string name="marill">Marill</string>
+    <string name="nidoking">Nidoking</string>
+    <string name="nidoqueen">Nidoqueen</string>
+    <string name="nidoran">Nidoran</string>
+    <string name="onix">Onix</string>
+    <string name="persian">Persian</string>
+    <string name="pikachu">Pikachu</string>
+    <string name="pikachu_clone">Pikachu</string>
+    <string name="poliwhirl">Poliwhirl</string>
+    <string name="primeape">Primeape</string>
+    <string name="psyduck">Psyduck</string>
+    <string name="raichu">Raichu</string>
+    <string name="sandslash">Sandslash</string>
+    <string name="scyther">Scyther</string>
+    <string name="sparky">Sparky</string>
+    <string name="squirtle">Squirtle</string>
+    <string name="squirtle_clone">Squirtle</string>
+    <string name="staryu">Staryu</string>
+    <string name="tangela">Tangela</string>
+    <string name="venomoth">Venomoth</string>
+    <string name="venonat">Venonat</string>
+    <string name="voltorb">Voltorb</string>
+    <string name="vulpix">Vulpix</string>
+    <string name="weepinbell">Weepinbell</string>
+    <string name="weezing">Weezing</string>
+    <string name="zippo">Zippo</string>
+    <string name="zubat">Zubat</string>
+
 
 </resources>
