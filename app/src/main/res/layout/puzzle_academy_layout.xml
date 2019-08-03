@@ -31,37 +31,19 @@
 
         </LinearLayout>
         <LinearLayout
-            android:id="@+id/scoreGroup"
+            android:id="@+id/movesLeftGroup"
             android:orientation="vertical"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/score"
+                android:id="@+id/movesLeft"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/score"/>
+                android:text="@string/moves"/>
             <TextView
-                android:id="@+id/scoreValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/speedGroup"
-            android:orientation="vertical"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/speed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/speed"/>
-            <TextView
-                android:id="@+id/speedValue"
+                android:id="@+id/movesLeftValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -69,7 +51,7 @@
 
     </LinearLayout>
 
-    <fragment android:name="com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame.TimeZoneGameFragment"
+    <fragment android:name="com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame.PuzzleAcademyFragment"
         android:id="@+id/puzzleBoard"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

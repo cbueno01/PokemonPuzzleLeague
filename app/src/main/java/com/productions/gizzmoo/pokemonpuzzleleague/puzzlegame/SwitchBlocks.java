@@ -1,4 +1,4 @@
-package com.productions.gizzmoo.pokemonpuzzleleague;
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame;
 
 import android.graphics.Point;
 

@@ -10,6 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame.PuzzleAcademyActivity;
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame.TimeZoneActivity;
+import com.productions.gizzmoo.pokemonpuzzleleague.settings.SettingsActivity;
+
 public class MenuActivity extends AppCompatActivity {
 
     private final String currentFrameKey = "CURRENT_FRAME_KEY";
@@ -29,17 +33,26 @@ public class MenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        Button mStartButton = (Button) findViewById(R.id.startButton);
-        mStartButton.setOnClickListener(new View.OnClickListener() {
+        Button mTimeZoneButton = findViewById(R.id.timeZoneButton);
+        mTimeZoneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MenuActivity.this, TimeZoneActivity.class);
                 startActivity(intent);
-                }
+            }
         });
 
-        mPanningImage = (ImageViewPanning) findViewById(R.id.backgroundPanning);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Button mPuzzleAcademy = findViewById(R.id.puzzleAcademy);
+        mPuzzleAcademy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MenuActivity.this, PuzzleAcademyActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        mPanningImage = findViewById(R.id.backgroundPanning);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         if (savedInstanceState != null) {
@@ -110,7 +123,8 @@ public class MenuActivity extends AppCompatActivity {
             while (!mPanningLoop.isCancelled()) {
                 try {
                     Thread.sleep(FRAME_PERIOD);
-                } catch (InterruptedException e) {}
+                } catch (InterruptedException e) {
+                }
 
                 publishProgress();
             }

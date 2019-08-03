@@ -1,10 +1,9 @@
-package com.productions.gizzmoo.pokemonpuzzleleague;
+package com.productions.gizzmoo.pokemonpuzzleleague.settings;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 
 /**
  * Created by Chrystian on 4/7/2018.

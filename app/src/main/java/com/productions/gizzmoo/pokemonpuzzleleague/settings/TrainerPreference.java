@@ -1,4 +1,4 @@
-package com.productions.gizzmoo.pokemonpuzzleleague;
+package com.productions.gizzmoo.pokemonpuzzleleague.settings;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,6 +10,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
+
+import com.productions.gizzmoo.pokemonpuzzleleague.ImageAdapter;
+import com.productions.gizzmoo.pokemonpuzzleleague.R;
+import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources;
 
 /**
  * Created by Chrystian on 4/8/2018.

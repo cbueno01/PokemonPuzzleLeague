@@ -1,14 +1,20 @@
-package com.productions.gizzmoo.pokemonpuzzleleague;
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.app.DialogFragment;
+
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block;
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameDialogFragment;
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameFragment;
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus;
+
 import java.util.Random;
 
-import static com.productions.gizzmoo.pokemonpuzzleleague.GameLoop.NUM_OF_COLS;
-import static com.productions.gizzmoo.pokemonpuzzleleague.GameLoop.NUM_OF_ROWS;
+import static com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.NUM_OF_COLS;
+import static com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.NUM_OF_ROWS;
 
 public class TimeZoneGameFragment extends GameFragment<TimeZoneGameLoop> implements TimeZoneGameLoop.TimeZoneGameLoopListener {
 

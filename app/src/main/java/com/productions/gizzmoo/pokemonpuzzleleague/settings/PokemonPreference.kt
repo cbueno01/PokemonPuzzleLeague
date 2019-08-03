@@ -1,4 +1,4 @@
-package com.productions.gizzmoo.pokemonpuzzleleague
+package com.productions.gizzmoo.pokemonpuzzleleague.settings
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -12,6 +12,11 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.GridView
 import android.widget.Toast
+import com.productions.gizzmoo.pokemonpuzzleleague.ImageAdapter
+import com.productions.gizzmoo.pokemonpuzzleleague.Pokemon
+import com.productions.gizzmoo.pokemonpuzzleleague.R
+import com.productions.gizzmoo.pokemonpuzzleleague.Trainer
+import com.productions.gizzmoo.pokemonpuzzleleague.PokemonResources
 
 class  PokemonPreference(context: Context, attrs: AttributeSet, defStyleAttr: Int) : DialogPreference(context, attrs, defStyleAttr), SharedPreferences.OnSharedPreferenceChangeListener {
     companion object {

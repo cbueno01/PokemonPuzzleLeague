@@ -1,4 +1,4 @@
-package com.productions.gizzmoo.pokemonpuzzleleague;
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,9 +12,12 @@ import android.graphics.Rect;
 import android.preference.PreferenceManager;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.productions.gizzmoo.pokemonpuzzleleague.R;
+import com.productions.gizzmoo.pokemonpuzzleleague.Trainer;
+import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources;
 
 import static android.view.MotionEvent.INVALID_POINTER_ID;
 
@@ -55,7 +58,7 @@ public class PuzzleBoardView extends View {
     private Point mLastTouchPointer;
     private boolean mLeftBlockSwitcherIsBeingMoved;
     private boolean mRightBlockSwitcherIsBeingMoved;
-    private BoardListener mListener;
+    private IBoard mListener;
 
     private int mRisingAnimationCounter;
     private int mRisingAnimationOffset;
@@ -114,7 +117,7 @@ public class PuzzleBoardView extends View {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext());
         Trainer currentTrainer = Trainer.Companion.getTypeByID(settings.getInt("pref_trainer_key", 0));
         int trainerResource = TrainerResources.Companion.getTrainerFullBody(currentTrainer);
-        mTrainerBitmap =  BitmapFactory.decodeResource(mContext.getResources(), trainerResource);
+        mTrainerBitmap = BitmapFactory.decodeResource(mContext.getResources(), trainerResource);
     }
 
     public void setGrid(Block[][] grid) {
@@ -136,7 +139,7 @@ public class PuzzleBoardView extends View {
         mNewRowBlocks = newRow;
     }
 
-    public void setRisingAnimationCount (int count) {
+    public void setRisingAnimationCount(int count) {
         mRisingAnimationCounter = count;
     }
 
@@ -157,8 +160,8 @@ public class PuzzleBoardView extends View {
     }
 
     private Point getGridCoordinatesOffXY(float x, float y) {
-        int posX = (int)Math.abs((x - BOARD_PADDING - mWidthOffset) / mBlockSize);
-        int posY = (int)Math.abs((y - BOARD_PADDING - mHeightOffset) / mBlockSize);
+        int posX = (int) Math.abs((x - BOARD_PADDING - mWidthOffset) / mBlockSize);
+        int posY = (int) Math.abs((y - BOARD_PADDING - mHeightOffset) / mBlockSize);
 
         // Don't return a point out of the grid.
         if (posX > 5) {
@@ -191,7 +194,7 @@ public class PuzzleBoardView extends View {
         mWidthOffset = 0;
         mHeightOffset = 0;
 
-        mBlockSize = Math.min(mBoardWidth / 6,  mBoardHeight / 12);
+        mBlockSize = Math.min(mBoardWidth / 6, mBoardHeight / 12);
         if (mBlockSize == (mBoardWidth / 6)) {
             mHeightOffset = (mBoardHeight - (mBlockSize * 12)) / 2;
             mBoardHeight = mBlockSize * 12;
@@ -221,8 +224,8 @@ public class PuzzleBoardView extends View {
         }
 
         if (mShouldAnimatingUp) {
-            int bitmapBlockSize = (int)(BoardResources.getBlockHeights() * ((float)mRisingAnimationCounter / mNumOfTotalFrames));
-            mRisingAnimationOffset = (int)(mBlockSize * (bitmapBlockSize / (float)BoardResources.getBlockHeights()));
+            int bitmapBlockSize = (int) (BoardResources.getBlockHeights() * ((float) mRisingAnimationCounter / mNumOfTotalFrames));
+            mRisingAnimationOffset = (int) (mBlockSize * (bitmapBlockSize / (float) BoardResources.getBlockHeights()));
             mRisingAnimationCounter++;
         }
 
@@ -269,7 +272,7 @@ public class PuzzleBoardView extends View {
                                 mBlocks[i][j].clear();
                             }
                         } else if (mBlocks[i][j].isBeingSwitched) {                                                                                     // Handle Switching blocks
-                            int switchAnimationOffset = (int)(mBlockSize - ((mBlocks[i][j].switchAnimationCount / (float)ANIMATION_SWITCH_FRAMES_NEEDED) * mBlockSize));
+                            int switchAnimationOffset = (int) (mBlockSize - ((mBlocks[i][j].switchAnimationCount / (float) ANIMATION_SWITCH_FRAMES_NEEDED) * mBlockSize));
                             if (mBlocks[i][j].leftRightAnimationDirection == 1) {                                                                       // left block animation
                                 mBlockRect.set(x + switchAnimationOffset, y, x + mBlockSize + switchAnimationOffset, y + mBlockSize);
                                 drawBlock(canvas, mBlocks[i][j], mBlockRect, 1);
@@ -299,7 +302,7 @@ public class PuzzleBoardView extends View {
                                 mBlocks[i][j].downAnimatingCount++;
                             }
 
-                            int fallingAnimationOffset = (int)(((ANIMATION_FALLING_FRAMES_NEEDED - mBlocks[i][j].downAnimatingCount) / (float) ANIMATION_FALLING_FRAMES_NEEDED) * mBlockSize);
+                            int fallingAnimationOffset = (int) (((ANIMATION_FALLING_FRAMES_NEEDED - mBlocks[i][j].downAnimatingCount) / (float) ANIMATION_FALLING_FRAMES_NEEDED) * mBlockSize);
                             mBlockRect.set(x, y - fallingAnimationOffset, x + mBlockSize, y + mBlockSize - fallingAnimationOffset);
                             drawBlock(canvas, mBlocks[i][j], mBlockRect, 1);
 
@@ -336,7 +339,7 @@ public class PuzzleBoardView extends View {
         // Draw new blocks coming in
         if (doesStatusAllowAnimation()) {
             int y = (12 * mBlockSize) + mHeightOffset;
-            float bitmapRation = ((float)mRisingAnimationOffset) / mBlockSize;
+            float bitmapRation = ((float) mRisingAnimationOffset) / mBlockSize;
 
             for (int i = 0; i < mNewRowBlocks.length; i++) {
                 int x = (i * mBlockSize) + mWidthOffset;
@@ -404,7 +407,7 @@ public class PuzzleBoardView extends View {
             } else {
                 currentBitmap = BoardResources.getDarkBlock(block.getBlockType());
             }
-            mBlockRectScale.set(0, 0, currentBitmap.getWidth(), (int)(currentBitmap.getHeight() * heightRatio));
+            mBlockRectScale.set(0, 0, currentBitmap.getWidth(), (int) (currentBitmap.getHeight() * heightRatio));
             canvas.drawBitmap(currentBitmap, mBlockRectScale, position, null);
         }
     }
@@ -428,9 +431,9 @@ public class PuzzleBoardView extends View {
         mBoardBoarderPaint.setStrokeWidth(2);
 
         for (int i = 0; i < 16; i++) {
-            int red = (int)(((Color.red(lightColor) - Color.red(darkColor)) * i) / 15f);
-            int green = (int)(((Color.green(lightColor) - Color.green(darkColor)) * i) / 15f);
-            int blue = (int)(((Color.blue(lightColor) - Color.blue(darkColor)) * i) / 15f);
+            int red = (int) (((Color.red(lightColor) - Color.red(darkColor)) * i) / 15f);
+            int green = (int) (((Color.green(lightColor) - Color.green(darkColor)) * i) / 15f);
+            int blue = (int) (((Color.blue(lightColor) - Color.blue(darkColor)) * i) / 15f);
 
             int newRed = Color.red(lightColor) - red;
             int newGreen = Color.green(lightColor) - green;
@@ -535,8 +538,7 @@ public class PuzzleBoardView extends View {
                         if (mListener != null) {
                             mListener.boardSwipedUp();
                         }
-                    }
-                    else if (p.x == mLastTouch.x && p.y == mLastTouch.y) {
+                    } else if (p.x == mLastTouch.x && p.y == mLastTouch.y) {
                         Point leftBlockSwitch = mBlockSwitcher.getLeftBlock();
                         tryToSwitch(leftBlockSwitch);
                     }
@@ -598,7 +600,7 @@ public class PuzzleBoardView extends View {
                     mListener.switchBlock(leftBlockSwitch);
                 }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             if (tryToSwitchHelper(leftBlockSwitch)) {
                 startSwitchAnimation(leftBlockSwitch);
                 if (mListener != null) {
@@ -610,7 +612,7 @@ public class PuzzleBoardView extends View {
 
     private boolean tryToSwitchHelper(Point leftBlockSwitch) {
         if (!mBlocks[leftBlockSwitch.y][leftBlockSwitch.x].isAnimatingDown && !mBlocks[leftBlockSwitch.y][leftBlockSwitch.x + 1].isAnimatingDown) {
-            if (!mBlocks[leftBlockSwitch.y][leftBlockSwitch.x].hasMatched && !mBlocks[leftBlockSwitch.y][leftBlockSwitch.x + 1].hasMatched){
+            if (!mBlocks[leftBlockSwitch.y][leftBlockSwitch.x].hasMatched && !mBlocks[leftBlockSwitch.y][leftBlockSwitch.x + 1].hasMatched) {
                 return true;
             }
         }
@@ -624,17 +626,8 @@ public class PuzzleBoardView extends View {
         mBlocks[leftBlockSwitch.y][leftBlockSwitch.x + 1].startSwitchAnimation(1);
     }
 
-    public void setBoardListener(BoardListener listener) {
+    public void setBoardListener(IBoard listener) {
         mListener = listener;
     }
 
-}
-
-interface BoardListener {
-    void switchBlock(Point switcherLeftBlock);
-    void boardSwipedUp();
-    void blockFinishedMatchAnimation(int row, int column);
-    void blockIsPopping(int position, int total);
-    void needsBlockSwap(Block b1, Block b2);
-    void switchBlockMoved();
 }

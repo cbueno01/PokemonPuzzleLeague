@@ -1,4 +1,8 @@
-package com.productions.gizzmoo.pokemonpuzzleleague;
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame;
+
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block;
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop;
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus;
 
 import java.util.Random;
 
@@ -48,7 +52,7 @@ public class TimeZoneGameLoop extends GameLoop {
         super.onProgressUpdate(values);
 
         if (mListener != null) {
-            ((TimeZoneGameLoopListener)mListener).updateGameTimeAndSpeed(mElapsedTime, mGameSpeedLevel);
+            ((TimeZoneGameLoopListener) mListener).updateGameTimeAndSpeed(mElapsedTime, mGameSpeedLevel);
         }
     }
 
@@ -59,9 +63,10 @@ public class TimeZoneGameLoop extends GameLoop {
             return;
         }
 
+        lock.lock();
         for (int i = 1; i < NUM_OF_ROWS; i++) {
             for (int j = 0; j < NUM_OF_COLS; j++) {
-                swapBlocks(j, i, j, i-1);
+                swapBlocks(j, i, j, i - 1);
             }
         }
 
@@ -80,8 +85,9 @@ public class TimeZoneGameLoop extends GameLoop {
         createNewRowBlocks(mNewRow, rand);
 
         if (mListener != null) {
-            ((TimeZoneGameLoopListener)mListener).newBlockWasAdded(mNumOfLinesLeft);
+            ((TimeZoneGameLoopListener) mListener).newBlockWasAdded(mNumOfLinesLeft);
         }
+        lock.unlock();
     }
 
     public int getNumOfFramesForCurrentLevel() {
@@ -96,14 +102,13 @@ public class TimeZoneGameLoop extends GameLoop {
 
         float normalizedSpeed = (mGameSpeedLevel - minSpeed) / (maxSpeed - minSpeed);
         float invertNormSpeed = 1 - normalizedSpeed;
-        return (int)(((invertNormSpeed * 9) + 1) * 30);
+        return (int) (((invertNormSpeed * 9) + 1) * 30);
     }
 
     private void checkIfUserLost() {
         if (mFramesInWarning >= getNumOfFramesForCurrentLevel()) {
             changeGameStatus(GameStatus.Stopped);
-        }
-        else if (getGameStatus() == GameStatus.Warning) {
+        } else if (getGameStatus() == GameStatus.Warning) {
             mFramesInWarning++;
         } else {
             mFramesInWarning = 0;
@@ -111,7 +116,7 @@ public class TimeZoneGameLoop extends GameLoop {
     }
 
     private void checkIfUserWon() {
-        if (mNumOfLinesLeft > 11) {
+        if (mNumOfLinesLeft > 11 || isBoardAnimating()) {
             return;
         }
 
@@ -157,7 +162,7 @@ public class TimeZoneGameLoop extends GameLoop {
     }
 
     private int getNumOfRowsForLevel() {
-        return ((int)(mGameSpeedLevel * 1.25)) + 3;
+        return ((int) (mGameSpeedLevel * 1.25)) + 3;
     }
 
     public Block[] getNewRow() {
@@ -194,6 +199,7 @@ public class TimeZoneGameLoop extends GameLoop {
 
     public interface TimeZoneGameLoopListener extends GameLoopListener {
         void newBlockWasAdded(int numOfLinesLeft);
+
         void updateGameTimeAndSpeed(long timeInMilli, int gameSpeed);
     }
 }

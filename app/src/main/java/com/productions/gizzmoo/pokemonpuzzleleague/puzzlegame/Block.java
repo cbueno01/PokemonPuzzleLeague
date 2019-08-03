@@ -1,4 +1,4 @@
-package com.productions.gizzmoo.pokemonpuzzleleague;
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame;
 
 import android.graphics.Point;
 import android.support.annotation.NonNull;
@@ -40,7 +40,7 @@ public class Block implements Serializable, Comparable<Block> {
     public Block(int t, int x, int y) {
         switch (t) {
             case 1:
-               type = BlockType.LEAF;
+                type = BlockType.LEAF;
                 break;
             case 2:
                 type = BlockType.FIRE;
@@ -157,7 +157,11 @@ public class Block implements Serializable, Comparable<Block> {
     }
 
     public boolean canInteract() {
-        return !isBlockEmpty() && !isAnimatingDown && !hasMatched && !isBeingSwitched;
+        return !isBlockEmpty() && !isAnimating();
+    }
+
+    public boolean isAnimating() {
+        return isAnimatingDown || hasMatched || isBeingSwitched;
     }
 
     public enum BlockType {

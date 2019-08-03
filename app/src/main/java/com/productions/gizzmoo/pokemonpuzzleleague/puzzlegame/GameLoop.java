@@ -1,11 +1,14 @@
-package com.productions.gizzmoo.pokemonpuzzleleague;
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame;
 
 import android.os.AsyncTask;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-import static com.productions.gizzmoo.pokemonpuzzleleague.PuzzleBoardView.ANIMATION_MATCH_INVERT_FRAMES_NEEDED;
-import static com.productions.gizzmoo.pokemonpuzzleleague.PuzzleBoardView.ANIMATION_MATCH_POP_FRAMES_NEEDED;
+import static com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.ANIMATION_MATCH_INVERT_FRAMES_NEEDED;
+import static com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.ANIMATION_MATCH_POP_FRAMES_NEEDED;
 
 public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
     public static final int NUM_OF_COLS = 6;
@@ -18,6 +21,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
     protected long mElapsedTime;
 
     protected Block[][] mGrid;
+    protected Lock lock = new ReentrantLock();
     protected GameLoopListener mListener;
     protected ArrayList<Block> mBlockMatch;
     protected SwitchBlocks mBlockSwitcher;
@@ -39,12 +43,13 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        while(mStatus != GameStatus.Stopped && !isCancelled()) {
+        while (mStatus != GameStatus.Stopped && !isCancelled()) {
             mElapsedTime = (System.nanoTime() / 1000000) - mStartTime;
 
             try {
                 Thread.sleep(FRAME_PERIOD);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
 
             applyGravity();
             checkForMatches();
@@ -133,8 +138,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
     private void getUpdatedGameStatus() {
         if (mDidWin) {
             changeGameStatus(GameStatus.Stopped);
-        }
-        else if (doesRowContainBlock(0)) {
+        } else if (doesRowContainBlock(0)) {
             if (mStatus != GameStatus.Warning) {
                 changeGameStatus(GameStatus.Warning);
             }
@@ -156,7 +160,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
     private ArrayList<Block> checkForMatchWithDirection(int i, int j, int direction) {
         ArrayList<Block> tempList = new ArrayList<>();
         tempList.add(mGrid[i][j]);
-        switch(direction) {
+        switch (direction) {
             case 0:
                 int pos = i - 1;
                 // Check down
@@ -201,9 +205,9 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
     private void playSoundIfNecessary() {
         boolean playPokemonSound = shouldPlayPokemonSound();
         if (playPokemonSound) {
-           if (mListener != null) {
-               mListener.playPokemonSound(comboCount);
-           }
+            if (mListener != null) {
+                mListener.playPokemonSound(comboCount);
+            }
         }
 
         if (mBlockMatch.size() > 3 && !playPokemonSound) {
@@ -225,7 +229,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
     }
 
     private void startMatchAnimation() {
-        int matchSize =  mBlockMatch.size();
+        int matchSize = mBlockMatch.size();
         for (int i = 0; i < matchSize; i++) {
             Block b = mBlockMatch.get(i);
             b.hasMatched = true;
@@ -282,16 +286,18 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         return false;
     }
 
-    public synchronized void swapBlocks(int x1, int y1, int x2, int y2) {
+    protected void swapBlocks(int x1, int y1, int x2, int y2) {
+        lock.lock();
         Block blockHolder = mGrid[y1][x1];
         mGrid[y1][x1] = mGrid[y2][x2];
         mGrid[y2][x2] = blockHolder;
 
-        mGrid[y1][x1].changeCoords(x1,y1);
-        mGrid[y2][x2].changeCoords(x2,y2);
+        mGrid[y1][x1].changeCoords(x1, y1);
+        mGrid[y2][x2].changeCoords(x2, y2);
+        lock.unlock();
     }
 
-    public void blockFinishedMatchAnimation(int row, int column) {
+    protected void blockFinishedMatchAnimation(int row, int column) {
         int rowToUpdate = row - 1;
         while (rowToUpdate >= 0 && !mGrid[rowToUpdate][column].isBlockEmpty()) {
             if (mGrid[rowToUpdate][column].canInteract()) {
@@ -305,6 +311,18 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         if (mBlockSwitcher.isAtTop()) {
             mBlockSwitcher.moveDown();
         }
+    }
+
+    protected boolean isBoardAnimating() {
+        for (Block[] row : mGrid) {
+            for (Block block : row) {
+                if (block.isAnimating()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public GameStatus getGameStatus() {
@@ -335,10 +353,15 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
 
     public interface GameLoopListener {
         void gameStatusChanged(GameStatus newStatus);
+
         void playPokemonSound(int comboNumber);
+
         void playTrainerSound(boolean isMetallic);
+
         void updateBoardView();
+
         void numberOfBlocksMatched();
+
         void gameFinished(boolean didWin);
     }
 }

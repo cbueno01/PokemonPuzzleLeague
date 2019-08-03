@@ -19,12 +19,26 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/toolbar"/>
 
-    <Button
-        android:id="@+id/startButton"
-        android:layout_width="128dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/start"
-        android:layout_centerInParent="true"
-        android:theme="@style/AppBaseTheme"/>
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+
+        <Button
+            android:id="@+id/timeZoneButton"
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:text="@string/time_zone"
+            android:theme="@style/AppBaseTheme"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/puzzleAcademy"
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:text="@string/puzzle_academy"
+            android:theme="@style/AppBaseTheme"/>
+    </LinearLayout>
 
 </RelativeLayout>

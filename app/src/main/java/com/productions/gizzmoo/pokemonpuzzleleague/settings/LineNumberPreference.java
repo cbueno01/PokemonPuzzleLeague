@@ -1,4 +1,4 @@
-package com.productions.gizzmoo.pokemonpuzzleleague;
+package com.productions.gizzmoo.pokemonpuzzleleague.settings;
 
 import android.content.Context;
 import android.os.Parcelable;
@@ -7,6 +7,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+
+import com.productions.gizzmoo.pokemonpuzzleleague.R;
 
 /**
  * Created by Chrystian on 6/2/2018.

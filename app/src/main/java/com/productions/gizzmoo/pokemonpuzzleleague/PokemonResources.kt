@@ -89,19 +89,18 @@ class PokemonResources {
                 Trainer.TRACY to arrayOf(Pokemon.MARILL, Pokemon.VENONAT, Pokemon.SCYTHER)
         )
 
-        fun getPokemonForTrainer(trainer : Trainer) : Array<Pokemon> {
+        fun getPokemonForTrainer(trainer: Trainer): Array<Pokemon> {
             return if (mTrainerToPokemonMap.containsKey(trainer)) mTrainerToPokemonMap[trainer]!! else mTrainerToPokemonMap[Trainer.ASH]!!
         }
 
-        fun getPokemonPortrait(pokemon : Pokemon) : Int {
+        fun getPokemonPortrait(pokemon: Pokemon): Int {
             return if (mPortraitResources.containsKey(pokemon)) mPortraitResources[pokemon]!! else mPortraitResources[Pokemon.PIKACHU]!!
         }
 
-        fun getPokemonName(pokemon : Pokemon, context: Context) : String {
-            return if(mPokemonNames.containsKey(pokemon)) context.resources.getString(mPokemonNames[pokemon]!!) else context.resources.getString(mPokemonNames[Pokemon.PIKACHU]!!)
+        fun getPokemonName(pokemon: Pokemon, context: Context): String {
+            return if (mPokemonNames.containsKey(pokemon)) context.resources.getString(mPokemonNames[pokemon]!!) else context.resources.getString(mPokemonNames[Pokemon.PIKACHU]!!)
 
 
-            
         }
 
     }

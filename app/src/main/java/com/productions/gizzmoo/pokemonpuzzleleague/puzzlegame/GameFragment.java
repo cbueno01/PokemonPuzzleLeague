@@ -1,19 +1,23 @@
-package com.productions.gizzmoo.pokemonpuzzleleague;
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame;
 
+import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.app.Fragment;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.productions.gizzmoo.pokemonpuzzleleague.R;
+import com.productions.gizzmoo.pokemonpuzzleleague.Trainer;
+import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources;
+
 import static android.media.AudioManager.STREAM_MUSIC;
 
-public abstract class GameFragment <T extends GameLoop> extends Fragment implements BoardListener, GameLoop.GameLoopListener {
+public abstract class GameFragment<T extends GameLoop> extends Fragment implements IBoard, GameLoop.GameLoopListener {
 
     private static final String BOARD_KEY = "BOARD_KEY";
     private static final String BLOCK_SWITCHER_KEY = "BLOCK_SWITCHER_KEY";
@@ -193,8 +197,12 @@ public abstract class GameFragment <T extends GameLoop> extends Fragment impleme
         }
     }
 
+    @Override
+    public void boardSwipedUp() {
+    }
+
     private int getPopSoundID(int pos, int total) {
-        int index = (int)(((float)pos / total) * 4);
+        int index = (int) (((float) pos / total) * 4);
         return mPopSoundIDs[index];
     }
 

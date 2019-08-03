@@ -1,4 +1,4 @@
-package com.productions.gizzmoo.pokemonpuzzleleague;
+package com.productions.gizzmoo.pokemonpuzzleleague.settings;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">PokemonPuzzleLeague</string>
-    <string name="start">Start</string>
+    <string name="time_zone">TimeZone</string>
+    <string name="puzzle_academy">Puzzle Academy</string>
     <string name="settings">Settings</string>
     <string name="aesthetics">Aesthetics</string>
     <string name="game_play">Game Play</string>
@@ -12,6 +13,7 @@
     <string name="win">You win!</string>
     <string name="lose">You lose!</string>
     <string name="okay">Okay</string>
+    <string name="moves">Moves:</string>
 
     <!--Trainers-->
     <string name="ash">Ash</string>

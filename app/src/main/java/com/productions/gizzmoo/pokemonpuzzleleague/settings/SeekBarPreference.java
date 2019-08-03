@@ -1,4 +1,4 @@
-package com.productions.gizzmoo.pokemonpuzzleleague;
+package com.productions.gizzmoo.pokemonpuzzleleague.settings;
 
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
@@ -9,6 +9,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.productions.gizzmoo.pokemonpuzzleleague.R;
 
 import java.util.Locale;
 
@@ -64,10 +66,12 @@ public class SeekBarPreference extends DialogPreference {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
         mTextView = view.findViewById(R.id.textView);
