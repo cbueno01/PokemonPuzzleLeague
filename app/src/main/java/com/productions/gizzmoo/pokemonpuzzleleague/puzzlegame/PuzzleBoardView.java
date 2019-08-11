@@ -18,6 +18,7 @@ import android.view.View;
 import com.productions.gizzmoo.pokemonpuzzleleague.R;
 import com.productions.gizzmoo.pokemonpuzzleleague.Trainer;
 import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources;
+import com.productions.gizzmoo.pokemonpuzzleleague.settings.TrainerPreference;
 
 import static android.view.MotionEvent.INVALID_POINTER_ID;
 
@@ -115,7 +116,7 @@ public class PuzzleBoardView extends View {
 
         BoardResources.createImageBitmaps(mContext);
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext());
-        Trainer currentTrainer = Trainer.Companion.getTypeByID(settings.getInt("pref_trainer_key", 0));
+        Trainer currentTrainer = Trainer.Companion.getTypeByID(settings.getInt("pref_trainer_key", TrainerPreference.DEFAULT_ID));
         int trainerResource = TrainerResources.Companion.getTrainerFullBody(currentTrainer);
         mTrainerBitmap = BitmapFactory.decodeResource(mContext.getResources(), trainerResource);
     }

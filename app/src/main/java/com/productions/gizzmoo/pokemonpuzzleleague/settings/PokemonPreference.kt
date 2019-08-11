@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.AudioManager.STREAM_MUSIC
+import android.media.SoundPool
 import android.os.Parcelable
 import android.preference.DialogPreference
 import android.preference.PreferenceManager
@@ -20,7 +22,7 @@ import com.productions.gizzmoo.pokemonpuzzleleague.PokemonResources
 
 class  PokemonPreference(context: Context, attrs: AttributeSet, defStyleAttr: Int) : DialogPreference(context, attrs, defStyleAttr), SharedPreferences.OnSharedPreferenceChangeListener {
     companion object {
-        const val DEFAULT_ID =  0 // First Pokemon
+        const val DEFAULT_ID = 0 // First Pokemon
     }
 
     private val mContext : Context = context
@@ -33,13 +35,19 @@ class  PokemonPreference(context: Context, attrs: AttributeSet, defStyleAttr: In
     private lateinit var mBitmaps: Array<Bitmap>
     private lateinit var mPokemonArr: Array<Pokemon>
     private lateinit var mPokemonNames: Array<String>
+    private lateinit var mPokemonSounds: Array<Int>
+
+    private var mSoundPool: SoundPool? = null
+    private var mLoadedSoundPool: Boolean = false
 
     constructor(context: Context, attrs: AttributeSet): this(context, attrs, 0)
 
     init {
         dialogLayoutResource = R.layout.pokemon_preference
         mSettings = PreferenceManager.getDefaultSharedPreferences(mContext.applicationContext)
-        mCurrentTrainer = Trainer.getTypeByID(mSettings.getInt("pref_trainer_key", 0))
+        mCurrentTrainer = Trainer.getTypeByID(mSettings.getInt("pref_trainer_key", TrainerPreference.DEFAULT_ID))
+        mSoundPool = SoundPool(2, STREAM_MUSIC, 0)
+        mSoundPool?.setOnLoadCompleteListener({ _, _, _ -> mLoadedSoundPool = true })
         updateResourcesForNewTrainer()
     }
 
@@ -51,7 +59,9 @@ class  PokemonPreference(context: Context, attrs: AttributeSet, defStyleAttr: In
         mGridView.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             persistInt(position)
             mPokemonID = position
-            Toast.makeText(mContext, "" + mPokemonNames[position], Toast.LENGTH_SHORT).show()
+            if (mLoadedSoundPool) {
+                mSoundPool?.play( mPokemonSounds[position], 1f, 1f, 1, 0, 1f)
+            }
             dialog.dismiss()
         }
 
@@ -60,7 +70,7 @@ class  PokemonPreference(context: Context, attrs: AttributeSet, defStyleAttr: In
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         if (key == "pref_trainer_key") {
-            mCurrentTrainer = Trainer.getTypeByID(mSettings.getInt("pref_trainer_key", 0))
+            mCurrentTrainer = Trainer.getTypeByID(mSettings.getInt("pref_trainer_key", TrainerPreference.DEFAULT_ID))
             mPokemonID = 0
             mSettings.edit().putInt("pref_pokemon_key", mPokemonID).apply()
             updateResourcesForNewTrainer()
@@ -104,7 +114,7 @@ class  PokemonPreference(context: Context, attrs: AttributeSet, defStyleAttr: In
         mPokemonID = myState.value
     }
 
-    fun updateResourcesForNewTrainer() {
+    private fun updateResourcesForNewTrainer() {
         mPokemonArr = PokemonResources.Companion.getPokemonForTrainer(mCurrentTrainer)
 
         mBitmaps = Array(mPokemonArr.size, {i ->
@@ -113,6 +123,10 @@ class  PokemonPreference(context: Context, attrs: AttributeSet, defStyleAttr: In
 
         mPokemonNames = Array(mPokemonArr.size, {i ->
             PokemonResources.getPokemonName(mPokemonArr[i], mContext)
+        })
+
+        mPokemonSounds = Array(mPokemonArr.size, {i ->
+            mSoundPool?.load(mContext, PokemonResources.getPokemonSelectionSound(mPokemonArr[i]), 1)!!
         })
     }
 }

@@ -99,38 +99,29 @@ class TrainerResources {
                 Trainer.TRACY to R.string.tracey
         )
 
-        fun getTrainerSong(trainer: Trainer) : IntArray {
-            return if (mTrainerSongs.containsKey(trainer)) mTrainerSongs[trainer]!! else mTrainerSongs[Trainer.ASH]!!
-        }
+        fun getTrainerSong(trainer: Trainer) : IntArray =
+            mTrainerSongs[trainer].let { it } ?: mTrainerSongs[Trainer.ASH]!!
 
-        fun getTrainerComboSound(trainer: Trainer) : Int {
-            return if (mTrainerCombos.containsKey(trainer)) mTrainerCombos[trainer]!! else mTrainerCombos[Trainer.ASH]!!
-        }
+        fun getTrainerComboSound(trainer: Trainer) : Int =
+            mTrainerCombos[trainer].let { it } ?: mTrainerCombos[Trainer.ASH]!!
 
-        fun getTrainerPortrait(trainer: Trainer) : Int {
-            return if (mTrainerPortraits.containsKey(trainer)) mTrainerPortraits[trainer]!! else mTrainerPortraits[Trainer.ASH]!!
-        }
+        fun getTrainerPortrait(trainer: Trainer) : Int =
+            mTrainerPortraits[trainer].let { it } ?: mTrainerPortraits[Trainer.ASH]!!
 
-        fun getAllTrainerPortraits() : IntArray {
-            return mTrainerPortraits.toSortedMap().values.toIntArray()
+        fun getAllTrainerPortraits() : IntArray =
+            mTrainerPortraits.toSortedMap().values.toIntArray()
 
-        }
+        fun getTrainerFullBody(trainer: Trainer) : Int =
+            mTrainerFullBody[trainer].let { it } ?: mTrainerFullBody[Trainer.ASH]!!
 
-        fun getTrainerFullBody(trainer: Trainer) : Int {
-            return if (mTrainerFullBody.containsKey(trainer)) mTrainerFullBody[trainer]!! else mTrainerFullBody[Trainer.ASH]!!
-        }
-
-        fun getTrainerName(trainer : Trainer, context: Context) : String {
-            return if (mTrainerNames.containsKey(trainer)) context.resources.getString(mTrainerNames[trainer]!!) else context.resources.getString(mTrainerNames[Trainer.ASH]!!)
-        }
+        fun getTrainerName(trainer : Trainer, context: Context) : String =
+            context.resources.getString(mTrainerNames[trainer].let { it } ?: mTrainerNames[Trainer.ASH]!!)
 
         fun getTrainerNames(context : Context) : Array<String> {
             val resourceArray = mTrainerNames.toSortedMap().values.toIntArray()
-            val stringArray = Array<String>(resourceArray.size, { i ->
+            return Array(resourceArray.size, { i ->
                 context.resources.getString(resourceArray[i])
             })
-
-            return stringArray
         }
     }
 }

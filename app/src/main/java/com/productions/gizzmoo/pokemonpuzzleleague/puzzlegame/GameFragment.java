@@ -11,9 +11,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.productions.gizzmoo.pokemonpuzzleleague.Pokemon;
+import com.productions.gizzmoo.pokemonpuzzleleague.PokemonResources;
 import com.productions.gizzmoo.pokemonpuzzleleague.R;
 import com.productions.gizzmoo.pokemonpuzzleleague.Trainer;
 import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources;
+import com.productions.gizzmoo.pokemonpuzzleleague.settings.PokemonPreference;
+import com.productions.gizzmoo.pokemonpuzzleleague.settings.TrainerPreference;
 
 import static android.media.AudioManager.STREAM_MUSIC;
 
@@ -45,13 +49,17 @@ public abstract class GameFragment<T extends GameLoop> extends Fragment implemen
     private int[] mPokemonSoundIDs = new int[4];
 
     private final int[] popSoundResources = {R.raw.pop_sound_1, R.raw.pop_sound_2, R.raw.pop_sound_3, R.raw.pop_sound_4};
-    private final int[] pokemonSoundResources = {R.raw.pikachu_sound_1, R.raw.pikachu_sound_2, R.raw.pikachu_sound_3, R.raw.pikachu_sound_4};
+    private Integer[] pokemonSoundResources;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLoadedSoundPool = false;
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        int pokemonIndex = settings.getInt("pref_pokemon_key", PokemonPreference.DEFAULT_ID);
+        Trainer trainer = getCurrentTrainer();
+        pokemonSoundResources = PokemonResources.Companion.getPokemonComboResources(PokemonResources.Companion.getPokemonForTrainer(trainer)[pokemonIndex]);
 
         if (savedInstanceState != null) {
             mTempGrid = (Block[][]) savedInstanceState.getSerializable(BOARD_KEY);
@@ -172,9 +180,7 @@ public abstract class GameFragment<T extends GameLoop> extends Fragment implemen
     }
 
     private void setGameSound() {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-        Trainer trainer = Trainer.Companion.getTypeByID(settings.getInt("pref_trainer_key", 0));
-
+        Trainer trainer = getCurrentTrainer();
 
         mSoundPool = new SoundPool(2, STREAM_MUSIC, 0);
         mSoundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
@@ -218,6 +224,11 @@ public abstract class GameFragment<T extends GameLoop> extends Fragment implemen
         } else {
             return mPokemonSoundIDs[3];
         }
+    }
+
+    private Trainer getCurrentTrainer() {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        return Trainer.Companion.getTypeByID(settings.getInt("pref_trainer_key", TrainerPreference.DEFAULT_ID));
     }
 
     public T getGameLoop() {

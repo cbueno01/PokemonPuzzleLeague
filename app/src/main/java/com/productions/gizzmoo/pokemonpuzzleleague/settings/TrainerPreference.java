@@ -20,7 +20,7 @@ import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources;
  */
 
 public class TrainerPreference extends DialogPreference {
-    private static final int DEFAULT_ID = 0; // Ash
+    public static final int DEFAULT_ID = 0; // Ash
     private int mTrainerID = DEFAULT_ID;
 
     private GridView mGridView;
