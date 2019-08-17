@@ -27,9 +27,13 @@
             android:parentActivityName=".MenuActivity"
             android:screenOrientation="portrait"/>
 
-        <activity
-            android:name=".puzzlegame.puzzleacademygame.PuzzleAcademyActivity"
+        <activity android:name=".puzzlegame.puzzleacademygame.PuzzleAcademySelectionActivity"
             android:parentActivityName=".MenuActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".puzzlegame.puzzleacademygame.PuzzleAcademyGameActivity"
+            android:parentActivityName=".puzzlegame.puzzleacademygame.PuzzleAcademySelectionActivity"
             android:screenOrientation="portrait"/>
 
         <activity

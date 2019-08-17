@@ -7,16 +7,33 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameFragment
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.NUM_OF_COLS
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.NUM_OF_ROWS
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
+import org.json.JSONArray
+import org.json.JSONObject
+import java.lang.Exception
 
 class PuzzleAcademyFragment : GameFragment<PuzzleAcademyGameLoop>(), PuzzleAcademyGameLoop.PuzzleAcademyGameLoopListener {
     var listener: PuzzleAcademyFragmentInterface? = null
+    var puzzleId = 0
 
     override fun gameStatusChanged(newStatus: GameStatus?) {}
 
     override fun createGameLoop(): PuzzleAcademyGameLoop {
-        val swapsLeft = getNumOfSwipes()
-        listener?.updateNumOfSwaps(swapsLeft)
-        return PuzzleAcademyGameLoop(getPuzzleBoard(), swapsLeft)
+        lateinit var grid: Array<Array<Block>>
+        val moves: Int
+
+        try {
+            val json = JSONObject(JSONUtils.getJSONStringFromFile(activity))
+            val stage = JSONUtils.getStageObjectFromKey(json, 1)
+            val level = getLevelObjectFromKey(stage, puzzleId)
+            grid = getGridFromLevel(level)
+            moves = getMovesFromLevel(level)
+            doSanityChecks(grid, moves)
+        } catch (ex: org.json.JSONException) {
+            throw Exception("There was a parsing error with the JSON file")
+        }
+
+        listener?.updateNumOfSwaps(moves)
+        return PuzzleAcademyGameLoop(grid, moves)
     }
 
     override fun numberOfBlocksMatched() {}
@@ -36,28 +53,38 @@ class PuzzleAcademyFragment : GameFragment<PuzzleAcademyGameLoop>(), PuzzleAcade
         listener?.updateGameTime(timeInMilli)
     }
 
-    private fun getPuzzleBoard(): Array<Array<Block>> {
-        val grid = Array(NUM_OF_ROWS) { arrayOfBlocks(NUM_OF_COLS) }
-
-        // TODO: Get grid scheme from device
-        grid[NUM_OF_ROWS - 1][1] = Block(2, 1, NUM_OF_ROWS - 1)
-        grid[NUM_OF_ROWS - 1][2] = Block(2, 2, NUM_OF_ROWS - 1)
-        grid[NUM_OF_ROWS - 1][4] = Block(2, 4, NUM_OF_ROWS - 1)
-        return grid
-    }
-
-    private fun getNumOfSwipes(): Int {
-        // TODO: Get num of swipes from device
-        return 1
-    }
-
-    private fun arrayOfBlocks(numOfBlocks: Int): Array<Block> {
-        return Array(numOfBlocks) { Block(0, it, numOfBlocks) }
-    }
-
     interface PuzzleAcademyFragmentInterface {
         fun updateGameTime(timeInMilli: Long)
         fun updateNumOfSwaps(swapsLeft: Int)
+    }
+
+    private fun getLevelObjectFromKey(jsonObject: JSONArray, level: Int): JSONObject =
+        jsonObject[level] as JSONObject
+
+    private fun getGridFromLevel(level: JSONObject): Array<Array<Block>> {
+        val gridJson = level.getJSONArray("grid")
+        return Array(gridJson.length())
+                { i -> Array((gridJson[i] as JSONArray).length())
+                        { j -> Block((gridJson[i] as JSONArray).getInt(j), j, i) }}
+    }
+
+    private fun getMovesFromLevel(level: JSONObject): Int =
+        level.getInt("moves")
+
+    private fun doSanityChecks(grid: Array<Array<Block>>, moves: Int) {
+        if (moves < 0) {
+            throw Exception("There are negative moves in the JSON")
+        }
+
+        if (grid.size != NUM_OF_ROWS) {
+            throw Exception("The number of rows in the JSON file need to be $NUM_OF_ROWS")
+        }
+
+        for (i in 0 until(grid.size)) {
+            if (grid[i].size != NUM_OF_COLS) {
+                throw Exception("The number of columns in row ${i + 1} in the JSON file need to be $NUM_OF_COLS")
+            }
+        }
     }
 
 }

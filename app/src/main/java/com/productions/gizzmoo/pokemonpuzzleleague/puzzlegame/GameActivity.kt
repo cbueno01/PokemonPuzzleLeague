@@ -8,11 +8,12 @@ import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.app.FragmentActivity
 import android.view.View
+import com.productions.gizzmoo.pokemonpuzzleleague.PokemonPuzzleLeagueActivity
 import com.productions.gizzmoo.pokemonpuzzleleague.music.GameMusicService
 import com.productions.gizzmoo.pokemonpuzzleleague.music.MusicService
 import com.productions.gizzmoo.pokemonpuzzleleague.music.ServiceBinder
 
-abstract class GameActivity : FragmentActivity(), ServiceConnection {
+abstract class GameActivity : PokemonPuzzleLeagueActivity(), ServiceConnection {
     protected var musicService: GameMusicService? = null
     protected var isMusicServiceBound: Boolean = false
     private var trackPosition: Int = 0
@@ -30,14 +31,6 @@ abstract class GameActivity : FragmentActivity(), ServiceConnection {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         trackPosition = savedInstanceState?.getInt(trackPositionKey) ?: 0
-    }
-
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
-            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
-        }
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {

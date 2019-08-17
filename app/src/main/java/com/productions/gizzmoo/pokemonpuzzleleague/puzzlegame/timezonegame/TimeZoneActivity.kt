@@ -20,7 +20,7 @@ class TimeZoneActivity : GameActivity(), GameDialogFragment.OnGameEndingDialogFr
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.time_zone_layout)
+        setContentView(R.layout.time_zone_game)
         timeView = findViewById(R.id.timerValue)
         speedView = findViewById(R.id.speedValue)
         gameFragment = fragmentManager.findFragmentById(R.id.puzzleBoard) as TimeZoneGameFragment
