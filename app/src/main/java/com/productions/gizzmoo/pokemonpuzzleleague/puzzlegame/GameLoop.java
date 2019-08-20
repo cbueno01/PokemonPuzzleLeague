@@ -28,7 +28,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
     private GameStatus mStatus;
     protected boolean mDidWin;
 
-    private int comboCount;
+    protected int comboCount;
 
 
     public GameLoop(Block[][] grid) {

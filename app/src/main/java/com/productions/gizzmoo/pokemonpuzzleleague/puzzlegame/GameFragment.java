@@ -197,10 +197,6 @@ public abstract class GameFragment<T extends GameLoop> extends Fragment implemen
         }
     }
 
-    @Override
-    public void boardSwipedUp() {
-    }
-
     private int getPopSoundID(int pos, int total) {
         int index = (int) (((float) pos / total) * 4);
         return mPopSoundIDs[index];

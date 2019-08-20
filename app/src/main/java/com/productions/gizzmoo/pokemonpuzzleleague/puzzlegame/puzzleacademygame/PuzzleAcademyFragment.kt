@@ -7,13 +7,16 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameFragment
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.NUM_OF_COLS
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.NUM_OF_ROWS
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
+import kotlinx.android.synthetic.main.pokemon_preference.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.Exception
+import java.util.*
 
 class PuzzleAcademyFragment : GameFragment<PuzzleAcademyGameLoop>(), PuzzleAcademyGameLoop.PuzzleAcademyGameLoopListener {
     var listener: PuzzleAcademyFragmentInterface? = null
     var puzzleId = 0
+    var boardHistory: Stack<Array<Array<Int>>> = Stack()
 
     override fun gameStatusChanged(newStatus: GameStatus?) {}
 
@@ -44,6 +47,7 @@ class PuzzleAcademyFragment : GameFragment<PuzzleAcademyGameLoop>(), PuzzleAcade
     }
 
     override fun switchBlock(switcherLeftBlock: Point) {
+        addGridToBoardHistory(gameLoop.gameGrid)
         super.switchBlock(switcherLeftBlock)
         gameLoop.numOfSwapsLeft--
         listener?.updateNumOfSwaps(gameLoop.numOfSwapsLeft)
@@ -53,9 +57,20 @@ class PuzzleAcademyFragment : GameFragment<PuzzleAcademyGameLoop>(), PuzzleAcade
         listener?.updateGameTime(timeInMilli)
     }
 
-    interface PuzzleAcademyFragmentInterface {
-        fun updateGameTime(timeInMilli: Long)
-        fun updateNumOfSwaps(swapsLeft: Int)
+    override fun boardSwipedUp() {
+        if (boardHistory.empty()) {
+            return
+        }
+
+        val currentHistoryGrid = boardHistory.pop()
+        val newGrid: Array<Array<Block>> = Array(currentHistoryGrid.size)
+        {i -> Array(currentHistoryGrid[i].size)
+            {j -> Block(currentHistoryGrid[i][j], j, i) }}
+
+        mGameLoop.gameGrid = newGrid
+        mBoardView.setGrid(mGameLoop.gameGrid, mGameLoop.blockSwitcher)
+        gameLoop.numOfSwapsLeft++
+        listener?.updateNumOfSwaps(gameLoop.numOfSwapsLeft)
     }
 
     private fun getLevelObjectFromKey(jsonObject: JSONArray, level: Int): JSONObject =
@@ -87,4 +102,16 @@ class PuzzleAcademyFragment : GameFragment<PuzzleAcademyGameLoop>(), PuzzleAcade
         }
     }
 
+    private fun addGridToBoardHistory(currentGrid: Array<Array<Block>>) {
+        val newGrid = Array(currentGrid.size)
+            { i -> Array(currentGrid[i].size)
+                { j -> currentGrid[i][j].blockType.value }}
+
+        boardHistory.push(newGrid)
+    }
+
+    interface PuzzleAcademyFragmentInterface {
+        fun updateGameTime(timeInMilli: Long)
+        fun updateNumOfSwaps(swapsLeft: Int)
+    }
 }
