@@ -75,6 +75,10 @@ public abstract class GameFragment<T extends GameLoop> extends Fragment implemen
         setGameSound();
     }
 
+    public void refreshBoardFromInstantState() {
+        mGameLoop.setGameProperties(mTempGrid, mTempSwitcher, mGameStartTime);
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -84,7 +88,7 @@ public abstract class GameFragment<T extends GameLoop> extends Fragment implemen
         mGameLoop.setGameLoopListener(this);
 
         if (mTempSwitcher != null || mTempGrid != null) {
-            mGameLoop.setGameProperties(mTempGrid, mTempSwitcher, mGameStartTime);
+            refreshBoardFromInstantState();
             mTempGrid = null;
             mTempSwitcher = null;
         }

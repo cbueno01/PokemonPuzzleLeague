@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import com.productions.gizzmoo.pokemonpuzzleleague.R
 
-class PuzzleAcademySelectionAdapter(private val context: Context, private val count: Int) : BaseAdapter() {
+class PuzzleAcademySelectionAdapter(private val context: Context, private val fileManager: FileManager) : BaseAdapter() {
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         return PuzzleAcademyGridViewItem(context).apply {
             text = (position + 1).toString()
@@ -32,7 +32,7 @@ class PuzzleAcademySelectionAdapter(private val context: Context, private val co
     }
 
     override fun getCount(): Int {
-        return count
+        return fileManager.getNumOfLevels()
     }
 
     companion object {
