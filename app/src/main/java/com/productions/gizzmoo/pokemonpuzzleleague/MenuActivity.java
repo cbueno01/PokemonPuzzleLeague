@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame.PuzzleAcademyActivity;
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame.PuzzleAcademySelectionActivity;
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame.TimeZoneActivity;
 import com.productions.gizzmoo.pokemonpuzzleleague.settings.SettingsActivity;
 
@@ -46,7 +46,7 @@ public class MenuActivity extends AppCompatActivity {
         mPuzzleAcademy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MenuActivity.this, PuzzleAcademyActivity.class);
+                Intent intent = new Intent(MenuActivity.this, PuzzleAcademySelectionActivity.class);
                 startActivity(intent);
             }
         });

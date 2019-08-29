@@ -40,6 +40,14 @@ class PuzzleAcademyGameLoop(grid: Array<Array<Block>>, var numOfSwapsLeft: Int) 
         changeGameStatus(GameStatus.Stopped)
     }
 
+    fun setGameGrid(newGrid: Array<Array<Block>>) {
+        lock.lock()
+        mGrid = newGrid
+        comboCount = 0
+        mBlockMatch.clear()
+        lock.unlock()
+    }
+
     override fun postGameMechanicHook() {}
 
     interface PuzzleAcademyGameLoopListener : GameLoopListener {

@@ -60,7 +60,7 @@ public class GameDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_game_ending_dialog, container, false);
+        View view = inflater.inflate(R.layout.game_fragment_ending_dialog, container, false);
 
         return view;
     }
