@@ -2,10 +2,10 @@ package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame
 
 import android.os.Bundle
 import android.widget.TextView
+import com.productions.gizzmoo.pokemonpuzzleleague.R
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameActivity
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameDialogFragment
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
-import com.productions.gizzmoo.pokemonpuzzleleague.R
 import java.util.Locale
 
 /**
@@ -40,7 +40,7 @@ class TimeZoneActivity : GameActivity(), GameDialogFragment.OnGameEndingDialogFr
         speedView.text = String.format(Locale.US, "%02d", gameSpeed)
     }
 
-    override fun onGameEndingDialogResponse() {
+    override fun onGameEndingDialogResponse(didWin: Boolean) {
         finish()
     }
 

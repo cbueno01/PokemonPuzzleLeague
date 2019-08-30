@@ -34,7 +34,7 @@ public class GameDialogFragment extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (mListener != null) {
-                    mListener.onGameEndingDialogResponse();
+                    mListener.onGameEndingDialogResponse(mDidWin);
                 }
             }
         });
@@ -79,12 +79,12 @@ public class GameDialogFragment extends DialogFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener.onGameEndingDialogResponse();
+        mListener.onGameEndingDialogResponse(mDidWin);
         mListener = null;
     }
 
 
     public interface OnGameEndingDialogFragmentReturnListener {
-        void onGameEndingDialogResponse();
+        void onGameEndingDialogResponse(boolean didWin);
     }
 }

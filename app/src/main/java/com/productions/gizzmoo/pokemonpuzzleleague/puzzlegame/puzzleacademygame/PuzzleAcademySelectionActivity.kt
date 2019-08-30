@@ -6,12 +6,18 @@ import com.productions.gizzmoo.pokemonpuzzleleague.PokemonPuzzleLeagueActivity
 import com.productions.gizzmoo.pokemonpuzzleleague.R
 
 class PuzzleAcademySelectionActivity : PokemonPuzzleLeagueActivity() {
+    private lateinit var puzzleAdapter: PuzzleAcademySelectionAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.puzzle_academy_selection)
         val gridView = findViewById<GridView>(R.id.gridView)
-        val fileManager = FileManager(this, 1)
-        gridView.adapter = PuzzleAcademySelectionAdapter(this, fileManager)
+        puzzleAdapter = PuzzleAcademySelectionAdapter(this)
+        gridView.adapter = puzzleAdapter
+    }
+
+    override fun onStop() {
+        super.onStop()
+        puzzleAdapter.notifyDataSetChanged()
     }
 }

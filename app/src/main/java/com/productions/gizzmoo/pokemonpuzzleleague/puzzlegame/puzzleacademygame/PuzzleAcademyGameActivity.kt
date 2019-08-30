@@ -12,7 +12,6 @@ class PuzzleAcademyGameActivity : GameActivity(), PuzzleAcademyFragment.PuzzleAc
     private lateinit var timeView: TextView
     private lateinit var swapsView: TextView
     private lateinit var gameFragment: PuzzleAcademyFragment
-    private lateinit var fileManager: FileManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.puzzle_academy_game)
@@ -21,7 +20,6 @@ class PuzzleAcademyGameActivity : GameActivity(), PuzzleAcademyFragment.PuzzleAc
         gameFragment = fragmentManager.findFragmentById(R.id.puzzleBoard) as PuzzleAcademyFragment
         gameFragment.listener = this
         gameFragment.puzzleId = getPuzzleID()
-        fileManager = FileManager(this, 1, getPuzzleID())
     }
 
     override fun updateGameTime(timeInMilli: Long) {
@@ -32,9 +30,9 @@ class PuzzleAcademyGameActivity : GameActivity(), PuzzleAcademyFragment.PuzzleAc
         swapsView.text = swapsLeft.toString()
     }
 
-    override fun onGameEndingDialogResponse() {
+    override fun onGameEndingDialogResponse(didWin: Boolean) {
         gameFragment.gameEnded = true
-        fileManager.clearCurrentJSONObject()
+        FileManager.getJSONReaderWriter(this, 1).clearCurrentJSONObject(this, getPuzzleID(), didWin)
         finish()
     }
 
