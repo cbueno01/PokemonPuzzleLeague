@@ -115,7 +115,7 @@ class  PokemonPreference(context: Context, attrs: AttributeSet, defStyleAttr: In
     }
 
     private fun updateResourcesForNewTrainer() {
-        mPokemonArr = PokemonResources.Companion.getPokemonForTrainer(mCurrentTrainer)
+        mPokemonArr = PokemonResources.getPokemonForTrainer(mCurrentTrainer)
 
         mBitmaps = Array(mPokemonArr.size, {i ->
             BitmapFactory.decodeResource(mContext.resources, PokemonResources.getPokemonPortrait(mPokemonArr[i]))

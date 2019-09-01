@@ -59,7 +59,7 @@ public abstract class GameFragment<T extends GameLoop> extends Fragment implemen
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int pokemonIndex = settings.getInt("pref_pokemon_key", PokemonPreference.DEFAULT_ID);
         Trainer trainer = getCurrentTrainer();
-        pokemonSoundResources = PokemonResources.Companion.getPokemonComboResources(PokemonResources.Companion.getPokemonForTrainer(trainer)[pokemonIndex]);
+        pokemonSoundResources = PokemonResources.INSTANCE.getPokemonComboResources(PokemonResources.INSTANCE.getPokemonForTrainer(trainer)[pokemonIndex]);
 
         if (savedInstanceState != null) {
             mTempGrid = (Block[][]) savedInstanceState.getSerializable(BOARD_KEY);

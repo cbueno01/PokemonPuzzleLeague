@@ -15,9 +15,12 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.productions.gizzmoo.pokemonpuzzleleague.Pokemon;
+import com.productions.gizzmoo.pokemonpuzzleleague.PokemonResources;
 import com.productions.gizzmoo.pokemonpuzzleleague.R;
 import com.productions.gizzmoo.pokemonpuzzleleague.Trainer;
 import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources;
+import com.productions.gizzmoo.pokemonpuzzleleague.settings.PokemonPreference;
 import com.productions.gizzmoo.pokemonpuzzleleague.settings.TrainerPreference;
 
 import static android.view.MotionEvent.INVALID_POINTER_ID;
@@ -52,6 +55,7 @@ public class PuzzleBoardView extends View {
     private Rect mBlockRectScale = new Rect();
     private Rect mBoardRect = new Rect();
     private Bitmap mTrainerBitmap;
+    private Bitmap mPokemonBitmap;
     private int mNumOfTotalFrames;
 
     private int mActivePointerId = INVALID_POINTER_ID;
@@ -116,9 +120,15 @@ public class PuzzleBoardView extends View {
 
         BoardResources.createImageBitmaps(mContext);
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext());
+
         Trainer currentTrainer = Trainer.Companion.getTypeByID(settings.getInt("pref_trainer_key", TrainerPreference.DEFAULT_ID));
         int trainerResource = TrainerResources.Companion.getTrainerFullBody(currentTrainer);
         mTrainerBitmap = BitmapFactory.decodeResource(mContext.getResources(), trainerResource);
+
+        int pokemonIndex = settings.getInt("pref_pokemon_key", PokemonPreference.DEFAULT_ID);
+        Pokemon currentPokemon = PokemonResources.INSTANCE.getPokemonForTrainer(currentTrainer)[pokemonIndex];
+//        int pokemonResource = PokemonResources.
+//        mPokemonBitmap = BitmapFactory.decodeResource(mContext.getResources(), )
     }
 
     public void setGrid(Block[][] grid) {
