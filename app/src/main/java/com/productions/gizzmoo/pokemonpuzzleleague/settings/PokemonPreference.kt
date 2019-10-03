@@ -13,12 +13,11 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.AdapterView
 import android.widget.GridView
-import android.widget.Toast
 import com.productions.gizzmoo.pokemonpuzzleleague.ImageAdapter
 import com.productions.gizzmoo.pokemonpuzzleleague.Pokemon
+import com.productions.gizzmoo.pokemonpuzzleleague.PokemonResources
 import com.productions.gizzmoo.pokemonpuzzleleague.R
 import com.productions.gizzmoo.pokemonpuzzleleague.Trainer
-import com.productions.gizzmoo.pokemonpuzzleleague.PokemonResources
 
 class  PokemonPreference(context: Context, attrs: AttributeSet, defStyleAttr: Int) : DialogPreference(context, attrs, defStyleAttr), SharedPreferences.OnSharedPreferenceChangeListener {
     companion object {
@@ -117,16 +116,16 @@ class  PokemonPreference(context: Context, attrs: AttributeSet, defStyleAttr: In
     private fun updateResourcesForNewTrainer() {
         mPokemonArr = PokemonResources.getPokemonForTrainer(mCurrentTrainer)
 
-        mBitmaps = Array(mPokemonArr.size, {i ->
-            BitmapFactory.decodeResource(mContext.resources, PokemonResources.getPokemonPortrait(mPokemonArr[i]))
-        })
+        mBitmaps = Array(mPokemonArr.size) {
+            i -> BitmapFactory.decodeResource(mContext.resources, PokemonResources.getPokemonPortrait(mPokemonArr[i]))
+        }
 
-        mPokemonNames = Array(mPokemonArr.size, {i ->
-            PokemonResources.getPokemonName(mPokemonArr[i], mContext)
-        })
+        mPokemonNames = Array(mPokemonArr.size) {
+            i -> PokemonResources.getPokemonName(mPokemonArr[i], mContext)
+        }
 
-        mPokemonSounds = Array(mPokemonArr.size, {i ->
-            mSoundPool?.load(mContext, PokemonResources.getPokemonSelectionSound(mPokemonArr[i]), 1)!!
-        })
+        mPokemonSounds = Array(mPokemonArr.size) {
+            i -> mSoundPool?.load(mContext, PokemonResources.getPokemonSelectionSound(mPokemonArr[i]), 1)!!
+        }
     }
 }

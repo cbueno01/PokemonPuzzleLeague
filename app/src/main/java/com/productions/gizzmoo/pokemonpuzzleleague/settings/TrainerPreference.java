@@ -107,13 +107,13 @@ public class TrainerPreference extends DialogPreference {
     }
 
     private void init() {
-        int[] imageResources = TrainerResources.Companion.getAllTrainerPortraits();
+        int[] imageResources = TrainerResources.INSTANCE.getAllTrainerPortraits();
         mBitmaps = new Bitmap[imageResources.length];
 
         for (int i = 0; i < imageResources.length; i++) {
             mBitmaps[i] = BitmapFactory.decodeResource(mContext.getResources(), imageResources[i]);
         }
 
-        mTrainerNames = TrainerResources.Companion.getTrainerNames(mContext);
+        mTrainerNames = TrainerResources.INSTANCE.getTrainerNames(mContext);
     }
 }

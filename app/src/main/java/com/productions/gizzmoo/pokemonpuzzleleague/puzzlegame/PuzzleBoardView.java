@@ -1,29 +1,16 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.preference.PreferenceManager;
-import android.support.v4.view.MotionEventCompat;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.View;
+import android.content.*;
+import android.graphics.*;
+import android.preference.*;
+import android.support.v4.view.*;
+import android.util.*;
+import android.view.*;
 
-import com.productions.gizzmoo.pokemonpuzzleleague.Pokemon;
-import com.productions.gizzmoo.pokemonpuzzleleague.PokemonResources;
-import com.productions.gizzmoo.pokemonpuzzleleague.R;
-import com.productions.gizzmoo.pokemonpuzzleleague.Trainer;
-import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources;
-import com.productions.gizzmoo.pokemonpuzzleleague.settings.PokemonPreference;
-import com.productions.gizzmoo.pokemonpuzzleleague.settings.TrainerPreference;
+import com.productions.gizzmoo.pokemonpuzzleleague.*;
+import com.productions.gizzmoo.pokemonpuzzleleague.settings.*;
 
-import static android.view.MotionEvent.INVALID_POINTER_ID;
+import static android.view.MotionEvent.*;
 
 
 /**
@@ -54,6 +41,7 @@ public class PuzzleBoardView extends View {
     private Rect mBlockRect = new Rect();
     private Rect mBlockRectScale = new Rect();
     private Rect mBoardRect = new Rect();
+    private Rect mPokemonBackgroundRect = new Rect();
     private Bitmap mTrainerBitmap;
     private Bitmap mPokemonBitmap;
     private int mNumOfTotalFrames;
@@ -122,13 +110,16 @@ public class PuzzleBoardView extends View {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext.getApplicationContext());
 
         Trainer currentTrainer = Trainer.Companion.getTypeByID(settings.getInt("pref_trainer_key", TrainerPreference.DEFAULT_ID));
-        int trainerResource = TrainerResources.Companion.getTrainerFullBody(currentTrainer);
-        mTrainerBitmap = BitmapFactory.decodeResource(mContext.getResources(), trainerResource);
-
         int pokemonIndex = settings.getInt("pref_pokemon_key", PokemonPreference.DEFAULT_ID);
         Pokemon currentPokemon = PokemonResources.INSTANCE.getPokemonForTrainer(currentTrainer)[pokemonIndex];
-//        int pokemonResource = PokemonResources.
-//        mPokemonBitmap = BitmapFactory.decodeResource(mContext.getResources(), )
+
+        int trainerResource = TrainerResources.INSTANCE.getTrainerFullBody(currentTrainer, PokemonResources.INSTANCE.isEvolvedGary(currentPokemon));
+        int pokemonResource = PokemonResources.INSTANCE.getPokemonBackground(currentTrainer, currentPokemon);
+
+        mTrainerBitmap = BitmapFactory.decodeResource(mContext.getResources(), trainerResource);
+        if (currentTrainer != Trainer.MEWTWO) {
+            mPokemonBitmap = BitmapFactory.decodeResource(mContext.getResources(), pokemonResource);
+        }
     }
 
     public void setGrid(Block[][] grid) {
@@ -222,6 +213,11 @@ public class PuzzleBoardView extends View {
         mWidthOffset += 8;
 
         mBoardRect.set(mWidthOffset, mHeightOffset, mBoardWidth + mWidthOffset, mBoardHeight + mHeightOffset);
+
+        if (mPokemonBitmap != null) {
+            double heightRatio = mPokemonBitmap.getHeight() / (double)mTrainerBitmap.getHeight();
+            mPokemonBackgroundRect.set(mWidthOffset, mHeightOffset, mBoardWidth + mWidthOffset, (int)(mBoardHeight * heightRatio) + mHeightOffset);
+        }
     }
 
     @Override
@@ -232,6 +228,9 @@ public class PuzzleBoardView extends View {
         canvas.drawRect(mBoardRect, mBoardPaint);
         if (mTrainerBitmap != null) {
             canvas.drawBitmap(mTrainerBitmap, null, mBoardRect, null);
+        }
+        if (mPokemonBitmap != null) {
+            canvas.drawBitmap(mPokemonBitmap, null, mPokemonBackgroundRect, null);
         }
 
         if (mShouldAnimatingUp) {

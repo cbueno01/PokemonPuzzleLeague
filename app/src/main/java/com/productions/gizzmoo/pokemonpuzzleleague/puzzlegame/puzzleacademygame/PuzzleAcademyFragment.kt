@@ -32,10 +32,12 @@ class PuzzleAcademyFragment : GameFragment<PuzzleAcademyGameLoop>(), PuzzleAcade
     }
 
     override fun switchBlock(switcherLeftBlock: Point) {
-        addGridToBoardHistory(gameLoop.gameGrid)
-        super.switchBlock(switcherLeftBlock)
-        gameLoop.numOfSwapsLeft--
-        listener?.updateNumOfSwaps(gameLoop.numOfSwapsLeft)
+        if (gameLoop.numOfSwapsLeft > 0) {
+            addGridToBoardHistory(gameLoop.gameGrid)
+            super.switchBlock(switcherLeftBlock)
+            gameLoop.numOfSwapsLeft--
+            listener?.updateNumOfSwaps(gameLoop.numOfSwapsLeft)
+        }
     }
 
     override fun updateGameTime(timeInMilli: Long) {
@@ -43,15 +45,13 @@ class PuzzleAcademyFragment : GameFragment<PuzzleAcademyGameLoop>(), PuzzleAcade
     }
 
     override fun boardSwipedUp() {
-        if (boardHistory.empty()) {
-            return
+        if (!boardHistory.empty()) {
+            val currentHistoryGrid = boardHistory.pop()
+            mGameLoop.gameGrid = intGridToBlockGrid(currentHistoryGrid)
+            mBoardView.setGrid(mGameLoop.gameGrid, mGameLoop.blockSwitcher)
+            gameLoop.numOfSwapsLeft++
+            listener?.updateNumOfSwaps(gameLoop.numOfSwapsLeft)
         }
-
-        val currentHistoryGrid = boardHistory.pop()
-        mGameLoop.gameGrid = intGridToBlockGrid(currentHistoryGrid)
-        mBoardView.setGrid(mGameLoop.gameGrid, mGameLoop.blockSwitcher)
-        gameLoop.numOfSwapsLeft++
-        listener?.updateNumOfSwaps(gameLoop.numOfSwapsLeft)
     }
 
     override fun onStop() {

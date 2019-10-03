@@ -121,20 +121,25 @@ object PokemonResources {
     )
 
     private val pokemonTrainerBackground = hashMapOf(
-            Pokemon.ABRA to R.drawable.abra_portrait, Pokemon.ALAKAZAM to R.drawable.alakazam_portrait, Pokemon.ARBOK to R.drawable.arbok_portrait, Pokemon.ARCANINE to R.drawable.arcanine_portrait,
-            Pokemon.BULBASAUR to R.drawable.bulbasaur_portrait, Pokemon.BULBASAUR_CLONE to R.drawable.bulbasaur_clone_portrait, Pokemon.CHARMELEON to R.drawable.charmeleon_portrait, Pokemon.CLOYSTER to R.drawable.cloyster_portrait,
-            Pokemon.DEWGONG to R.drawable.dewgong_portrait, Pokemon.GEODUDE to R.drawable.geodude_portrait, Pokemon.GLOOM to R.drawable.gloom_portrait, Pokemon.GOLBAT to R.drawable.golbat_portrait,
-            Pokemon.GROWLITHE to R.drawable.growlithe_portrait, Pokemon.HAPPY to R.drawable.happy_portrait, Pokemon.HITMONCHAN to R.drawable.hitmonchan_portrait, Pokemon.HORSEA to R.drawable.horsea_portrait,
-            Pokemon.HYPNO to R.drawable.hypno_portrait, Pokemon.JOLTEON to R.drawable.jolteon_portrait, Pokemon.KINGLER to R.drawable.kingler_portrait, Pokemon.KRABBY to R.drawable.krabby_portrait,
-            Pokemon.MAGMAR to R.drawable.magmar_portrait, Pokemon.MAGNETON to R.drawable.magneton_portrait, Pokemon.MARILL to R.drawable.marill_portrait, Pokemon.NIDOKING to R.drawable.nidoking_portrait,
-            Pokemon.NIDOQUEEN to R.drawable.nidoqueen_portrait, Pokemon.NIDORAN to R.drawable.nidoran_portrait, Pokemon.ONIX to R.drawable.onix_portrait, Pokemon.PERSIAN to R.drawable.persian_portrait,
-            Pokemon.PIKACHU to R.drawable.pikachu_portrait, Pokemon.PIKACHU_CLONE to R.drawable.pikachu_clone_portrait, Pokemon.POLIWHIRL to R.drawable.poliwhirl_portrait, Pokemon.PRIMEAPE to R.drawable.primeape_portrait,
-            Pokemon.PSYDUCK to R.drawable.psyduck_portrait, Pokemon.RAICHU to R.drawable.raichu_portrait, Pokemon.SANDSLASH to R.drawable.sandslash_portrait, Pokemon.SCYTHER to R.drawable.scyther_portrait,
-            Pokemon.SPARKY to R.drawable.sparky_portrait, Pokemon.SQUIRTLE to R.drawable.squirtle_portrait, Pokemon.SQUIRTLE_CLONE to R.drawable.squirtle_clone_portrait, Pokemon.STARYU to R.drawable.staryu_portrait,
-            Pokemon.TANGELA to R.drawable.tangela_portrait, Pokemon.VENOMOTH to R.drawable.venomoth_portrait, Pokemon.VENONAT to R.drawable.venonat_portrait, Pokemon.VOLTORB to R.drawable.voltorb_portrait,
-            Pokemon.VULPIX to R.drawable.vulpix_portrait, Pokemon.WEEPINBELL to R.drawable.weepinbell_portrait, Pokemon.WEEZING to R.drawable.weezing_portrait, Pokemon.ZIPPO to R.drawable.zippo_portrait,
-            Pokemon.ZUBAT to R.drawable.zubat_portrait
+            Trainer.ASH to hashMapOf(Pokemon.PIKACHU to R.drawable.ash_pikachu, Pokemon.SQUIRTLE to R.drawable.ash_squirtle, Pokemon.BULBASAUR to R.drawable.ash_bulbasaur),
+            Trainer.BLAINE to hashMapOf(Pokemon.ARCANINE to R.drawable.blaine_arcanine, Pokemon.CHARMELEON to R.drawable.blaine_charmeleon, Pokemon.MAGMAR to R.drawable.blaine_magmar),
+            Trainer.BROCK to hashMapOf(Pokemon.GEODUDE to R.drawable.brock_geodude, Pokemon.VULPIX to R.drawable.brock_vulpix, Pokemon.ZUBAT to R.drawable.brock_zubat),
+            Trainer.BRUNO to hashMapOf(Pokemon.ONIX to R.drawable.bruno_onix, Pokemon.HITMONCHAN to R.drawable.bruno_hitmonchan, Pokemon.PRIMEAPE to R.drawable.bruno_primeape),
+            Trainer.ERIKA to hashMapOf(Pokemon.TANGELA to R.drawable.erika_tangela, Pokemon.WEEPINBELL to R.drawable.erika_weepinbell, Pokemon.GLOOM to R.drawable.erika_gloom),
+            Trainer.GARY to hashMapOf(Pokemon.NIDORAN to R.drawable.gary_nidoran, Pokemon.GROWLITHE to R.drawable.gary_growlithe, Pokemon.KRABBY to R.drawable.gary_krabby, Pokemon.NIDOQUEEN to R.drawable.gary_evolved_nidoqueen, Pokemon.ARCANINE to R.drawable.gary_evolved_arcanine, Pokemon.KINGLER to R.drawable.gary_evolved_kingler),
+            Trainer.GIOVANNI to hashMapOf(Pokemon.PERSIAN to R.drawable.giovanni_persian, Pokemon.SANDSLASH to R.drawable.giovanni_sandslash, Pokemon.NIDOKING to R.drawable.giovanni_nidoking),
+            Trainer.KOGA to hashMapOf(Pokemon.VENOMOTH to R.drawable.koga_venomoth, Pokemon.VOLTORB to R.drawable.koga_voltorb, Pokemon.GOLBAT to R.drawable.koga_golbat),
+            Trainer.LORELEI to hashMapOf(Pokemon.CLOYSTER to R.drawable.lorelei_cloyster, Pokemon.POLIWHIRL to R.drawable.lorelei_poliwhirl, Pokemon.DEWGONG to R.drawable.lorelei_dewgong),
+            Trainer.LT_SURGE to hashMapOf(Pokemon.RAICHU to R.drawable.lt_surge_raichu, Pokemon.JOLTEON to R.drawable.lt_surge_jolteon, Pokemon.MAGNETON to R.drawable.lt_surge_magneton),
+            Trainer.MEWTWO to hashMapOf(),
+            Trainer.MISTY to hashMapOf(Pokemon.HORSEA to R.drawable.misty_horsea, Pokemon.PSYDUCK to R.drawable.misty_psyduck, Pokemon.STARYU to R.drawable.misty_staryu),
+            Trainer.RITCHIE to hashMapOf(Pokemon.SPARKY to R.drawable.ritchie_zappy, Pokemon.ZIPPO to R.drawable.ritchie_zippo, Pokemon.HAPPY to R.drawable.ritchie_happy),
+            Trainer.SABRINA to hashMapOf(Pokemon.ABRA to R.drawable.sabrina_abra, Pokemon.HYPNO to R.drawable.sabrina_hypno, Pokemon.ALAKAZAM to R.drawable.sabrina_alakazam),
+            Trainer.TEAM_ROCKET to hashMapOf(Pokemon.WEEZING to R.drawable.team_rocket_weezing, Pokemon.ARBOK to R.drawable.team_rocket_arbok, Pokemon.GOLBAT to R.drawable.team_rocket_golbat),
+            Trainer.TRACY to hashMapOf(Pokemon.MARILL to R.drawable.tracey_marill, Pokemon.VENONAT to R.drawable.tracey_venonat, Pokemon.SCYTHER to R.drawable.tracey_scyther)
     )
+
+
 
     private val garyEvolvedPokemon = arrayListOf(Pokemon.NIDOQUEEN, Pokemon.ARCANINE, Pokemon.KINGLER)
 
@@ -152,6 +157,9 @@ object PokemonResources {
 
     fun getPokemonSelectionSound(pokemon: Pokemon): Int =
        pokemonSelectionSound[pokemon].let { it } ?: pokemonSelectionSound[Pokemon.PIKACHU]!!
+
+    fun getPokemonBackground(trainer: Trainer, pokemon: Pokemon): Int =
+        pokemonTrainerBackground[trainer]?.let { i -> i[pokemon]?.let { it } ?: -1 } ?: -1
 
     fun isEvolvedGary(pokemon: Pokemon): Boolean =
         garyEvolvedPokemon.contains(pokemon)

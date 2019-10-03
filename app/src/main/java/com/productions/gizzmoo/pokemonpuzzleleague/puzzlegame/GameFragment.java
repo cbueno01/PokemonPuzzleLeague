@@ -1,25 +1,18 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame;
 
-import android.app.Fragment;
-import android.content.SharedPreferences;
-import android.graphics.Point;
-import android.media.SoundPool;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.app.*;
+import android.content.*;
+import android.graphics.*;
+import android.media.*;
+import android.os.*;
+import android.preference.*;
+import android.support.annotation.*;
+import android.view.*;
 
-import com.productions.gizzmoo.pokemonpuzzleleague.Pokemon;
-import com.productions.gizzmoo.pokemonpuzzleleague.PokemonResources;
-import com.productions.gizzmoo.pokemonpuzzleleague.R;
-import com.productions.gizzmoo.pokemonpuzzleleague.Trainer;
-import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources;
-import com.productions.gizzmoo.pokemonpuzzleleague.settings.PokemonPreference;
-import com.productions.gizzmoo.pokemonpuzzleleague.settings.TrainerPreference;
+import com.productions.gizzmoo.pokemonpuzzleleague.*;
+import com.productions.gizzmoo.pokemonpuzzleleague.settings.*;
 
-import static android.media.AudioManager.STREAM_MUSIC;
+import static android.media.AudioManager.*;
 
 public abstract class GameFragment<T extends GameLoop> extends Fragment implements IBoard, GameLoop.GameLoopListener {
 
@@ -194,7 +187,7 @@ public abstract class GameFragment<T extends GameLoop> extends Fragment implemen
             }
         });
 
-        mTrainerSoundID = mSoundPool.load(getActivity().getApplicationContext(), TrainerResources.Companion.getTrainerComboSound(trainer), 1);
+        mTrainerSoundID = mSoundPool.load(getActivity().getApplicationContext(), TrainerResources.INSTANCE.getTrainerComboSound(trainer), 1);
         mSwitchSoundID = mSoundPool.load(getActivity().getApplicationContext(), R.raw.switch_sound, 1);
         mMoveSoundID = mSoundPool.load(getActivity().getApplicationContext(), R.raw.move_sound, 1);
 
