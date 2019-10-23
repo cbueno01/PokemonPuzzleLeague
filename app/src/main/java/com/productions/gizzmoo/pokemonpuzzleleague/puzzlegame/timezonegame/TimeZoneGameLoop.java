@@ -16,12 +16,14 @@ public class TimeZoneGameLoop extends GameLoop {
     private int mBlockMatchAnimating;
     private int mFramesInWarning;
     private Random rand;
+    private int numOfFramesToStall;
 
     TimeZoneGameLoop(Block[][] grid, int numOfLines, int gameSpeedLevel) {
         super(grid);
         mNumOfLinesLeft = numOfLines;
         mGameSpeedLevel = gameSpeedLevel;
         rand = new Random();
+        numOfFramesToStall = 0;
     }
 
     @Override
@@ -32,27 +34,47 @@ public class TimeZoneGameLoop extends GameLoop {
 
     @Override
     protected void postGameMechanicHook() {
-        if (mBlockMatchAnimating == 0) {
+        if (canAnimateUp()) {
+            if (mListener != null) {
+                ((TimeZoneGameLoopListener) mListener).startAnimatingUp();
+            }
+
             if (mCurrentFrameCount >= getNumOfFramesForCurrentLevel()) {
                 addNewRow();
             } else {
                 mCurrentFrameCount++;
             }
+
+            numOfFramesToStall = 0;
+        } else {
+            numOfFramesToStall--;
         }
     }
 
     @Override
     protected void notifyBlocksMatched() {
         mBlockMatchAnimating += mBlockMatch.size();
-        super.notifyBlocksMatched();
+
+        if (comboCount > 0) {
+            numOfFramesToStall = MAX_FPS * 4;
+        } else if (mBlockMatch.size() >= 5) {
+            numOfFramesToStall = (int)(MAX_FPS * 1.5);
+        } else if (mBlockMatch.size() == 4) {
+            numOfFramesToStall = MAX_FPS;
+        }
+
+        if (mListener != null) {
+            ((TimeZoneGameLoopListener) mListener).stopAnimatingUp();
+        }
     }
 
     @Override
     protected void onProgressUpdate(Void... values) {
         super.onProgressUpdate(values);
+        int numOfDelayedSeconds = (int) Math.ceil(((float)numOfFramesToStall / MAX_FPS));
 
         if (mListener != null) {
-            ((TimeZoneGameLoopListener) mListener).updateGameTimeAndSpeed(mElapsedTime, mGameSpeedLevel);
+            ((TimeZoneGameLoopListener) mListener).updateGameTimeAndSpeed(mElapsedTime, mGameSpeedLevel, numOfDelayedSeconds);
         }
     }
 
@@ -169,8 +191,8 @@ public class TimeZoneGameLoop extends GameLoop {
         return mNewRow;
     }
 
-    public boolean isABlockAnimating() {
-        return mBlockMatchAnimating > 0;
+    public boolean canAnimateUp() {
+        return mBlockMatchAnimating <= 0 && numOfFramesToStall <= 0;
     }
 
     public int getNumOfAnimatingBlocks() {
@@ -199,7 +221,8 @@ public class TimeZoneGameLoop extends GameLoop {
 
     public interface TimeZoneGameLoopListener extends GameLoopListener {
         void newBlockWasAdded(int numOfLinesLeft);
-
-        void updateGameTimeAndSpeed(long timeInMilli, int gameSpeed);
+        void updateGameTimeAndSpeed(long timeInMilli, int gameSpeed, int delayInSeconds);
+        void startAnimatingUp();
+        void stopAnimatingUp();
     }
 }

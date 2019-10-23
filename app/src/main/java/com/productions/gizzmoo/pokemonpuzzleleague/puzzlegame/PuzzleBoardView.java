@@ -242,7 +242,7 @@ public class PuzzleBoardView extends View {
         // Create grid
         if (mBlocks != null) {
             for (int i = mBlocks.length - 1; i >= 0; i--) {
-                for (int j = mBlocks[i].length - 1; j >= 0; j--) {
+                for (int j = 0; j < mBlocks[i].length; j++) {
                     int x = (j * mBlockSize) + mWidthOffset;
                     int y = (i * mBlockSize) + mHeightOffset;
 
@@ -257,21 +257,21 @@ public class PuzzleBoardView extends View {
 
                             if (mBlocks[i][j].matchInvertedAnimationCount > 0) {
                                 drawMatchingBlock(canvas, mBlocks[i][j], mBlockRect, true, 0);
-                                mBlocks[i][j].matchInvertedAnimationCount--;
+                                mBlocks[i][j].decrementInvertedAnimationFrame();
                             } else if (mBlocks[i][j].delayMatchAnimationCount > 0) {
                                 drawMatchingBlock(canvas, mBlocks[i][j], mBlockRect, false, 0);
-                                mBlocks[i][j].delayMatchAnimationCount--;
+                                mBlocks[i][j].decrementDelayedMatchAnimationFrame();
                             } else if (mBlocks[i][j].matchPopAnimationCount < ANIMATION_MATCH_POP_FRAMES_NEEDED) {
                                 drawMatchingBlock(canvas, mBlocks[i][j], mBlockRect, false, mBlocks[i][j].matchPopAnimationCount);
-                                mBlocks[i][j].matchPopAnimationCount++;
+                                mBlocks[i][j].incrementPopAnimationFrame();
                             } else if (mBlocks[i][j].clearMatchCount > 0) {
                                 drawMatchingBlock(canvas, mBlocks[i][j], mBlockRect, false, ANIMATION_MATCH_POP_FRAMES_NEEDED + 1);
-                                mBlocks[i][j].clearMatchCount--;
+                                mBlocks[i][j].decrementClearFrame();
                                 if (!mBlocks[i][j].hasPopped) {
                                     if (mListener != null) {
                                         mListener.blockIsPopping(mBlocks[i][j].popPosition, mBlocks[i][j].matchTotalCount);
                                     }
-                                    mBlocks[i][j].hasPopped = true;
+                                    mBlocks[i][j].blockPopped();
                                 }
 
                             } else {
@@ -283,41 +283,41 @@ public class PuzzleBoardView extends View {
                             }
                         } else if (mBlocks[i][j].isBeingSwitched) {                                                                                     // Handle Switching blocks
                             int switchAnimationOffset = (int) (mBlockSize - ((mBlocks[i][j].switchAnimationCount / (float) ANIMATION_SWITCH_FRAMES_NEEDED) * mBlockSize));
-                            if (mBlocks[i][j].leftRightAnimationDirection == 1) {                                                                       // left block animation
+                            if (mBlocks[i][j].isAnimatingLeft()) {
                                 mBlockRect.set(x + switchAnimationOffset, y, x + mBlockSize + switchAnimationOffset, y + mBlockSize);
                                 drawBlock(canvas, mBlocks[i][j], mBlockRect, 1);
-                            } else {                                                                                                                    // right block animation
+                            } else {
                                 mBlockRect.set(x - switchAnimationOffset, y, x + mBlockSize - switchAnimationOffset, y + mBlockSize);
                                 drawBlock(canvas, mBlocks[i][j], mBlockRect, 1);
                             }
 
-                            mBlocks[i][j].switchAnimationCount++;
+                            mBlocks[i][j].incrementSwitchAnimationFrame();
 
                             if (mBlocks[i][j].switchAnimationCount >= ANIMATION_SWITCH_FRAMES_NEEDED) {
                                 mBlocks[i][j].stopSwitchAnimation();
                             }
 
                         } else if (mBlocks[i][j].isAnimatingDown) {                                                                                       // Handle falling blocks
+                            int fallingAnimationOffset = (int) (((ANIMATION_FALLING_FRAMES_NEEDED - mBlocks[i][j].downAnimatingCount) / (float) ANIMATION_FALLING_FRAMES_NEEDED) * mBlockSize);
+                            mBlockRect.set(x, y - fallingAnimationOffset, x + mBlockSize, y + mBlockSize - fallingAnimationOffset);
+                            drawBlock(canvas, mBlocks[i][j], mBlockRect, 1);
+
                             boolean blockNeedsToSwap = false;
                             if (mBlocks[i][j].downAnimatingCount >= ANIMATION_FALLING_FRAMES_NEEDED) {
-                                if (i < mBlocks.length - 1 && (mBlocks[i + 1][j].isBlockEmpty() || mBlocks[i + 1][j].isAnimatingDown) && !mBlocks[i + 1][j].isBeingSwitched && !mBlocks[i + 1][j].hasMatched) {
+                                if (i < mBlocks.length - 1 && (mBlocks[i + 1][j].isBlockEmpty() || mBlocks[i + 1][j].isAnimatingDown) && !(mBlocks[i + 1][j].isBeingSwitched || mBlocks[i + 1][j].hasMatched)) {
                                     blockNeedsToSwap = true;
                                 } else {
                                     if (mBlocks[i][j].canCombo) {
                                         mBlocks[i][j].removeComboFlagOnNextFrame = true;
                                     }
-                                    mBlocks[i][j].isAnimatingDown = false;
+                                    mBlocks[i][j].stopFallingAnimation();
                                 }
                             } else {
-                                mBlocks[i][j].downAnimatingCount++;
+                                mBlocks[i][j].incrementDownAnimationFrame();
                             }
 
-                            int fallingAnimationOffset = (int) (((ANIMATION_FALLING_FRAMES_NEEDED - mBlocks[i][j].downAnimatingCount) / (float) ANIMATION_FALLING_FRAMES_NEEDED) * mBlockSize);
-                            mBlockRect.set(x, y - fallingAnimationOffset, x + mBlockSize, y + mBlockSize - fallingAnimationOffset);
-                            drawBlock(canvas, mBlocks[i][j], mBlockRect, 1);
-
                             if (blockNeedsToSwap) {
-                                mBlocks[i][j].startFaillingAnimation();
+                                mBlocks[i][j].startFallingAnimation();
                                 if (mListener != null) {
                                     mListener.needsBlockSwap(mBlocks[i][j], mBlocks[i + 1][j]);
                                 }
@@ -335,10 +335,10 @@ public class PuzzleBoardView extends View {
                         }
                     } else { // Handle blanks that are being switched
                         if (mBlocks[i][j].isBeingSwitched) {
-                            mBlocks[i][j].switchAnimationCount++;
+                            mBlocks[i][j].incrementSwitchAnimationFrame();
 
                             if (mBlocks[i][j].switchAnimationCount >= ANIMATION_SWITCH_FRAMES_NEEDED) {
-                                mBlocks[i][j].stopSwitchAnimation();
+                                mBlocks[i][j].clear();
                             }
                         }
                     }
@@ -393,10 +393,6 @@ public class PuzzleBoardView extends View {
 
         // Create board border
         drawRectBoarder(canvas, mWidthOffset, mHeightOffset, mBoardWidth + mWidthOffset, mBoardHeight + mHeightOffset);
-
-//        if (mShouldAnimatingUp) {
-//            mRisingAnimationCounter++;
-//        }
     }
 
     private boolean doesStatusAllowAnimation() {
@@ -632,8 +628,8 @@ public class PuzzleBoardView extends View {
 
 
     private void startSwitchAnimation(Point leftBlockSwitch) {
-        mBlocks[leftBlockSwitch.y][leftBlockSwitch.x].startSwitchAnimation(0);
-        mBlocks[leftBlockSwitch.y][leftBlockSwitch.x + 1].startSwitchAnimation(1);
+        mBlocks[leftBlockSwitch.y][leftBlockSwitch.x].startSwitchAnimation(Direction.Right);
+        mBlocks[leftBlockSwitch.y][leftBlockSwitch.x + 1].startSwitchAnimation(Direction.Left);
     }
 
     public void setBoardListener(IBoard listener) {

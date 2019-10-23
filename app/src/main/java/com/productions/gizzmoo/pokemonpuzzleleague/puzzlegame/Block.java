@@ -17,9 +17,7 @@ public class Block implements Serializable, Comparable<Block> {
 
     public boolean isBeingSwitched;
     public int switchAnimationCount;
-    // 0 - animating right
-    // 1 - animating left
-    public int leftRightAnimationDirection;
+    public Direction leftRightAnimationDirection;
 
     public boolean isAnimatingDown;
     public int downAnimatingCount;
@@ -67,36 +65,21 @@ public class Block implements Serializable, Comparable<Block> {
         xCoor = x;
         yCoor = y;
 
-        isBeingSwitched = false;
-        switchAnimationCount = 0;
-        leftRightAnimationDirection = -1;
-
-        isAnimatingDown = false;
-        downAnimatingCount = 0;
-
-        hasMatched = false;
-        matchPopAnimationCount = 0;
-        matchInvertedAnimationCount = 0;
-        delayMatchAnimationCount = 0;
-        clearMatchCount = 0;
-        matchTotalCount = 0;
-        hasPopped = false;
-        popPosition = 0;
-
-        canCombo = false;
-        removeComboFlagOnNextFrame = false;
+        resetBlockValues();
     }
 
     public void clear() {
         type = BlockType.EMPTY;
+        resetBlockValues();
+    }
 
+    private void resetBlockValues() {
         isBeingSwitched = false;
         switchAnimationCount = 0;
-        leftRightAnimationDirection = -1;
+        leftRightAnimationDirection = Direction.None;
 
         isAnimatingDown = false;
         downAnimatingCount = 0;
-
         hasMatched = false;
         matchPopAnimationCount = 0;
         matchInvertedAnimationCount = 0;
@@ -139,12 +122,17 @@ public class Block implements Serializable, Comparable<Block> {
         return type;
     }
 
-    public void startFaillingAnimation() {
+    public void startFallingAnimation() {
         downAnimatingCount = 0;
         isAnimatingDown = true;
     }
 
-    public void startSwitchAnimation(int direction) {
+    public void stopFallingAnimation() {
+        downAnimatingCount = 0;
+        isAnimatingDown = false;
+    }
+
+    public void startSwitchAnimation(Direction direction) {
         isBeingSwitched = true;
         switchAnimationCount = 1;
         leftRightAnimationDirection = direction;
@@ -153,7 +141,17 @@ public class Block implements Serializable, Comparable<Block> {
     public void stopSwitchAnimation() {
         isBeingSwitched = false;
         switchAnimationCount = 0;
-        leftRightAnimationDirection = -1;
+        leftRightAnimationDirection = Direction.None;
+    }
+
+    public void blockMatched(int delayedMatchAnimationFrames, int matchInvertedAnimationFrames, int clearMatchFrames, int position, int totalNumOfBlockMatches) {
+        hasMatched = true;
+        matchPopAnimationCount = 0;
+        delayMatchAnimationCount = delayedMatchAnimationFrames;
+        matchInvertedAnimationCount = matchInvertedAnimationFrames;
+        clearMatchCount = clearMatchFrames;
+        popPosition = position;
+        matchTotalCount = totalNumOfBlockMatches;
     }
 
     public boolean canInteract() {
@@ -162,6 +160,38 @@ public class Block implements Serializable, Comparable<Block> {
 
     public boolean isAnimating() {
         return isAnimatingDown || hasMatched || isBeingSwitched;
+    }
+
+    public void incrementSwitchAnimationFrame() {
+        switchAnimationCount++;
+    }
+
+    public void incrementDownAnimationFrame() {
+        downAnimatingCount++;
+    }
+
+    public void incrementPopAnimationFrame() {
+        matchPopAnimationCount++;
+    }
+
+    public void decrementDelayedMatchAnimationFrame() {
+        delayMatchAnimationCount--;
+    }
+
+    public void decrementInvertedAnimationFrame() {
+        matchInvertedAnimationCount--;
+    }
+
+    public void decrementClearFrame() {
+        clearMatchCount--;
+    }
+
+    public void blockPopped() {
+        hasPopped = true;
+    }
+
+    public boolean isAnimatingLeft() {
+        return leftRightAnimationDirection == Direction.Left;
     }
 
     public enum BlockType {

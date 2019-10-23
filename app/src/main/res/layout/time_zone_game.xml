@@ -48,24 +48,36 @@
                 android:layout_height="wrap_content" />
 
         </LinearLayout>
-        <LinearLayout
-            android:id="@+id/speedGroup"
-            android:orientation="vertical"
+
+        <FrameLayout
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/speed"
+            <LinearLayout
+                android:id="@+id/speedGroup"
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/speed"/>
-            <TextView
-                android:id="@+id/speedValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/speed"/>
+                <TextView
+                    android:id="@+id/speedValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        <TextView
+            android:id="@+id/stallTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+        </FrameLayout>
 
     </LinearLayout>
 

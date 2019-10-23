@@ -1,20 +1,16 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame;
 
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.app.DialogFragment;
+import android.app.*;
+import android.content.*;
+import android.os.*;
+import android.preference.*;
+import android.support.annotation.*;
 
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block;
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameDialogFragment;
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameFragment;
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus;
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.*;
 
-import java.util.Random;
+import java.util.*;
 
-import static com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.NUM_OF_COLS;
-import static com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.NUM_OF_ROWS;
+import static com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.*;
 
 public class TimeZoneGameFragment extends GameFragment<TimeZoneGameLoop> implements TimeZoneGameLoop.TimeZoneGameLoopListener {
 
@@ -104,7 +100,7 @@ public class TimeZoneGameFragment extends GameFragment<TimeZoneGameLoop> impleme
 
     @Override
     public void boardSwipedUp() {
-        if (mGameLoop != null &&  !mGameLoop.isABlockAnimating()) {
+        if (mGameLoop != null &&  !mGameLoop.canAnimateUp()) {
             mGameLoop.addNewRow();
         }
     }
@@ -113,10 +109,6 @@ public class TimeZoneGameFragment extends GameFragment<TimeZoneGameLoop> impleme
     public void blockFinishedMatchAnimation(int row, int column) {
         super.blockFinishedMatchAnimation(row, column);
         mGameLoop.aBlockFinishedAnimating();
-
-        if (!mGameLoop.isABlockAnimating()) {
-            mBoardView.startAnimatingUp();
-        }
     }
 
     @Override
@@ -149,13 +141,11 @@ public class TimeZoneGameFragment extends GameFragment<TimeZoneGameLoop> impleme
     }
 
     @Override
-    public void numberOfBlocksMatched() {
-        mBoardView.stopAnimatingUp();
-    }
+    public void blocksMatched() {}
 
     @Override
     public void gameFinished(boolean didWin) {
-        DialogFragment newFragment = GameDialogFragment.newInstance(didWin);
+        DialogFragment newFragment = GameDialogFragment.Companion.newInstance(didWin);
         newFragment.show(getActivity().getFragmentManager(), "postDialog");
     }
 
@@ -168,10 +158,20 @@ public class TimeZoneGameFragment extends GameFragment<TimeZoneGameLoop> impleme
     }
 
     @Override
-    public void updateGameTimeAndSpeed(long timeInMilli, int gameSpeed) {
+    public void updateGameTimeAndSpeed(long timeInMilli, int gameSpeed, int delayInSeconds) {
         if (mListener != null) {
-            mListener.updateGameTimeAndSpeed(timeInMilli, gameSpeed);
+            mListener.updateGameTimeAndSpeed(timeInMilli, gameSpeed, delayInSeconds);
         }
+    }
+
+    @Override
+    public void startAnimatingUp() {
+        mBoardView.startAnimatingUp();
+    }
+
+    @Override
+    public void stopAnimatingUp() {
+        mBoardView.stopAnimatingUp();
     }
 
     private Block[][] getGameBoard() {
@@ -223,6 +223,6 @@ public class TimeZoneGameFragment extends GameFragment<TimeZoneGameLoop> impleme
 
     public interface TimeZoneFragmentInterface {
         void changeSong(boolean isPanic);
-        void updateGameTimeAndSpeed(long timeInMilli, int gameSpeed);
+        void updateGameTimeAndSpeed(long timeInMilli, int gameSpeed, int delayInSeconds);
     }
 }

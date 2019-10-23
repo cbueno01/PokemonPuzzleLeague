@@ -24,7 +24,7 @@ class PuzzleAcademyFragment : GameFragment<PuzzleAcademyGameLoop>(), PuzzleAcade
         return PuzzleAcademyGameLoop(grid, moves)
     }
 
-    override fun numberOfBlocksMatched() {}
+    override fun blocksMatched() {}
 
     override fun gameFinished(didWin: Boolean) {
         val newFragment = GameDialogFragment.newInstance(didWin)

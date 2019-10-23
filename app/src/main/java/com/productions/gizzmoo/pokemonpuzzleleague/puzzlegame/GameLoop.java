@@ -14,7 +14,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
     public static final int NUM_OF_COLS = 6;
     public static final int NUM_OF_ROWS = 12;
 
-    private final int MAX_FPS = 30;
+    protected final int MAX_FPS = 30;
     private final int FRAME_PERIOD = 1000 / MAX_FPS;
 
     private long mStartTime;
@@ -52,7 +52,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
             }
 
             applyGravity();
-            checkForMatches();
+            checkForMatchesAndCombos();
             checkToResetCombo();
             postGameMechanicHook();
             getUpdatedGameStatus();
@@ -93,8 +93,8 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         for (int y = NUM_OF_ROWS - 2; y >= 0; y--) {
             for (int x = 0; x < NUM_OF_COLS; x++) {
                 if (mGrid[y][x].canInteract()) {
-                    if (((mGrid[y + 1][x].isBlockEmpty()) || (mGrid[y + 1][x].isAnimatingDown)) && !mGrid[y + 1][x].isBeingSwitched && !mGrid[y + 1][x].hasMatched) {
-                        mGrid[y][x].startFaillingAnimation();
+                    if ((mGrid[y + 1][x].isBlockEmpty() || mGrid[y + 1][x].isAnimatingDown) && !(mGrid[y + 1][x].isBeingSwitched || mGrid[y + 1][x].hasMatched)) {
+                        mGrid[y][x].startFallingAnimation();
                         swapBlocks(x, y, x, y + 1);
                     }
                 }
@@ -114,7 +114,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         comboCount = 0;
     }
 
-    private void checkForMatches() {
+    private void checkForMatchesAndCombos() {
         for (int i = 0; i < NUM_OF_ROWS; i++) {
             for (int j = 0; j < NUM_OF_COLS; j++) {
                 if (mGrid[i][j].canInteract()) {
@@ -128,8 +128,9 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
             Collections.sort(mBlockMatch);
             removeDuplicateBlocks();
             startMatchAnimation();
-            notifyBlocksMatched();
+            addToComboIfApplicable();
             playSoundIfNecessary();
+            notifyBlocksMatched();
 
             mBlockMatch.clear();
         }
@@ -202,8 +203,17 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         return tempList;
     }
 
+    private void addToComboIfApplicable() {
+        for (Block b : mBlockMatch) {
+            if (b.canCombo) {
+                comboCount++;
+                return;
+            }
+        }
+    }
+
     private void playSoundIfNecessary() {
-        boolean playPokemonSound = shouldPlayPokemonSound();
+        boolean playPokemonSound = comboCount > 0;
         if (playPokemonSound) {
             if (mListener != null) {
                 mListener.playPokemonSound(comboCount);
@@ -217,34 +227,18 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
         }
     }
 
-    private boolean shouldPlayPokemonSound() {
-        for (Block b : mBlockMatch) {
-            if (b.canCombo) {
-                comboCount++;
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private void startMatchAnimation() {
         int matchSize = mBlockMatch.size();
         for (int i = 0; i < matchSize; i++) {
             Block b = mBlockMatch.get(i);
-            b.hasMatched = true;
-            b.delayMatchAnimationCount = i * ANIMATION_MATCH_POP_FRAMES_NEEDED;
-            b.matchInvertedAnimationCount = ANIMATION_MATCH_INVERT_FRAMES_NEEDED;
-            b.matchPopAnimationCount = 0;
-            b.clearMatchCount = (mBlockMatch.size() - 1) * ANIMATION_MATCH_POP_FRAMES_NEEDED - b.delayMatchAnimationCount + ANIMATION_MATCH_INVERT_FRAMES_NEEDED;
-            b.popPosition = i;
-            b.matchTotalCount = matchSize;
+            int delayedMatchAnimation = i * ANIMATION_MATCH_POP_FRAMES_NEEDED;
+            b.blockMatched(delayedMatchAnimation, ANIMATION_MATCH_INVERT_FRAMES_NEEDED, ((mBlockMatch.size() - 1) * ANIMATION_MATCH_POP_FRAMES_NEEDED - delayedMatchAnimation + ANIMATION_MATCH_INVERT_FRAMES_NEEDED), i, matchSize);
         }
     }
 
     protected void notifyBlocksMatched() {
         if (mListener != null) {
-            mListener.numberOfBlocksMatched();
+            mListener.blocksMatched();
         }
     }
 
@@ -360,7 +354,7 @@ public abstract class GameLoop extends AsyncTask<Void, Void, Void> {
 
         void updateBoardView();
 
-        void numberOfBlocksMatched();
+        void blocksMatched();
 
         void gameFinished(boolean didWin);
     }

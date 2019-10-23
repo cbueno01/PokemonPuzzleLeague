@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.widget.TextView
 import com.productions.gizzmoo.pokemonpuzzleleague.R
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameActivity
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameDialogFragment
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameEndingDialogListener
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame.PuzzleAcademySelectionAdapter.Companion.PUZZLE_ID_KEY
 import java.util.*
 
-class PuzzleAcademyGameActivity : GameActivity(), PuzzleAcademyFragment.PuzzleAcademyFragmentInterface, GameDialogFragment.OnGameEndingDialogFragmentReturnListener {
+class PuzzleAcademyGameActivity : GameActivity(), PuzzleAcademyFragment.PuzzleAcademyFragmentInterface, GameEndingDialogListener {
     private lateinit var timeView: TextView
     private lateinit var swapsView: TextView
     private lateinit var gameFragment: PuzzleAcademyFragment
