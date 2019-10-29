@@ -29,8 +29,8 @@ class TimeZoneActivity : GameActivity(), GameEndingDialogListener, TimeZoneGameF
         speedView = findViewById(R.id.speedValue)
         speedGroup = findViewById(R.id.speedGroup)
         stallTimeView = findViewById(R.id.stallTime)
-        gameFragment = fragmentManager.findFragmentById(R.id.puzzleBoard) as TimeZoneGameFragment
-        gameFragment.setFragmentListener(this)
+        gameFragment = supportFragmentManager.findFragmentById(R.id.puzzleBoard) as TimeZoneGameFragment
+        gameFragment.listener = this
     }
 
     override fun changeSong(isPanic: Boolean) {
@@ -59,6 +59,6 @@ class TimeZoneActivity : GameActivity(), GameEndingDialogListener, TimeZoneGameF
     }
 
     override fun shouldPlayPanicMusic(): Boolean {
-        return if (gameFragment.gameLoop != null) gameFragment.gameLoop.gameStatus != GameStatus.Running else false
+        return gameFragment.gameLoop.status != GameStatus.Running
     }
 }

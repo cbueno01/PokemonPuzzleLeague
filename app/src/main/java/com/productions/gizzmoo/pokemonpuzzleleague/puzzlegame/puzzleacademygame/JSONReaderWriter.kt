@@ -2,8 +2,8 @@ package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame
 
 import android.content.Context
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.NUM_OF_COLS
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.NUM_OF_ROWS
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.Companion.NUM_OF_COLS
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.Companion.NUM_OF_ROWS
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.FileNotFoundException

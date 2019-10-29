@@ -237,6 +237,7 @@ public class PuzzleBoardView extends View {
             int bitmapBlockSize = (int) (BoardResources.getBlockHeights() * ((float) mRisingAnimationCounter / mNumOfTotalFrames));
             mRisingAnimationOffset = (int) (mBlockSize * (bitmapBlockSize / (float) BoardResources.getBlockHeights()));
             mRisingAnimationCounter++;
+            Log.d("cbueno", "bitmapBlockSize: " + bitmapBlockSize + " mRisingAnimationOffset: " + mRisingAnimationOffset + " counter: " + mRisingAnimationCounter);
         }
 
         // Create grid
