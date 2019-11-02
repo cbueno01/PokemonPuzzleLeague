@@ -65,7 +65,7 @@ abstract class GameFragment<T : GameLoop> : Fragment(), IBoard, GameLoopListener
         super.onStart()
 
         gameLoop = createGameLoop()
-        boardView.setBoardListener(this)
+        boardView.listener = this
         gameLoop.listener = this
 
         if (tempSwitcher != null || tempGrid != null) {
@@ -96,6 +96,7 @@ abstract class GameFragment<T : GameLoop> : Fragment(), IBoard, GameLoopListener
     }
 
     override fun switchBlock(switcherLeftBlock: Point) {
+        startSwitchAnimation(switcherLeftBlock, gameLoop.grid)
         gameLoop.swapBlocks(switcherLeftBlock.x, switcherLeftBlock.y, switcherLeftBlock.x + 1, switcherLeftBlock.y)
 
         if (loadedSoundPool && switchSoundID != 0) {
@@ -107,10 +108,8 @@ abstract class GameFragment<T : GameLoop> : Fragment(), IBoard, GameLoopListener
         gameLoop.blockFinishedMatchAnimation(row, column)
     }
 
-    override fun needsBlockSwap(b1: Block, b2: Block) {
-        val b1Point = b1.coords
-        val b2Point = b2.coords
-        gameLoop.swapBlocks(b1Point.x, b1Point.y, b2Point.x, b2Point.y)
+    override fun needsBlockSwap(block1X: Int, block1Y: Int, block2X: Int, block2Y: Int) {
+        gameLoop.swapBlocks(block1X, block1Y, block2X, block2Y)
     }
 
     override fun switchBlockMoved() {
@@ -180,6 +179,11 @@ abstract class GameFragment<T : GameLoop> : Fragment(), IBoard, GameLoopListener
     private fun getCurrentTrainer(): Trainer {
         val settings = PreferenceManager.getDefaultSharedPreferences(activity?.applicationContext)
         return Trainer.getTypeByID(settings.getInt("pref_trainer_key", TrainerPreference.DEFAULT_ID))
+    }
+
+    private fun startSwitchAnimation(leftBlockSwitch: Point, blocks: Array<Array<Block>>) {
+        blocks[leftBlockSwitch.y][leftBlockSwitch.x].startSwitchAnimation(Direction.Right)
+        blocks[leftBlockSwitch.y][leftBlockSwitch.x + 1].startSwitchAnimation(Direction.Left)
     }
 
     protected abstract fun createGameLoop(): T

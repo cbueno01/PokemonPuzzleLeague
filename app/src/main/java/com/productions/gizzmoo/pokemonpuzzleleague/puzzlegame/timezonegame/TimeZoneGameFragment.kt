@@ -58,8 +58,8 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoop>(), TimeZoneGameLoopL
         drawLineIfNeeded(tempNumOfLinesLeft)
         boardView.setGameSpeed(gameLoop.getNumOfFramesForCurrentLevel())
         boardView.startAnimatingUp()
-        boardView.setNewRow(gameLoop.newRow)
-        boardView.setRisingAnimationCount(tempCurrentFrameCount)
+        boardView.newRowBlocks = gameLoop.newRow
+        boardView.risingAnimationCounter = tempCurrentFrameCount
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -119,7 +119,7 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoop>(), TimeZoneGameLoopL
     override fun newBlockWasAdded(numOfLinesLeft: Int) {
         drawLineIfNeeded(numOfLinesLeft)
         boardView.resetRisingAnimationCount()
-        boardView.setNewRow(gameLoop.newRow)
+        boardView.newRowBlocks = gameLoop.newRow
         boardView.setGameSpeed(gameLoop.getNumOfFramesForCurrentLevel())
     }
 

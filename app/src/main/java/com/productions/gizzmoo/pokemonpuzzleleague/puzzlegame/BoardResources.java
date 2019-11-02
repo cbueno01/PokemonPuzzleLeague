@@ -63,22 +63,22 @@ class BoardResources {
     private static Bitmap[] mInvertedBitmap = new Bitmap[mInvertedResources.length];
     private static HashMap<String, Bitmap[]> mAnimationBitmap = new HashMap<>();
 
-    static Bitmap getNormalBlock(Block.BlockType type) {
+    static Bitmap getNormalBlock(BlockType type) {
         int typeID = type.ordinal();
         return (typeID < mNormalBitmap.length && typeID > 0) ? mNormalBitmap[typeID] : null;
     }
 
-    static Bitmap getDarkBlock(Block.BlockType type) {
+    static Bitmap getDarkBlock(BlockType type) {
         int typeID = type.ordinal();
         return (typeID < mDarkBitmap.length && typeID > 0) ? mDarkBitmap[typeID] : null;
     }
 
-    static Bitmap getInvertedBlock(Block.BlockType type) {
+    static Bitmap getInvertedBlock(BlockType type) {
         int typeID = type.ordinal();
         return (typeID < mInvertedBitmap.length && typeID > 0) ? mInvertedBitmap[typeID] : null;
     }
 
-    static Bitmap getPopAnimationBlock(Block.BlockType type, int animationSection) {
+    static Bitmap getPopAnimationBlock(BlockType type, int animationSection) {
         String key = null;
         switch (animationSection) {
             case 0:

@@ -69,7 +69,7 @@ class PuzzleAcademyFragment : GameFragment<PuzzleAcademyGameLoop>(), PuzzleAcade
     private fun blockGridToIntGrid(currentGrid: Array<Array<Block>>): Array<Array<Int>> =
         Array(currentGrid.size)
             { i -> Array(currentGrid[i].size)
-                { j -> currentGrid[i][j].blockType.value }}
+                { j -> currentGrid[i][j].type.value }}
 
     private fun intGridToBlockGrid(currentGrid: Array<Array<Int>>): Array<Array<Block>> =
         Array(currentGrid.size)

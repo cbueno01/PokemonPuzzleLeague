@@ -171,7 +171,7 @@ class JSONReaderWriter(context: Context, stage: Int) {
         for (row in currentGrid) {
             val jsonRow = JSONArray()
             for (block in row) {
-                jsonRow.put(block.blockType.value)
+                jsonRow.put(block.type.value)
             }
             jsonGrid.put(jsonRow)
         }

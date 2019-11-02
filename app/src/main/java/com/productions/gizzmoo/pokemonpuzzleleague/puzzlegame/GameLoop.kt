@@ -1,8 +1,8 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame
 
 import android.os.AsyncTask
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.ANIMATION_MATCH_INVERT_FRAMES_NEEDED
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.ANIMATION_MATCH_POP_FRAMES_NEEDED
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.Companion.ANIMATION_MATCH_INVERT_FRAMES_NEEDED
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.Companion.ANIMATION_MATCH_POP_FRAMES_NEEDED
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
@@ -63,7 +63,7 @@ abstract class GameLoop(gameGrid: Array<Array<Block>>) : AsyncTask<Void, Void, V
     private fun applyGravity() {
         for (y in NUM_OF_ROWS - 2 downTo 0) {
             for (x in 0 until NUM_OF_COLS) {
-                if (grid[y][x].canInteract()) {
+                if (grid[y][x].canInteract) {
                     if ((grid[y + 1][x].isBlockEmpty || grid[y + 1][x].isAnimatingDown) && !(grid[y + 1][x].isBeingSwitched || grid[y + 1][x].hasMatched)) {
                         grid[y][x].startFallingAnimation()
                         swapBlocks(x, y, x, y + 1)
@@ -88,7 +88,7 @@ abstract class GameLoop(gameGrid: Array<Array<Block>>) : AsyncTask<Void, Void, V
     private fun checkForMatchesAndCombos() {
         for (i in 0 until NUM_OF_ROWS) {
             for (j in 0 until NUM_OF_COLS) {
-                if (grid[i][j].canInteract()) {
+                if (grid[i][j].canInteract) {
                     blockMatch.addAll(checkForMatchWithDirection(i, j, 0))
                     blockMatch.addAll(checkForMatchWithDirection(i, j, 1))
                 }
@@ -135,14 +135,14 @@ abstract class GameLoop(gameGrid: Array<Array<Block>>) : AsyncTask<Void, Void, V
             0 -> {
                 var pos = i - 1
                 // Check down
-                while (pos >= 0 && grid[i][j].blockType == grid[pos][j].blockType && grid[pos][j].canInteract()) {
+                while (pos >= 0 && grid[i][j].type == grid[pos][j].type && grid[pos][j].canInteract) {
                     tempList.add(grid[pos][j])
                     pos--
                 }
 
                 pos = i + 1
                 // Check up
-                while (pos < NUM_OF_ROWS && grid[i][j].blockType == grid[pos][j].blockType && grid[pos][j].canInteract()) {
+                while (pos < NUM_OF_ROWS && grid[i][j].type == grid[pos][j].type && grid[pos][j].canInteract) {
                     tempList.add(grid[pos][j])
                     pos++
                 }
@@ -150,14 +150,14 @@ abstract class GameLoop(gameGrid: Array<Array<Block>>) : AsyncTask<Void, Void, V
             1 -> {
                 var pos = j - 1
                 // Check right
-                while (pos >= 0 && grid[i][j].blockType == grid[i][pos].blockType && grid[i][pos].canInteract()) {
+                while (pos >= 0 && grid[i][j].type == grid[i][pos].type && grid[i][pos].canInteract) {
                     tempList.add(grid[i][pos])
                     pos--
                 }
 
                 pos = j + 1
                 // Check left
-                while (pos < NUM_OF_COLS && grid[i][j].blockType == grid[i][pos].blockType && grid[i][pos].canInteract()) {
+                while (pos < NUM_OF_COLS && grid[i][j].type == grid[i][pos].type && grid[i][pos].canInteract) {
                     tempList.add(grid[i][pos])
                     pos++
                 }
@@ -252,7 +252,7 @@ abstract class GameLoop(gameGrid: Array<Array<Block>>) : AsyncTask<Void, Void, V
     fun blockFinishedMatchAnimation(row: Int, column: Int) {
         var rowToUpdate = row - 1
         while (rowToUpdate >= 0 && !grid[rowToUpdate][column].isBlockEmpty) {
-            if (grid[rowToUpdate][column].canInteract()) {
+            if (grid[rowToUpdate][column].canInteract) {
                 grid[rowToUpdate][column].canCombo = true
             }
             rowToUpdate--
