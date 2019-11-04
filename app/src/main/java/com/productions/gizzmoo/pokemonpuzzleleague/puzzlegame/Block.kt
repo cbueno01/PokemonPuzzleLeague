@@ -1,8 +1,9 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame
 
 import android.graphics.Point
+import java.io.Serializable
 
-class Block(t: Int, x: Int, y: Int) :  Comparable<Block> {
+class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
     private var coordPoint: Point = Point(0, 0)
 
     var type: BlockType

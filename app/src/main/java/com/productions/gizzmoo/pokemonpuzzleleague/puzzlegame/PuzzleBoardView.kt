@@ -73,7 +73,6 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
     private var winLine: Int = 0
     private var shouldShowWinLine: Boolean = false
 
-
     init {
         BoardResources.createImageBitmaps(context)
         val settings = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext())
@@ -150,7 +149,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
         return true
     }
 
-    fun setGrid(grid: Array<Array<Block>>) {
+    private fun setGrid(grid: Array<Array<Block>>) {
         blocks = grid
         invalidate()
         requestLayout()
@@ -201,7 +200,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
             for (row in it.indices.reversed()) {
                 for (blockIndex in 0 until it[row].size) {
                     val widthStartPosition = blockIndex * blockSize + widthOffset
-                    val heightStartPosition = row * blockSize + heightOffset - (if (doesStatusAllowAnimation()) risingAnimationOffset else 0)
+                    val heightStartPosition = row * blockSize + heightOffset - (if (doesStatusAllowAnimation) risingAnimationOffset else 0)
                     handleDrawingBlock(canvas, it[row][blockIndex], widthStartPosition, heightStartPosition, row, blockIndex)
                 }
             }
@@ -326,7 +325,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
     }
 
     private fun drawNewRow(canvas: Canvas) {
-        if (doesStatusAllowAnimation()) {
+        if (doesStatusAllowAnimation) {
             val y = 12 * blockSize + heightOffset
             val bitmapRation = risingAnimationOffset.toFloat() / blockSize
 
@@ -344,7 +343,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
             val x = leftBlock.x * blockSize + widthOffset
             var y = leftBlock.y * blockSize + heightOffset
 
-            if (doesStatusAllowAnimation()) {
+            if (doesStatusAllowAnimation) {
                 y -= risingAnimationOffset
             }
 
@@ -367,7 +366,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
 
     private fun drawLine(canvas: Canvas) {
         if (shouldShowWinLine) {
-            val y = if (winLine != 0 && doesStatusAllowAnimation()) winLine * blockSize - risingAnimationOffset else winLine * blockSize
+            val y = if (winLine != 0 && doesStatusAllowAnimation) winLine * blockSize - risingAnimationOffset else winLine * blockSize
             canvas.drawLine(widthOffset.toFloat(), (y + heightOffset).toFloat(), (boardWidth + widthOffset).toFloat(), (y + heightOffset).toFloat(), blockSwitcherPaint)
         }
     }
@@ -398,7 +397,8 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
         }
     }
 
-    private fun doesStatusAllowAnimation(): Boolean = currentStatus === GameStatus.Running || currentStatus === GameStatus.Panic
+    private val doesStatusAllowAnimation: Boolean
+        get() = currentStatus === GameStatus.Running || currentStatus === GameStatus.Panic
 
     private fun updateRiseAnimationCountIfNeeded() {
         if (shouldAnimatingUp) {
@@ -465,7 +465,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
                         isReallyMoving = false
                     }
 
-                    it.leftBlock = newP
+                    it.setLeftBlock(newP)
 
                     if (isReallyMoving) {
                         listener?.switchBlockMoved()
@@ -501,7 +501,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
                 val currentX = event.x
                 val currentY = event.y
                 val p = getGridCoordinatesOffXY(currentX, currentY + risingAnimationOffset)
-                val deltaY = lastTouch?.let { lastTouch -> lastTouch.y - p.y } ?: 0
+                val deltaY = if (lastTouch != null) lastTouch!!.y - p.y else 0
 
                 if (deltaY >= MIN_SWIPE_DISTANCE) {
                     listener?.boardSwipedUp()

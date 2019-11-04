@@ -11,7 +11,7 @@ class GameMusicService : MusicService() {
 
     override fun onCreate() {
         super.onCreate()
-        val settings = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+        val settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val currentTrainer = Trainer.getTypeByID(settings.getInt("pref_trainer_key", TrainerPreference.DEFAULT_ID))
         resourceId = TrainerResources.getTrainerSong(currentTrainer)
     }
