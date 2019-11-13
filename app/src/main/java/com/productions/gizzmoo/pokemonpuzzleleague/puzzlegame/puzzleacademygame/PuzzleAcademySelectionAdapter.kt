@@ -13,10 +13,14 @@ class PuzzleAcademySelectionAdapter(private val context: Context) : BaseAdapter(
         return PuzzleAcademyGridViewItem(context).apply {
             text = (position + 1).toString()
             gravity = Gravity.CENTER
+//            setBackgroundResource(R.drawable.rectagle_border)
+
             if (FileManager.getJSONReaderWriter(context, 1).didWinLevel(position)) {
-                setBackgroundColor(context.resources.getColor(R.color.green))
+                setBackgroundColor(context.resources.getColor(R.color.secondary_light))
+                setTextColor(context.resources.getColor(R.color.secondary_text_color))
             } else {
-                setBackgroundResource(R.drawable.rectagle_border)
+                setBackgroundColor(context.resources.getColor(R.color.primary_dark))
+                setTextColor(context.resources.getColor(R.color.primary_text_color))
             }
             setOnClickListener {
                 val intent = Intent(context, PuzzleAcademyGameActivity::class.java).apply {

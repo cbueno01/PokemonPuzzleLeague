@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.productions.gizzmoo.pokemonpuzzleleague.MenuActivity"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,9 +8,8 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="@color/primary_dark"
         android:layout_alignParentTop="true"/>
-
 
     <com.productions.gizzmoo.pokemonpuzzleleague.ImageViewPanning
         android:id="@+id/backgroundPanning"
@@ -30,15 +28,19 @@
             android:layout_width="128dp"
             android:layout_height="wrap_content"
             android:text="@string/time_zone"
-            android:theme="@style/AppBaseTheme"
-            android:layout_marginBottom="16dp"/>
+            android:background="@drawable/app_button_drawable"
+            android:textColor="@color/primary_text_color"
+            android:layout_marginBottom="16dp"
+            android:padding="8dp"/>
 
         <Button
             android:id="@+id/puzzleAcademy"
             android:layout_width="128dp"
             android:layout_height="wrap_content"
             android:text="@string/puzzle_academy"
-            android:theme="@style/AppBaseTheme"/>
+            android:background="@drawable/app_button_drawable"
+            android:textColor="@color/primary_text_color"
+            android:padding="8dp"/>
     </LinearLayout>
 
 </RelativeLayout>

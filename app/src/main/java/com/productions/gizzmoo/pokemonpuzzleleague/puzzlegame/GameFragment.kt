@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.productions.gizzmoo.pokemonpuzzleleague.Direction
 import com.productions.gizzmoo.pokemonpuzzleleague.PokemonResources
 import com.productions.gizzmoo.pokemonpuzzleleague.R
 import com.productions.gizzmoo.pokemonpuzzleleague.Trainer

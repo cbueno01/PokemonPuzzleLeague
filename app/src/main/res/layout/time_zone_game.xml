@@ -8,8 +8,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="3"
-        android:padding="8dp"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -17,17 +15,21 @@
             android:orientation="vertical"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/timer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/time"/>
+                android:text="@string/time"
+                android:textColor="@color/primary_text_color"/>
             <TextView
                 android:id="@+id/timerValue"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_text_color"/>
 
         </LinearLayout>
         <LinearLayout
@@ -35,40 +37,49 @@
             android:orientation="vertical"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/score"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/score"/>
+                android:text="@string/score"
+                android:textColor="@color/primary_text_color"/>
             <TextView
                 android:id="@+id/scoreValue"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_text_color"/>
 
         </LinearLayout>
 
-        <FrameLayout
+        <RelativeLayout
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_margin="8dp">
 
             <LinearLayout
                 android:id="@+id/speedGroup"
                 android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center">
 
                 <TextView
                     android:id="@+id/speed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/speed"/>
+                    android:text="@string/speed"
+                    android:textColor="@color/primary_text_color"/>
                 <TextView
                     android:id="@+id/speedValue"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary_text_color"/>
 
             </LinearLayout>
 
@@ -76,8 +87,10 @@
             android:id="@+id/stallTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"/>
-        </FrameLayout>
+            android:visibility="gone"
+            android:textColor="@color/primary_text_color"
+            android:layout_centerInParent="true"/>
+        </RelativeLayout>
 
     </LinearLayout>
 

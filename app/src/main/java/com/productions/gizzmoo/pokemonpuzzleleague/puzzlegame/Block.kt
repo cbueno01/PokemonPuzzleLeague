@@ -1,6 +1,7 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame
 
 import android.graphics.Point
+import com.productions.gizzmoo.pokemonpuzzleleague.Direction
 import java.io.Serializable
 
 class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {

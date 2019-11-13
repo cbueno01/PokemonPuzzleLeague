@@ -36,7 +36,7 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoop>(), TimeZoneGameLoopL
         } else {
             val settings = PreferenceManager.getDefaultSharedPreferences(activity!!.applicationContext)
             tempNumOfLinesLeft = settings.getInt("pref_lines_key", 15) + NUM_OF_ROWS
-            tempGameSpeed = settings.getInt("pref_speed_key", 10)
+            tempGameSpeed = settings.getInt("pref_game_speed", 10)
         }
     }
 

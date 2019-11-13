@@ -26,9 +26,9 @@ class GameDialogFragment : DialogFragment() {
         val builder = AlertDialog.Builder(activity)
 
         if (mDidWin) {
-            builder.setMessage(R.string.win)
+            builder.setTitle(R.string.win)
         } else {
-            builder.setMessage(R.string.lose)
+            builder.setTitle(R.string.lose)
         }
 
         builder.setPositiveButton(R.string.okay) { _, _ ->

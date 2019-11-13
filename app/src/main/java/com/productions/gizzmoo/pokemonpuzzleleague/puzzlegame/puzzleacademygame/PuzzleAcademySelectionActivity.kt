@@ -1,11 +1,11 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame
 
+import android.app.Activity
 import android.os.Bundle
 import android.widget.GridView
-import com.productions.gizzmoo.pokemonpuzzleleague.PokemonPuzzleLeagueActivity
 import com.productions.gizzmoo.pokemonpuzzleleague.R
 
-class PuzzleAcademySelectionActivity : PokemonPuzzleLeagueActivity() {
+class PuzzleAcademySelectionActivity : Activity() {
     private lateinit var puzzleAdapter: PuzzleAcademySelectionAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

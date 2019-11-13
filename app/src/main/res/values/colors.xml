@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-    
     <color name="grey">#4B4B4B</color>
     <color name="green">#4CBB17</color>
     <color name="red">#8B0000</color>
@@ -16,5 +12,16 @@
     <color name="blue_speed_select">#00DDFE</color>
     <color name="yellow_speed_select">#FCFE00</color>
     <color name="red_speed_select">#F10100</color>
+
+    <!--App Them Colors-->
+    <color name="primary">#455A64</color>
+    <color name="primary_dark">#1C313A</color>
+    <color name="primary_light">#718792</color>
+    <color name="primary_text_color">#FFFFFF</color>
+
+    <color name="secondary">#64B5F6</color>
+    <color name="secondary_dark">#2286C3</color>
+    <color name="secondary_light">#9be7FF</color>
+    <color name="secondary_text_color">#000000</color>
 
 </resources>
