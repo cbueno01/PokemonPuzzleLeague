@@ -6,13 +6,13 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.Co
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
-abstract class GameLoop(gameGrid: Array<Array<Block>>) : AsyncTask<Void, Void, Void>() {
+abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : AsyncTask<Void, Void, Void>() {
     protected val lock: Lock = ReentrantLock()
     protected var didWin: Boolean = false
     protected var comboCount: Int = 0
     protected var elapsedTime: Long = 0
     protected val blockMatch: ArrayList<Block> = ArrayList()
-    var listener: GameLoopListener? = null
+    var listener: T? = null
     var grid: Array<Array<Block>> = gameGrid
     var blockSwitcher: SwitchBlocks = SwitchBlocks(2, 9, 3, 9)
         protected set

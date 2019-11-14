@@ -5,7 +5,7 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
 import java.util.*
 
-class TimeZoneGameLoop(grid: Array<Array<Block>>, numOfLines: Int, gameSpeedLevelParam: Int) : GameLoop(grid) {
+class TimeZoneGameLoop(grid: Array<Array<Block>>, numOfLines: Int, gameSpeedLevelParam: Int) : GameLoop<TimeZoneGameLoopListener>(grid) {
     private val rand: Random = Random()
     var newRow: Array<Block> = createNewRowBlocks(rand)
         private set
@@ -30,7 +30,7 @@ class TimeZoneGameLoop(grid: Array<Array<Block>>, numOfLines: Int, gameSpeedLeve
 
     override fun postGameMechanicHook() {
         if (canAnimateUp()) {
-            (listener as TimeZoneGameLoopListener?)?.startAnimatingUp()
+            listener?.startAnimatingUp()
 
             if (currentFrameCount >= getNumOfFramesForCurrentLevel()) {
                 addNewRow()
@@ -54,13 +54,13 @@ class TimeZoneGameLoop(grid: Array<Array<Block>>, numOfLines: Int, gameSpeedLeve
         } else if (blockMatch.size == 4) {
             numOfFramesToStall = MAX_FPS
         }
-        (listener as TimeZoneGameLoopListener?)?.stopAnimatingUp()
+        listener?.stopAnimatingUp()
     }
 
     override fun onProgressUpdate(vararg values: Void?) {
         super.onProgressUpdate()
         val numOfDelayedSeconds = Math.ceil(numOfFramesToStall.toDouble() / MAX_FPS).toInt()
-        (listener as TimeZoneGameLoopListener?)?.updateGameTimeAndSpeed(elapsedTime, gameSpeedLevel, numOfDelayedSeconds)
+        listener?.updateGameTimeAndSpeed(elapsedTime, gameSpeedLevel, numOfDelayedSeconds)
     }
 
     fun addNewRow() {
@@ -89,7 +89,7 @@ class TimeZoneGameLoop(grid: Array<Array<Block>>, numOfLines: Int, gameSpeedLeve
 
         increaseGameSpeedIfNeeded()
         newRow = createNewRowBlocks(rand)
-        (listener as TimeZoneGameLoopListener?)?.newBlockWasAdded(numOfLinesLeft)
+        listener?.newBlockWasAdded(numOfLinesLeft)
         lock.unlock()
     }
 
@@ -109,12 +109,10 @@ class TimeZoneGameLoop(grid: Array<Array<Block>>, numOfLines: Int, gameSpeedLeve
     }
 
     private fun checkIfUserLost() {
-        if (framesInWarning >= getNumOfFramesForCurrentLevel()) {
-            changeGameStatus(GameStatus.Stopped)
-        } else if (status === GameStatus.Warning) {
-            framesInWarning++
-        } else {
-            framesInWarning = 0
+        when {
+            framesInWarning >= getNumOfFramesForCurrentLevel() -> changeGameStatus(GameStatus.Stopped)
+            status === GameStatus.Warning -> framesInWarning++
+            else -> framesInWarning = 0
         }
     }
 

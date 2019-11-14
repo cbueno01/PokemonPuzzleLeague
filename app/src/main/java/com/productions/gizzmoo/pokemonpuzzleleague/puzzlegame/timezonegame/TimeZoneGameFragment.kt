@@ -10,7 +10,7 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.Companion
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
 import java.util.Random
 
-class TimeZoneGameFragment : GameFragment<TimeZoneGameLoop>(), TimeZoneGameLoopListener {
+class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGameLoop>(), TimeZoneGameLoopListener {
     var listener: TimeZoneFragmentInterface? = null
     private var tempNumOfLinesLeft: Int = 0
     private var tempGameSpeed: Int = 0
@@ -19,7 +19,7 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoop>(), TimeZoneGameLoopL
     private var tempCurrentFrameCount: Int = 0
     private var tempFrameCountInWarning: Int = 0
     private var tempNewBlockRow = TimeZoneGameLoop.createNewRowBlocks(Random())
-    private var mPrevGameStatus: GameStatus = GameStatus.Stopped
+    private var prevGameStatus: GameStatus = GameStatus.Stopped
 
     private var rand: Random = Random()
 
@@ -53,7 +53,7 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoop>(), TimeZoneGameLoopL
 
     override fun onStart() {
         super.onStart()
-        mPrevGameStatus = gameLoop.status
+        prevGameStatus = gameLoop.status
         gameLoop.setTimeZoneGameProperties(tempNewBlockRow, tempBlockMatchAnimating, tempLinesUntilSpeedIncrease, tempCurrentFrameCount, tempFrameCountInWarning)
         drawLineIfNeeded(tempNumOfLinesLeft)
         boardView.setGameSpeed(gameLoop.getNumOfFramesForCurrentLevel())
@@ -90,23 +90,23 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoop>(), TimeZoneGameLoopL
 
     override fun gameStatusChanged(newStatus: GameStatus) {
         // Check if game status actually changed
-        if (mPrevGameStatus == newStatus || newStatus == GameStatus.Stopped || mPrevGameStatus == GameStatus.Stopped) {
+        if (prevGameStatus == newStatus || newStatus == GameStatus.Stopped || prevGameStatus == GameStatus.Stopped) {
             return
         }
 
         boardView.statusChanged(newStatus)
 
-        if (mPrevGameStatus == GameStatus.Warning && (newStatus == GameStatus.Running || newStatus == GameStatus.Panic)) {
+        if (prevGameStatus == GameStatus.Warning && (newStatus == GameStatus.Running || newStatus == GameStatus.Panic)) {
             gameLoop.moveBlockSwitcherFromTop()
         }
 
-        if (newStatus == GameStatus.Running && mPrevGameStatus != GameStatus.Running) {
+        if (newStatus == GameStatus.Running && prevGameStatus != GameStatus.Running) {
             listener?.changeSong(false)
-        } else if ((newStatus == GameStatus.Warning || newStatus == GameStatus.Panic) && mPrevGameStatus != GameStatus.Warning && mPrevGameStatus != GameStatus.Panic) {
+        } else if ((newStatus == GameStatus.Warning || newStatus == GameStatus.Panic) && prevGameStatus != GameStatus.Warning && prevGameStatus != GameStatus.Panic) {
             listener?.changeSong(true)
         }
 
-        mPrevGameStatus = newStatus
+        prevGameStatus = newStatus
     }
 
     override fun blocksMatched() {}

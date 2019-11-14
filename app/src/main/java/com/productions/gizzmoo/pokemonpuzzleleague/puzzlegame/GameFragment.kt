@@ -17,7 +17,7 @@ import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources
 import com.productions.gizzmoo.pokemonpuzzleleague.settings.PokemonPreference
 import com.productions.gizzmoo.pokemonpuzzleleague.settings.TrainerPreference
 
-abstract class GameFragment<T : GameLoop> : Fragment(), IBoard, GameLoopListener {
+abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(), IBoard, GameLoopListener {
     protected lateinit var boardView: PuzzleBoardView
     lateinit var gameLoop: T
         protected set
@@ -67,7 +67,7 @@ abstract class GameFragment<T : GameLoop> : Fragment(), IBoard, GameLoopListener
 
         gameLoop = createGameLoop()
         boardView.listener = this
-        gameLoop.listener = this
+        gameLoop.listener = this as U
 
         if (tempSwitcher != null || tempGrid != null) {
             gameLoop.setGameProperties(tempGrid!!, tempSwitcher!!, gameStartTime)

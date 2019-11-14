@@ -4,10 +4,10 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
 
-class PuzzleAcademyGameLoop(grid: Array<Array<Block>>, var numOfSwapsLeft: Int) : GameLoop(grid) {
+class PuzzleAcademyGameLoop(grid: Array<Array<Block>>, var numOfSwapsLeft: Int) : GameLoop<PuzzleAcademyGameLoopListener>(grid) {
     override fun onProgressUpdate(vararg values: Void?) {
         super.onProgressUpdate()
-        (listener as PuzzleAcademyGameLoopListener?)?.updateGameTime(elapsedTime)
+        listener?.updateGameTime(elapsedTime)
     }
 
     override fun checkIfGameEnded() {

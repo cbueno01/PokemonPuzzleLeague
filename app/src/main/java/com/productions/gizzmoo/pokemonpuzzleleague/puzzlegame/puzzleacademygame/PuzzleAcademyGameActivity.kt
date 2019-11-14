@@ -8,16 +8,16 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameEndingDialogLi
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame.PuzzleAcademySelectionAdapter.Companion.PUZZLE_ID_KEY
 import java.util.*
 
-class PuzzleAcademyGameActivity : GameActivity(), PuzzleAcademyFragment.PuzzleAcademyFragmentInterface, GameEndingDialogListener {
+class PuzzleAcademyGameActivity : GameActivity(), PuzzleAcademyGameFragment.PuzzleAcademyFragmentInterface, GameEndingDialogListener {
     private lateinit var timeView: TextView
     private lateinit var swapsView: TextView
-    private lateinit var gameFragment: PuzzleAcademyFragment
+    private lateinit var gameFragment: PuzzleAcademyGameFragment
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.puzzle_academy_game)
         timeView = findViewById(R.id.timerValue)
         swapsView = findViewById(R.id.movesLeftValue)
-        gameFragment = supportFragmentManager.findFragmentById(R.id.puzzleBoard) as PuzzleAcademyFragment
+        gameFragment = supportFragmentManager.findFragmentById(R.id.puzzleBoard) as PuzzleAcademyGameFragment
         gameFragment.listener = this
         gameFragment.puzzleId = getPuzzleID()
     }

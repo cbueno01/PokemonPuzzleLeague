@@ -8,7 +8,7 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameFragment
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
 import java.util.*
 
-class PuzzleAcademyFragment : GameFragment<PuzzleAcademyGameLoop>(), PuzzleAcademyGameLoopListener {
+class PuzzleAcademyGameFragment : GameFragment<PuzzleAcademyGameLoopListener, PuzzleAcademyGameLoop>(), PuzzleAcademyGameLoopListener {
     var listener: PuzzleAcademyFragmentInterface? = null
     var puzzleId = 0
     var gameEnded = false
