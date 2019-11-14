@@ -401,9 +401,9 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
         get() = currentStatus === GameStatus.Running || currentStatus === GameStatus.Panic
 
     private fun updateRiseAnimationCountIfNeeded() {
+        val bitmapBlockSize = (BoardResources.getBlockHeights() * (risingAnimationCounter.toFloat() / numOfTotalFrames)).toInt()
+        risingAnimationOffset = (blockSize * (bitmapBlockSize / BoardResources.getBlockHeights().toFloat())).toInt()
         if (shouldAnimatingUp) {
-            val bitmapBlockSize = (BoardResources.getBlockHeights() * (risingAnimationCounter.toFloat() / numOfTotalFrames)).toInt()
-            risingAnimationOffset = (blockSize * (bitmapBlockSize / BoardResources.getBlockHeights().toFloat())).toInt()
             risingAnimationCounter++
         }
     }
