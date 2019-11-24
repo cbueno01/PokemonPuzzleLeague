@@ -1,35 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="@string/settings">
 
-    <com.productions.gizzmoo.pokemonpuzzleleague.settings.CustomPreferenceCategory
+    <PreferenceCategory
         android:title="@string/aesthetics">
         <com.productions.gizzmoo.pokemonpuzzleleague.settings.TrainerPreference
             android:key="pref_trainer_key"
             android:title="Trainer"
-            android:summary="Select your trainer"
-            android:dialogTitle="Trainers"
-            android:persistent="true"/>
+            android:dialogTitle="Trainers"/>
 
         <com.productions.gizzmoo.pokemonpuzzleleague.settings.PokemonPreference
             android:key="pref_pokemon_key"
             android:title="Pokemon"
-            android:summary="Select your pokemon"
             android:dialogTitle="Pokemon"/>
-    </com.productions.gizzmoo.pokemonpuzzleleague.settings.CustomPreferenceCategory>
+    </PreferenceCategory>
 
-    <com.productions.gizzmoo.pokemonpuzzleleague.settings.CustomPreferenceCategory
+    <PreferenceCategory
         android:title="@string/game_play">
         <com.productions.gizzmoo.pokemonpuzzleleague.settings.NumberPreference
             android:key="pref_game_speed"
             android:title="Game Speed"
-            android:summary="Select the speed for endless game mode"
             android:dialogTitle="Game Speed"/>
-    </com.productions.gizzmoo.pokemonpuzzleleague.settings.CustomPreferenceCategory>
+    </PreferenceCategory>
 
-    <com.productions.gizzmoo.pokemonpuzzleleague.settings.CustomPreferenceCategory
+    <PreferenceCategory
         android:title="@string/sound">
-    </com.productions.gizzmoo.pokemonpuzzleleague.settings.CustomPreferenceCategory>
+        <SwitchPreference
+            android:key="pref_music"
+            android:title="@string/game_music"
+            android:defaultValue="true" />
+        <SwitchPreference
+            android:key="pref_game_sound"
+            android:title="@string/game_sound"
+            android:defaultValue="true" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

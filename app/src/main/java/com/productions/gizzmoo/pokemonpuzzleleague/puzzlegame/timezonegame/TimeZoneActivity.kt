@@ -34,11 +34,9 @@ class TimeZoneActivity : GameActivity(), GameEndingDialogListener, TimeZoneGameF
     }
 
     override fun changeSong(isPanic: Boolean) {
-        if (!isMusicServiceBound) {
-            return
+        if (isMusicServiceBound) {
+            musicService?.changeSong(isPanic)
         }
-
-        musicService!!.changeSong(isPanic)
     }
 
     override fun updateGameTimeAndSpeed(timeInMilli: Long, gameSpeed: Int, delayInSeconds: Int) {

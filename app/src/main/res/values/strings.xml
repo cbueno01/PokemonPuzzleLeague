@@ -6,6 +6,8 @@
     <string name="aesthetics">Aesthetics</string>
     <string name="game_play">Game Play</string>
     <string name="sound">Sound</string>
+    <string name="game_music">Game Music</string>
+    <string name="game_sound">Game Sound</string>
 
     <string name="time">Time:</string>
     <string name="score">Score:</string>

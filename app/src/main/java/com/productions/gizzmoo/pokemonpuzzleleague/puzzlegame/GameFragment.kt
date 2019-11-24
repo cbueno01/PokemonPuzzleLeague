@@ -1,11 +1,10 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame
 
 import android.graphics.Point
-import android.media.AudioManager.STREAM_MUSIC
 import android.media.SoundPool
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,6 +32,7 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(),
     private var moveSoundID: Int = 0
     private val popSoundIDs = IntArray(4)
     private val pokemonSoundIDs = IntArray(4)
+    private var isGameSoundEnabled: Boolean = true
 
     private val popSoundResources = intArrayOf(R.raw.pop_sound_1, R.raw.pop_sound_2, R.raw.pop_sound_3, R.raw.pop_sound_4)
     private lateinit var pokemonSoundResources: Array<Int>
@@ -42,6 +42,7 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(),
         val settings = PreferenceManager.getDefaultSharedPreferences(activity)
         val pokemonIndex = settings.getInt("pref_pokemon_key", PokemonPreference.DEFAULT_ID)
         val trainer = getCurrentTrainer()
+        isGameSoundEnabled = settings.getBoolean("pref_game_sound", true)
         pokemonSoundResources = PokemonResources.getPokemonComboResources(PokemonResources.getPokemonForTrainer(trainer)[pokemonIndex])
 
         if (savedInstanceState != null) {
@@ -100,7 +101,7 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(),
         startSwitchAnimation(switcherLeftBlock, gameLoop.grid)
         gameLoop.swapBlocks(switcherLeftBlock.x, switcherLeftBlock.y, switcherLeftBlock.x + 1, switcherLeftBlock.y)
 
-        if (loadedSoundPool && switchSoundID != 0) {
+        if (loadedSoundPool && switchSoundID != 0 && isGameSoundEnabled) {
             soundPool.play(switchSoundID, 1f, 1f, SWITCH_SOUND_PRIORITY, 0, 1f)
         }
     }
@@ -114,27 +115,27 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(),
     }
 
     override fun switchBlockMoved() {
-        if (loadedSoundPool && moveSoundID != 0) {
+        if (loadedSoundPool && moveSoundID != 0 && isGameSoundEnabled) {
             soundPool.play(moveSoundID, 1f, 1f, MOVE_SOUND_PRIORITY, 0, 1f)
         }
     }
 
     override fun blockIsPopping(position: Int, total: Int) {
         val soundID = getPopSoundID(position, total)
-        if (loadedSoundPool && soundID != 0) {
+        if (loadedSoundPool && soundID != 0 && isGameSoundEnabled) {
             soundPool.play(soundID, 1f, 1f, POP_SOUND_PRIORITY, 0, 1f)
         }
     }
 
     override fun playPokemonSound(comboNumber: Int) {
         val pokemonSoundID = getPokemonSoundID(comboNumber)
-        if (loadedSoundPool && pokemonSoundID != 0) {
+        if (loadedSoundPool && pokemonSoundID != 0 && isGameSoundEnabled) {
             soundPool.play(pokemonSoundID, 1f, 1f, POKEMON_SOUND_PRIORITY, 0, 1f)
         }
     }
 
     override fun playTrainerSound(isMetallic: Boolean) {
-        if (loadedSoundPool && trainerSoundID != 0) {
+        if (loadedSoundPool && trainerSoundID != 0 && isGameSoundEnabled) {
             soundPool.play(trainerSoundID, 1f, 1f, TRAINER_SOUND_PRIORITY, 0, 1f)
         }
     }
@@ -146,7 +147,7 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(),
     private fun setGameSound() {
         val trainer = getCurrentTrainer()
 
-        soundPool = SoundPool(2, STREAM_MUSIC, 0)
+        soundPool = SoundPool.Builder().setMaxStreams(2).build()
         soundPool.setOnLoadCompleteListener { _, _, _ -> loadedSoundPool = true }
 
         trainerSoundID = soundPool.load(activity?.applicationContext, TrainerResources.getTrainerComboSound(trainer), 1)

@@ -7,11 +7,11 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
-import com.productions.gizzmoo.pokemonpuzzleleague.PokemonPuzzleLeagueActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.productions.gizzmoo.pokemonpuzzleleague.music.GameMusicService
 import com.productions.gizzmoo.pokemonpuzzleleague.music.ServiceBinder
 
-abstract class GameActivity : PokemonPuzzleLeagueActivity(), ServiceConnection {
+abstract class GameActivity : AppCompatActivity(), ServiceConnection {
     protected var musicService: GameMusicService? = null
     protected var isMusicServiceBound: Boolean = false
     private var trackPosition: Int = 0

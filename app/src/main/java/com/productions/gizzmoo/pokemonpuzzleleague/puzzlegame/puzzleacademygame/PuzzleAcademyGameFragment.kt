@@ -29,7 +29,7 @@ class PuzzleAcademyGameFragment : GameFragment<PuzzleAcademyGameLoopListener, Pu
 
     override fun gameFinished(didWin: Boolean) {
         val newFragment = GameDialogFragment.newInstance(didWin)
-        newFragment.show(activity?.fragmentManager, "postDialog")
+        newFragment.show(activity?.supportFragmentManager, "postDialog")
     }
 
     override fun switchBlock(switcherLeftBlock: Point) {

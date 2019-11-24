@@ -1,9 +1,6 @@
 <resources>
-    <style name="MenuActivityTheme" parent="Theme.AppCompat">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowContentOverlay">@null</item>
+    <style name="MenuActivityTheme" parent="FullScreen">
+        <item name="colorPrimary">@color/primary_dark</item>
         <item name="android:textColorPrimary">@color/primary_text_color</item>
         <item name="android:textColorSecondary">@color/primary_text_color</item>
         <item name="actionMenuTextColor">@color/primary_text_color</item>
@@ -18,8 +15,16 @@
 
     <style name="SettingsTheme" parent="FullScreen">
         <item name="android:navigationBarColor">@color/primary_dark</item>
-        <item name="android:actionBarStyle">@style/ActionBarStyle</item>
-        <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="colorPrimary">@color/primary_dark</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@color/primary_light</item>
+        <item name="colorAccent">@color/secondary_dark</item>
+
+        <!-- switcher style -->
+        <item name="colorControlActivated">@color/secondary_dark</item>
+        <item name="android:colorForeground">#42221f1f</item>
     </style>
 
     <style name="NoTitleOrActionBar" parent="FullScreen">
@@ -27,25 +32,31 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
-    <style name="FullScreen">
+    <style name="FullScreen" parent="Theme.AppCompat">
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="ActionBarStyle" parent="@android:style/Widget.ActionBar">
-        <item name="android:logo">@android:color/transparent</item>
-        <item name="android:background">@color/primary_dark</item>
-    </style>
-
-    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Dialog">
         <!-- Used for the buttons -->
         <item name="colorAccent">@color/primary_text_color</item>
         <!-- Used for the title and text -->
         <item name="android:textStyle">bold</item>
         <item name="android:textColorPrimary">@color/primary_text_color</item>
+        <item name="android:textColorSecondaryInverse">@color/primary_light</item>
         <!-- Used for the background -->
         <item name="android:background">@color/primary_dark</item>
-        <item name="colorControlNormal">@color/primary_text_color</item>
+    </style>
+
+    <style name="SettingsDialogFragment" parent="Theme.AppCompat">
+        <!-- Used for the buttons -->
+        <item name="colorAccent">@color/primary_text_color</item>
+        <!-- Used for the title and text -->
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColorPrimary">@color/primary_text_color</item>
+        <item name="android:textColorSecondaryInverse">@color/primary_light</item>
+        <!-- Used for the background -->
+        <item name="android:background">@color/primary_dark</item>
     </style>
 </resources>
 

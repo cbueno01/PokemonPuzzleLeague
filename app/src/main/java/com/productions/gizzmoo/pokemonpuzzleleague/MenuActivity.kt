@@ -2,8 +2,7 @@ package com.productions.gizzmoo.pokemonpuzzleleague
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
@@ -40,8 +39,6 @@ class MenuActivity : AppCompatActivity(), PanningLoopListener {
         }
 
         panningImage = findViewById(R.id.backgroundPanning)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
 
         if (savedInstanceState != null) {
             currentFrame = savedInstanceState.getInt(currentFrameKey)

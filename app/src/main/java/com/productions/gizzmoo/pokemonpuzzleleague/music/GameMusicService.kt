@@ -8,22 +8,28 @@ import com.productions.gizzmoo.pokemonpuzzleleague.settings.TrainerPreference
 class GameMusicService : MusicService() {
     private lateinit var resourceId: IntArray
     private var resourceIndex = 0
+    private var isMusicEnabled = true
 
     override fun onCreate() {
         super.onCreate()
         val settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val currentTrainer = Trainer.getTypeByID(settings.getInt("pref_trainer_key", TrainerPreference.DEFAULT_ID))
+        isMusicEnabled = settings.getBoolean("pref_music", true)
         resourceId = TrainerResources.getTrainerSong(currentTrainer)
     }
 
     fun startMusic(position: Int, isPanic: Boolean) {
-        resourceIndex = if (isPanic) 1 else 0
-        super.startMusic(position)
+        if (isMusicEnabled) {
+            resourceIndex = if (isPanic) 1 else 0
+            super.startMusic(position)
+        }
     }
 
     fun changeSong(isPanic: Boolean) {
-        stopMusic()
-        startMusic(0, isPanic)
+        if (isMusicEnabled) {
+            stopMusic()
+            startMusic(0, isPanic)
+        }
     }
 
     override fun getResource(): Int {

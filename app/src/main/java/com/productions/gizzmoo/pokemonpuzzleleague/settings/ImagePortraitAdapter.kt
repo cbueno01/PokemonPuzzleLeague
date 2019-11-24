@@ -11,7 +11,7 @@ import com.productions.gizzmoo.pokemonpuzzleleague.R
 class ImagePortraitAdapter(private val context: Context, private val bitmaps: Array<Bitmap>) : BaseAdapter() {
     var chosenPosition: Int = 0
 
-    override fun getCount(): Int =  bitmaps.size
+    override fun getCount(): Int = bitmaps.size
 
     override fun getItem(position: Int): Any = bitmaps[position]
 

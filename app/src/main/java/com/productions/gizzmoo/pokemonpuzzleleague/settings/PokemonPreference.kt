@@ -4,28 +4,23 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.media.AudioManager.STREAM_MUSIC
 import android.media.SoundPool
 import android.os.Parcelable
-import android.preference.DialogPreference
-import android.preference.PreferenceManager
 import android.util.AttributeSet
-import android.view.View
-import android.widget.AdapterView
-import android.widget.GridView
+import androidx.preference.DialogPreference
+import androidx.preference.PreferenceManager
 import com.productions.gizzmoo.pokemonpuzzleleague.Pokemon
 import com.productions.gizzmoo.pokemonpuzzleleague.PokemonResources
-import com.productions.gizzmoo.pokemonpuzzleleague.R
 import com.productions.gizzmoo.pokemonpuzzleleague.Trainer
 
 class PokemonPreference(context: Context, attrs: AttributeSet? = null) : DialogPreference(context, attrs), SharedPreferences.OnSharedPreferenceChangeListener {
-    private var pokemonID = DEFAULT_ID
-    private val settings : SharedPreferences
+    var pokemonID = DEFAULT_ID
+        private set
+    private val settings : SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
     private var currentTrainer : Trainer
-    private lateinit var gridView : GridView
-    private lateinit var portraitAdapter : ImagePortraitAdapter
 
-    private lateinit var bitmaps: Array<Bitmap>
+    lateinit var bitmaps: Array<Bitmap>
+        private set
     private lateinit var pokemonArr: Array<Pokemon>
     private lateinit var pokemonNames: Array<String>
     private lateinit var pokemonSounds: Array<Int>
@@ -34,29 +29,10 @@ class PokemonPreference(context: Context, attrs: AttributeSet? = null) : DialogP
     private var loadedSoundPool: Boolean = false
 
     init {
-        dialogLayoutResource = R.layout.pokemon_preference
-        settings = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
         currentTrainer = Trainer.getTypeByID(settings.getInt("pref_trainer_key", TrainerPreference.DEFAULT_ID))
-        soundPool = SoundPool(2, STREAM_MUSIC, 0)
+        soundPool = SoundPool.Builder().setMaxStreams(2).build()
         soundPool?.setOnLoadCompleteListener { _, _, _ -> loadedSoundPool = true }
         updateResourcesForNewTrainer()
-    }
-
-    override fun onBindDialogView(view: View) {
-        gridView = view.findViewById(R.id.grid)
-        portraitAdapter = ImagePortraitAdapter(context, bitmaps)
-        portraitAdapter.chosenPosition = pokemonID
-        gridView.adapter = portraitAdapter
-        gridView.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            persistInt(position)
-            pokemonID = position
-            if (loadedSoundPool) {
-                soundPool?.play( pokemonSounds[position], 1f, 1f, 1, 0, 1f)
-            }
-            dialog.dismiss()
-        }
-
-        super.onBindDialogView(view)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
@@ -65,6 +41,7 @@ class PokemonPreference(context: Context, attrs: AttributeSet? = null) : DialogP
             pokemonID = 0
             settings.edit().putInt("pref_pokemon_key", pokemonID).apply()
             updateResourcesForNewTrainer()
+            summary = pokemonNames[pokemonID]
         }
     }
 
@@ -76,18 +53,8 @@ class PokemonPreference(context: Context, attrs: AttributeSet? = null) : DialogP
         }
     }
 
-    override fun onDialogClosed(positiveResult: Boolean) {
-        if (positiveResult) {
-            persistInt(pokemonID)
-        }
-    }
-
     override fun onSaveInstanceState(): Parcelable {
         val superState = super.onSaveInstanceState()
-        if (isPersistent) {
-            return superState
-        }
-
         val myState = SavedState(superState)
         myState.value = pokemonID
         return myState
@@ -103,6 +70,19 @@ class PokemonPreference(context: Context, attrs: AttributeSet? = null) : DialogP
         super.onRestoreInstanceState(myState?.superState)
 
         pokemonID = myState?.value ?: DEFAULT_ID
+    }
+
+    override fun getSummary(): CharSequence {
+        return pokemonNames[pokemonID]
+    }
+
+    fun persistPokemonID(newPokemonID: Int) {
+        pokemonID = newPokemonID
+        summary = pokemonNames[newPokemonID]
+        persistInt(newPokemonID)
+        if (loadedSoundPool) {
+            soundPool?.play( pokemonSounds[newPokemonID], 1f, 1f, 1, 0, 1f)
+        }
     }
 
     private fun updateResourcesForNewTrainer() {

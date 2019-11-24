@@ -9,7 +9,7 @@ import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
 import android.preference.PreferenceManager
-import android.support.v4.view.MotionEventCompat
+import androidx.core.view.MotionEventCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.MotionEvent.INVALID_POINTER_ID
@@ -68,6 +68,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
     var risingAnimationCounter: Int = 1
     private var risingAnimationOffset: Int = 0
     private var shouldAnimatingUp: Boolean = false
+    var showNewBlocks: Boolean = false
 
     private var currentStatus: GameStatus = GameStatus.Running
     private var winLine: Int = 0
@@ -75,7 +76,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
 
     init {
         BoardResources.createImageBitmaps(context)
-        val settings = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext())
+        val settings = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
 
         val currentTrainer = Trainer.getTypeByID(settings.getInt("pref_trainer_key", TrainerPreference.DEFAULT_ID))
         val pokemonIndex = settings.getInt("pref_pokemon_key", PokemonPreference.DEFAULT_ID)
@@ -200,7 +201,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
             for (row in it.indices.reversed()) {
                 for (blockIndex in 0 until it[row].size) {
                     val widthStartPosition = blockIndex * blockSize + widthOffset
-                    val heightStartPosition = row * blockSize + heightOffset - (if (doesStatusAllowAnimation) risingAnimationOffset else 0)
+                    val heightStartPosition = row * blockSize + heightOffset - (if (doesStatusAllowAnimation && showNewBlocks) risingAnimationOffset else 0)
                     handleDrawingBlock(canvas, it[row][blockIndex], widthStartPosition, heightStartPosition, row, blockIndex)
                 }
             }
@@ -325,7 +326,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
     }
 
     private fun drawNewRow(canvas: Canvas) {
-        if (doesStatusAllowAnimation) {
+        if (showNewBlocks && doesStatusAllowAnimation) {
             val y = 12 * blockSize + heightOffset
             val bitmapRation = risingAnimationOffset.toFloat() / blockSize
 

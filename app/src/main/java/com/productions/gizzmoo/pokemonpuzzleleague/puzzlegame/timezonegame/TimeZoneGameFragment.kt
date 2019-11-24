@@ -60,6 +60,7 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
         boardView.startAnimatingUp()
         boardView.newRowBlocks = gameLoop.newRow
         boardView.risingAnimationCounter = tempCurrentFrameCount
+        boardView.showNewBlocks = true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -113,7 +114,7 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
 
     override fun gameFinished(didWin: Boolean) {
         val newFragment = GameDialogFragment.newInstance(didWin)
-        newFragment.show(activity?.fragmentManager, "postDialog")
+        newFragment.show(activity?.supportFragmentManager, "postDialog")
     }
 
     override fun newBlockWasAdded(numOfLinesLeft: Int) {
@@ -164,10 +165,10 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
 
     }
 
-    fun drawLineIfNeeded(numOfLines: Int) {
-        if (numOfLines <= NUM_OF_ROWS) {
-            boardView.winLineAt(numOfLines)
-        }
+    private fun drawLineIfNeeded(numOfLines: Int) {
+//        if (numOfLines <= NUM_OF_ROWS) {
+//            boardView.winLineAt(numOfLines)
+//        }
     }
 
     interface TimeZoneFragmentInterface {
