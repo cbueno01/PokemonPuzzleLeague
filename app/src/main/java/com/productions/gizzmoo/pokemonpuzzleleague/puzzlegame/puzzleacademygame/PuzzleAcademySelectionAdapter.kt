@@ -8,12 +8,11 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import com.productions.gizzmoo.pokemonpuzzleleague.R
 
-class PuzzleAcademySelectionAdapter(private val context: Context) : BaseAdapter() {
+class PuzzleAcademySelectionAdapter(private val context: Context, private val onClick: (Int) -> Unit) : BaseAdapter() {
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         return PuzzleAcademyGridViewItem(context).apply {
             text = (position + 1).toString()
             gravity = Gravity.CENTER
-//            setBackgroundResource(R.drawable.rectagle_border)
 
             if (FileManager.getJSONReaderWriter(context, 1).didWinLevel(position)) {
                 setBackgroundColor(context.resources.getColor(R.color.secondary_light))
@@ -22,12 +21,7 @@ class PuzzleAcademySelectionAdapter(private val context: Context) : BaseAdapter(
                 setBackgroundColor(context.resources.getColor(R.color.primary_dark))
                 setTextColor(context.resources.getColor(R.color.primary_text_color))
             }
-            setOnClickListener {
-                val intent = Intent(context, PuzzleAcademyGameActivity::class.java).apply {
-                    putExtra(PUZZLE_ID_KEY, position)
-                }
-                context.startActivity(intent)
-            }
+            setOnClickListener { onClick(position) }
         }
     }
 

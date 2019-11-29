@@ -46,6 +46,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             (DIVIDER_SIZE * resources.displayMetrics.density + 0.5f).toInt()
 
     companion object {
-        const val DIVIDER_SIZE = 8
+        const val DIVIDER_SIZE = 1
     }
 }

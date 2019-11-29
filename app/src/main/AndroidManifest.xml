@@ -23,24 +23,20 @@
 
         <activity
             android:name=".puzzlegame.timezonegame.TimeZoneActivity"
-            android:parentActivityName=".MenuActivity"
             android:screenOrientation="portrait"
             android:theme="@style/GameTheme"/>
 
         <activity android:name=".puzzlegame.puzzleacademygame.PuzzleAcademySelectionActivity"
-            android:parentActivityName=".MenuActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MenuActivityTheme"/>
 
         <activity
             android:name=".puzzlegame.puzzleacademygame.PuzzleAcademyGameActivity"
-            android:parentActivityName=".puzzlegame.puzzleacademygame.PuzzleAcademySelectionActivity"
             android:screenOrientation="portrait"
             android:theme="@style/GameTheme"/>
 
         <activity
             android:name=".settings.SettingsActivity"
-            android:parentActivityName=".MenuActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SettingsTheme"/>
 

@@ -30,12 +30,14 @@ class MenuActivity : AppCompatActivity(), PanningLoopListener {
         mTimeZoneButton.setOnClickListener {
             val intent = Intent(this@MenuActivity, TimeZoneActivity::class.java)
             startActivity(intent)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
         val mPuzzleAcademy = findViewById<Button>(R.id.puzzleAcademy)
         mPuzzleAcademy.setOnClickListener {
             val intent = Intent(this@MenuActivity, PuzzleAcademySelectionActivity::class.java)
             startActivity(intent)
+            overridePendingTransition(R.anim.slide_out_left, R.anim.slide_in_right)
         }
 
         panningImage = findViewById(R.id.backgroundPanning)

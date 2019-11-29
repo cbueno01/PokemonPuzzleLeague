@@ -7,7 +7,7 @@
         <item name="android:navigationBarColor">@color/primary_dark</item>
     </style>
 
-    <style name="GameTheme" parent="NoTitleOrActionBar">>
+    <style name="GameTheme" parent="FullScreen">
         <item name="android:windowBackground">@color/primary_dark</item>
         <item name="android:colorBackground">@color/primary_dark</item>
         <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
@@ -25,11 +25,6 @@
         <!-- switcher style -->
         <item name="colorControlActivated">@color/secondary_dark</item>
         <item name="android:colorForeground">#42221f1f</item>
-    </style>
-
-    <style name="NoTitleOrActionBar" parent="FullScreen">
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowNoTitle">true</item>
     </style>
 
     <style name="FullScreen" parent="Theme.AppCompat">
