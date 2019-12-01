@@ -8,6 +8,7 @@
     <string name="sound">Sound</string>
     <string name="game_music">Game Music</string>
     <string name="game_sound">Game Sound</string>
+    <string name="ready">Ready</string>
 
     <string name="time">Time:</string>
     <string name="score">Score:</string>

@@ -1,11 +1,11 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame
 
-import android.graphics.Point
 import com.productions.gizzmoo.pokemonpuzzleleague.Direction
 import java.io.Serializable
 
 class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
-    private var coordPoint: Point = Point(0, 0)
+    private var xCoord = 0
+    private var yCoord = 0
 
     var type: BlockType
         private set
@@ -67,8 +67,8 @@ class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
             else -> BlockType.EMPTY
         }
 
-        coordPoint.x = x
-        coordPoint.y = y
+        xCoord = x
+        yCoord = y
 
         resetBlockValues()
     }
@@ -79,19 +79,16 @@ class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
     }
 
     override fun compareTo(other: Block): Int {
-        val p1 = coordPoint
-        val p2 = other.coordPoint
-
-        return if (p1.y == p2.y) {
-            p1.x - p2.x
+        return if (this.yCoord == other.yCoord) {
+            this.xCoord - other.xCoord
         } else {
-            p1.y - p2.y
+            this.yCoord - other.yCoord
         }
     }
 
     fun changeCoords(newX: Int, newY: Int) {
-        coordPoint.x = newX
-        coordPoint.y = newY
+        this.xCoord = newX
+        this.yCoord = newY
     }
 
     fun startFallingAnimation() {

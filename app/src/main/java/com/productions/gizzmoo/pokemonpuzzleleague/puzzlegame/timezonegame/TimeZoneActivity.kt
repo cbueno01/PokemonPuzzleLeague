@@ -29,7 +29,7 @@ class TimeZoneActivity : GameActivity(), GameEndingDialogListener, TimeZoneGameF
         speedView = findViewById(R.id.speedValue)
         speedGroup = findViewById(R.id.speedGroup)
         stallTimeView = findViewById(R.id.stallTime)
-        gameFragment = supportFragmentManager.findFragmentById(R.id.puzzleBoard) as TimeZoneGameFragment
+        gameFragment = supportFragmentManager.findFragmentById(R.id.puzzleGame) as TimeZoneGameFragment
         gameFragment.listener = this
     }
 

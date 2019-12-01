@@ -37,6 +37,7 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(),
     private val popSoundResources = intArrayOf(R.raw.pop_sound_1, R.raw.pop_sound_2, R.raw.pop_sound_3, R.raw.pop_sound_4)
     private lateinit var pokemonSoundResources: Array<Int>
 
+    @Suppress("UNCHECKED_CAST")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val settings = PreferenceManager.getDefaultSharedPreferences(activity)
@@ -63,6 +64,7 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(),
         setGameSound()
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun onStart() {
         super.onStart()
 
@@ -78,7 +80,7 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(),
 
         boardView.setGrid(gameLoop.grid, gameLoop.blockSwitcher)
         boardView.statusChanged(gameLoop.status)
-        gameLoop.startGame()
+        startGame()
     }
 
     override fun onStop() {
@@ -142,6 +144,10 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(),
 
     override fun updateBoardView() {
         boardView.invalidate()
+    }
+
+    protected open fun startGame() {
+        gameLoop.startGame()
     }
 
     private fun setGameSound() {

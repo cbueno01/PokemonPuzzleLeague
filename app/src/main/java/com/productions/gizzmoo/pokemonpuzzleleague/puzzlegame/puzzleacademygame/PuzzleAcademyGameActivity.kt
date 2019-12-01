@@ -17,7 +17,7 @@ class PuzzleAcademyGameActivity : GameActivity(), PuzzleAcademyGameFragment.Puzz
         setContentView(R.layout.puzzle_academy_game)
         timeView = findViewById(R.id.timerValue)
         swapsView = findViewById(R.id.movesLeftValue)
-        gameFragment = supportFragmentManager.findFragmentById(R.id.puzzleBoard) as PuzzleAcademyGameFragment
+        gameFragment = supportFragmentManager.findFragmentById(R.id.puzzleGame) as PuzzleAcademyGameFragment
         gameFragment.listener = this
         gameFragment.puzzleId = getPuzzleID()
     }

@@ -59,7 +59,7 @@
     </LinearLayout>
 
     <fragment android:name="com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame.PuzzleAcademyGameFragment"
-        android:id="@+id/puzzleBoard"
+        android:id="@+id/puzzleGame"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

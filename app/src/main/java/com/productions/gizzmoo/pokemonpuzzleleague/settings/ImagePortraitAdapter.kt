@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import com.productions.gizzmoo.pokemonpuzzleleague.R
 
 class ImagePortraitAdapter(private val context: Context, private val bitmaps: Array<Bitmap>) : BaseAdapter() {
@@ -30,7 +31,7 @@ class ImagePortraitAdapter(private val context: Context, private val bitmaps: Ar
             imageView = convertView as ImageView
         }
 
-        val background = if (position == chosenPosition) context.resources.getColor(R.color.secondary) else context.resources.getColor(R.color.primary_dark)
+        val background = ContextCompat.getColor(context, if (position == chosenPosition) R.color.secondary else R.color.primary_dark)
         imageView.setBackgroundColor(background)
         imageView.setImageBitmap(bitmaps[position])
         return imageView

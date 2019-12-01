@@ -6,11 +6,12 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.productions.gizzmoo.pokemonpuzzleleague.R
 import android.graphics.drawable.ColorDrawable
+import androidx.core.content.ContextCompat
 
 class SettingsFragment : PreferenceFragmentCompat() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        setDivider(ColorDrawable(resources.getColor(R.color.primary)))
+        setDivider(ColorDrawable(ContextCompat.getColor(activity!!, R.color.primary)))
         setDividerHeight(getDpiForDivider())
     }
 

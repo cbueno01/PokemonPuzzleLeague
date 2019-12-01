@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import androidx.core.content.ContextCompat
 import com.productions.gizzmoo.pokemonpuzzleleague.R
 
 class PuzzleAcademySelectionAdapter(private val context: Context, private val onClick: (Int) -> Unit) : BaseAdapter() {
@@ -15,11 +16,11 @@ class PuzzleAcademySelectionAdapter(private val context: Context, private val on
             gravity = Gravity.CENTER
 
             if (FileManager.getJSONReaderWriter(context, 1).didWinLevel(position)) {
-                setBackgroundColor(context.resources.getColor(R.color.secondary_light))
-                setTextColor(context.resources.getColor(R.color.secondary_text_color))
+                setBackgroundColor(ContextCompat.getColor(context, R.color.secondary_light))
+                setTextColor(ContextCompat.getColor(context, R.color.secondary_text_color))
             } else {
-                setBackgroundColor(context.resources.getColor(R.color.primary_dark))
-                setTextColor(context.resources.getColor(R.color.primary_text_color))
+                setBackgroundColor(ContextCompat.getColor(context, R.color.primary_dark))
+                setTextColor(ContextCompat.getColor(context, R.color.primary_text_color))
             }
             setOnClickListener { onClick(position) }
         }

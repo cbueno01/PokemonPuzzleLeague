@@ -139,7 +139,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
 
-        when (MotionEventCompat.getActionMasked(event)) {
+        when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> performActionDown(event)
             MotionEvent.ACTION_MOVE -> performActionMove(event)
             MotionEvent.ACTION_UP -> performActionUp(event)
@@ -426,15 +426,15 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
     }
 
     private fun performActionDown(event: MotionEvent) {
-        val pointerIndex = MotionEventCompat.getActionIndex(event)
-        val x = MotionEventCompat.getX(event, pointerIndex)
-        val y = MotionEventCompat.getY(event, pointerIndex)
+        val pointerIndex = event.actionIndex
+        val x = event.getX(pointerIndex)
+        val y = event.getY(pointerIndex)
         val p = getGridCoordinatesOffXY(x, y + risingAnimationOffset)
 
         // Remember where we started (for dragging)
         lastTouch = p
         // Save the ID of this pointer (for dragging)
-        activePointerId = MotionEventCompat.getPointerId(event, 0)
+        activePointerId = event.getPointerId(0)
         blockSwitcher?.let {
             if (it.areCoordinatesInSwitcher(p.x, p.y)) {
                 it.switcherIsBeingMoved = true
@@ -446,10 +446,10 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
 
     private fun performActionMove(event: MotionEvent) {
         // Find the index of the active pointer and fetch its position
-        val pointerIndex = MotionEventCompat.findPointerIndex(event, activePointerId)
+        val pointerIndex = event.findPointerIndex(activePointerId)
 
-        val x = MotionEventCompat.getX(event, pointerIndex)
-        val y = MotionEventCompat.getY(event, pointerIndex)
+        val x = event.getX(pointerIndex)
+        val y = event.getY(pointerIndex)
         val newP = getGridCoordinatesOffXY(x, y + risingAnimationOffset)
 
         blockSwitcher?.let {
@@ -523,10 +523,10 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
     }
 
     private fun performActionPointerUp(event: MotionEvent) {
-        val pointerIndex = MotionEventCompat.getActionIndex(event)
+        val pointerIndex = event.actionIndex
 
-        val currentX = MotionEventCompat.getX(event, pointerIndex)
-        val currentY = MotionEventCompat.getY(event, pointerIndex)
+        val currentX = event.getX(pointerIndex)
+        val currentY = event.getY(pointerIndex)
         val p = getGridCoordinatesOffXY(currentX, currentY + risingAnimationOffset)
 
         if (p.x == lastTouchPointer?.x && p.y == lastTouchPointer?.y) {
@@ -535,21 +535,21 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
              }
         }
 
-        val pointerId = MotionEventCompat.getPointerId(event, pointerIndex)
+        val pointerId = event.getPointerId(pointerIndex)
 
         if (pointerId == activePointerId) {
             // This was our active pointer going up. Choose a new
             // active pointer and adjust accordingly.
             val newPointerIndex = if (pointerIndex == 0) 1 else 0
-            activePointerId = MotionEventCompat.getPointerId(event, newPointerIndex)
+            activePointerId = event.getPointerId(newPointerIndex)
             blockSwitcher?.switcherIsBeingMoved = false
         }
     }
 
     private fun performActionPointerDown(event: MotionEvent) {
-        val pointerIndex = MotionEventCompat.getActionIndex(event)
-        val x = MotionEventCompat.getX(event, pointerIndex)
-        val y = MotionEventCompat.getY(event, pointerIndex)
+        val pointerIndex = event.actionIndex
+        val x = event.getX(pointerIndex)
+        val y = event.getY(pointerIndex)
         lastTouchPointer = getGridCoordinatesOffXY(x, y + risingAnimationOffset)
     }
 

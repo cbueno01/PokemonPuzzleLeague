@@ -2,7 +2,14 @@ package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame
 
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.RelativeLayout
+import android.widget.TextView
+import com.productions.gizzmoo.pokemonpuzzleleague.R
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameCountDownTimer
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameDialogFragment
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameFragment
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.Companion.NUM_OF_COLS
@@ -21,8 +28,14 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
     private var tempNewBlockRow = TimeZoneGameLoop.createNewRowBlocks(Random())
     private var prevGameStatus: GameStatus = GameStatus.Stopped
 
+    private var readyContainerView: RelativeLayout? = null
+    private var countDownView: TextView? = null
+    private var gameCountDownTimer: GameCountDownTimer? = null
+    private var gameCounterExecuted = false
+
     private var rand: Random = Random()
 
+    @Suppress("UNCHECKED_CAST")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState != null) {
@@ -33,6 +46,7 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
             tempCurrentFrameCount = savedInstanceState.getInt(frameCountKey)
             tempFrameCountInWarning = savedInstanceState.getInt(frameCountInWarningKey)
             tempNewBlockRow = savedInstanceState.getSerializable(newRowKey) as Array<Block>
+            gameCounterExecuted = savedInstanceState.getBoolean(gameCounterExecutedKey)
         } else {
             val settings = PreferenceManager.getDefaultSharedPreferences(activity!!.applicationContext)
             tempNumOfLinesLeft = settings.getInt("pref_lines_key", 15) + NUM_OF_ROWS
@@ -49,13 +63,14 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
         tempCurrentFrameCount = gameLoop.currentFrameCount
         tempFrameCountInWarning = gameLoop.framesInWarning
         tempNewBlockRow = gameLoop.newRow
+        gameCountDownTimer?.cancel()
     }
 
     override fun onStart() {
         super.onStart()
         prevGameStatus = gameLoop.status
         gameLoop.setTimeZoneGameProperties(tempNewBlockRow, tempBlockMatchAnimating, tempLinesUntilSpeedIncrease, tempCurrentFrameCount, tempFrameCountInWarning)
-        drawLineIfNeeded(tempNumOfLinesLeft)
+//        drawLineIfNeeded(tempNumOfLinesLeft)
         boardView.setGameSpeed(gameLoop.getNumOfFramesForCurrentLevel())
         boardView.startAnimatingUp()
         boardView.newRowBlocks = gameLoop.newRow
@@ -72,6 +87,16 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
         outState.putInt(frameCountKey, gameLoop.currentFrameCount)
         outState.putInt(frameCountInWarningKey, gameLoop.framesInWarning)
         outState.putSerializable(newRowKey, gameLoop.newRow)
+        outState.putBoolean(gameCounterExecutedKey, gameCounterExecuted)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val mainView = super.onCreateView(inflater, container, savedInstanceState)
+        readyContainerView = mainView?.findViewById(R.id.readyContainer)
+        countDownView = mainView?.findViewById(R.id.countDown)
+        // Don't let user click through view
+        readyContainerView?.setOnClickListener {}
+        return mainView
     }
 
     override fun boardSwipedUp() {
@@ -118,7 +143,7 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
     }
 
     override fun newBlockWasAdded(numOfLinesLeft: Int) {
-        drawLineIfNeeded(numOfLinesLeft)
+//        drawLineIfNeeded(numOfLinesLeft)
         boardView.resetRisingAnimationCount()
         boardView.newRowBlocks = gameLoop.newRow
         boardView.setGameSpeed(gameLoop.getNumOfFramesForCurrentLevel())
@@ -134,6 +159,16 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
 
     override fun stopAnimatingUp() {
         boardView.stopAnimatingUp()
+    }
+
+    override fun startGame() {
+        if (!gameCounterExecuted) {
+            readyContainerView?.visibility = View.VISIBLE
+            gameCountDownTimer = GameCountDownTimer(onFinishTimer(), onTimerUpdate())
+            gameCountDownTimer?.start()
+        } else {
+            super.startGame()
+        }
     }
 
     private fun getGameBoard(): Array<Array<Block>> {
@@ -165,11 +200,25 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
 
     }
 
-    private fun drawLineIfNeeded(numOfLines: Int) {
+    private fun onFinishTimer(): () -> Unit {
+        return {
+            gameCounterExecuted = true
+            readyContainerView?.visibility = View.GONE
+            super.startGame()
+        }
+    }
+
+    private fun onTimerUpdate(): (Int) -> Unit {
+        return { value ->
+            countDownView?.text = value.toString()
+        }
+    }
+
+//    private fun drawLineIfNeeded(numOfLines: Int) {
 //        if (numOfLines <= NUM_OF_ROWS) {
 //            boardView.winLineAt(numOfLines)
 //        }
-    }
+//    }
 
     interface TimeZoneFragmentInterface {
         fun changeSong(isPanic: Boolean)
@@ -184,6 +233,7 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
         private const val frameCountKey = "FRAME_COUNT_KEY"
         private const val frameCountInWarningKey = "FRAME_COUNT_IN_WARNING_KEY"
         private const val newRowKey = "NEW_BLOCK_ROW_KEY"
+        private const val gameCounterExecutedKey = "COUNTER_EXECUTED_KEY"
 
         private const val NUMBER_OF_BLOCKS_MULTIPLIER = 5
     }
