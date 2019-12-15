@@ -253,7 +253,7 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
         var rowToUpdate = row - 1
         while (rowToUpdate >= 0 && !grid[rowToUpdate][column].isBlockEmpty) {
             if (grid[rowToUpdate][column].canInteract) {
-                grid[rowToUpdate][column].canCombo = true
+                grid[rowToUpdate][column].setCanComboFlag(true)
             }
             rowToUpdate--
         }

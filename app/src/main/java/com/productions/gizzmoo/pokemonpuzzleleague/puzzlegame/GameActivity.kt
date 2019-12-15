@@ -21,8 +21,8 @@ abstract class GameActivity : AppCompatActivity(), ServiceConnection {
 
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
         musicService = ((binder as ServiceBinder).service as GameMusicService)
-        musicService?.startMusic(trackPosition, shouldPlayPanicMusic())
         isMusicServiceBound = true
+        playMusicOnStartUp()
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
@@ -67,6 +67,14 @@ abstract class GameActivity : AppCompatActivity(), ServiceConnection {
     override fun finish() {
         super.finish()
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+    }
+
+    protected open fun playMusicOnStartUp() {
+        startMusic()
+    }
+
+    protected fun startMusic() {
+        musicService?.startMusic(trackPosition, shouldPlayPanicMusic())
     }
 
     @SuppressLint("RestrictedApi")

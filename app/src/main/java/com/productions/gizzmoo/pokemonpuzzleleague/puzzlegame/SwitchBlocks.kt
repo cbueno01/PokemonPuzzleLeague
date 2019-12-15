@@ -5,6 +5,7 @@ import java.io.Serializable
 
 class SwitchBlocks(private var leftColumn: Int, private var leftRow: Int, private var rightColumn: Int, private var rightRow: Int) : Serializable {
     var switcherIsBeingMoved: Boolean = false
+    var allowedToBeOnTop: Boolean = true
 
     init {
         if (!isSwitcherStable) {

@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.MotionEvent
 import android.view.MotionEvent.INVALID_POINTER_ID
 import android.view.View
@@ -246,11 +247,14 @@ open class PuzzleBoardView(context: Context) : View(context) {
 
         var blockNeedsToSwap = false
         if (block.downAnimatingCount >= ANIMATION_FALLING_FRAMES_NEEDED) {
+            if (block.downAnimatingCount > ANIMATION_FALLING_FRAMES_NEEDED) {
+                Log.d("cbueno", "blockAnimation count is higher that $ANIMATION_FALLING_FRAMES_NEEDED: ${block.downAnimatingCount}")
+            }
             if (row < blocks!!.size - 1 && (blocks!![row + 1][blockIndex].isBlockEmpty || blocks!![row + 1][blockIndex].isAnimatingDown) && !(blocks!![row + 1][blockIndex].isBeingSwitched || blocks!![row + 1][blockIndex].hasMatched)) {
                 blockNeedsToSwap = true
             } else {
                 if (block.canCombo) {
-                    block.removeComboFlagOnNextFrame = true
+                    block.setRemoveComboFlagOnNextFrame(true)
                 }
                 block.stopFallingAnimation()
             }
@@ -266,8 +270,8 @@ open class PuzzleBoardView(context: Context) : View(context) {
 
     private fun removeComboAndDrawBlock(canvas: Canvas, block: Block, widthStartPosition: Int, heightStartPosition: Int) {
         if (block.removeComboFlagOnNextFrame) {
-            block.removeComboFlagOnNextFrame = false
-            block.canCombo = false
+            block.setRemoveComboFlagOnNextFrame(false)
+            block.setCanComboFlag(false)
         }
 
         blockRect.set(widthStartPosition, heightStartPosition, widthStartPosition + blockSize, heightStartPosition + blockSize)
@@ -390,7 +394,7 @@ open class PuzzleBoardView(context: Context) : View(context) {
                         isReallyMoving = false
                     }
 
-                    if (!shouldAllowSwitcherToTheTop() && newP.y == 0) {
+                    if (!it.allowedToBeOnTop && newP.y == 0) {
                         newP.y = 1
                         isReallyMoving = false
                     }
@@ -406,7 +410,7 @@ open class PuzzleBoardView(context: Context) : View(context) {
                         isReallyMoving = false
                     }
 
-                    if (!shouldAllowSwitcherToTheTop() && newP.y == 0) {
+                    if (!it.allowedToBeOnTop && newP.y == 0) {
                         newP.y = 1
                         isReallyMoving = false
                     }
@@ -506,8 +510,6 @@ open class PuzzleBoardView(context: Context) : View(context) {
 
         return false
     }
-
-    protected open fun shouldAllowSwitcherToTheTop(): Boolean = true
 
     companion object {
         const val BOARD_PADDING = 16

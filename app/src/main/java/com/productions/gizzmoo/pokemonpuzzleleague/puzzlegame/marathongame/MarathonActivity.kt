@@ -20,6 +20,8 @@ class MarathonActivity : GameActivity(), GameEndingDialogListener, MarathonGameF
     private lateinit var speedGroup: LinearLayout
     private lateinit var stallTimeView: TextView
     private lateinit var gameFragment: MarathonGameFragment
+    // Game may have started but music is not ready.
+    private var gameStarted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +33,11 @@ class MarathonActivity : GameActivity(), GameEndingDialogListener, MarathonGameF
         stallTimeView = findViewById(R.id.stallTime)
         gameFragment = supportFragmentManager.findFragmentById(R.id.puzzleGame) as MarathonGameFragment
         gameFragment.listener = this
+    }
+
+    override fun onStop() {
+        super.onStop()
+        gameStarted = false
     }
 
     override fun changeSong(isPanic: Boolean) {
@@ -52,11 +59,21 @@ class MarathonActivity : GameActivity(), GameEndingDialogListener, MarathonGameF
         }
     }
 
-    override fun onGameEndingDialogResponse(didWin: Boolean) {
-        finish()
+    override fun onGameEndingDialogResponse(didWin: Boolean) { finish() }
+
+    override fun shouldPlayPanicMusic(): Boolean =
+        gameFragment.gameLoop.status != GameStatus.Running
+
+    override fun onGameStarted() {
+        if (isMusicServiceBound) {
+            startMusic()
+        }
+        gameStarted = true
     }
 
-    override fun shouldPlayPanicMusic(): Boolean {
-        return gameFragment.gameLoop.status != GameStatus.Running
+    override fun playMusicOnStartUp() {
+        if (gameStarted) {
+            super.playMusicOnStartUp()
+        }
     }
 }

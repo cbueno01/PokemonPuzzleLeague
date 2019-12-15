@@ -22,6 +22,7 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
         private set
     var framesInWarning: Int = 0
         private set
+    private var hasUpdatedRisingAnimationStatus = true
 
     override fun checkIfGameEnded() {
         checkIfUserLost()
@@ -30,7 +31,10 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
 
     override fun postGameMechanicHook() {
         if (canAnimateUp()) {
-            listener?.startAnimatingUp()
+            if (!hasUpdatedRisingAnimationStatus) {
+                listener?.tryToStartAnimatingUp()
+                hasUpdatedRisingAnimationStatus = true
+            }
 
             if (currentFrameCount >= getNumOfFramesForCurrentLevel()) {
                 addNewRow()
@@ -41,6 +45,7 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
             numOfFramesToStall = 0
         } else {
             numOfFramesToStall--
+            hasUpdatedRisingAnimationStatus = false
         }
     }
 
@@ -61,6 +66,11 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
         super.onProgressUpdate()
         val numOfDelayedSeconds = Math.ceil(numOfFramesToStall.toDouble() / MAX_FPS).toInt()
         listener?.updateGameTimeAndSpeed(elapsedTime, gameSpeedLevel, numOfDelayedSeconds)
+    }
+
+    override fun onPreExecute() {
+        super.onPreExecute()
+        listener?.gameIsPrepared()
     }
 
     fun addNewRow() {

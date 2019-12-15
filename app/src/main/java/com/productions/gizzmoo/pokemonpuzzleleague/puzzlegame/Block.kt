@@ -39,9 +39,9 @@ class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
         private set
 
     var canCombo: Boolean = false
-//        private set
+        private set
     var removeComboFlagOnNextFrame: Boolean = false
-//        private set
+        private set
 
     val canInteract: Boolean
         get() = !isBlockEmpty && !isAnimating
@@ -73,6 +73,7 @@ class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
         resetBlockValues()
     }
 
+    @Synchronized
     fun clear() {
         type = BlockType.EMPTY
         resetBlockValues()
@@ -86,33 +87,39 @@ class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
         }
     }
 
+    @Synchronized
     fun changeCoords(newX: Int, newY: Int) {
         this.xCoord = newX
         this.yCoord = newY
     }
 
+    @Synchronized
     fun startFallingAnimation() {
         downAnimatingCount = 0
         isAnimatingDown = true
     }
 
+    @Synchronized
     fun stopFallingAnimation() {
         downAnimatingCount = 0
         isAnimatingDown = false
     }
 
+    @Synchronized
     fun startSwitchAnimation(direction: Direction) {
         isBeingSwitched = true
         switchAnimationCount = 1
         leftRightAnimationDirection = direction
     }
 
+    @Synchronized
     fun stopSwitchAnimation() {
         isBeingSwitched = false
         switchAnimationCount = 0
         leftRightAnimationDirection = Direction.None
     }
 
+    @Synchronized
     fun blockMatched(delayedMatchAnimationFrames: Int, matchInvertedAnimationFrames: Int, clearMatchFrames: Int, position: Int, totalNumOfBlockMatches: Int) {
         hasMatched = true
         matchPopAnimationCount = 0
@@ -123,32 +130,49 @@ class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
         matchTotalCount = totalNumOfBlockMatches
     }
 
+    @Synchronized
     fun incrementSwitchAnimationFrame() {
         switchAnimationCount++
     }
 
+    @Synchronized
     fun incrementDownAnimationFrame() {
         downAnimatingCount++
     }
 
+    @Synchronized
     fun incrementPopAnimationFrame() {
         matchPopAnimationCount++
     }
 
+    @Synchronized
     fun decrementDelayedMatchAnimationFrame() {
         delayMatchAnimationCount--
     }
 
+    @Synchronized
     fun decrementInvertedAnimationFrame() {
         matchInvertedAnimationCount--
     }
 
+    @Synchronized
     fun decrementClearFrame() {
         clearMatchCount--
     }
 
+    @Synchronized
     fun blockPopped() {
         hasPopped = true
+    }
+
+    @Synchronized
+    fun setCanComboFlag(flag: Boolean) {
+        canCombo = flag
+    }
+
+    @Synchronized
+    fun setRemoveComboFlagOnNextFrame(flag: Boolean) {
+        removeComboFlagOnNextFrame = flag
     }
 
     private fun resetBlockValues() {

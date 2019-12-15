@@ -13,7 +13,6 @@ class MarathonPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
     private var risingAnimationOffset: Int = 0
     private var shouldAnimatingUp: Boolean = false
     private var numOfTotalFrames: Int = 1
-    private var currentStatus: GameStatus = GameStatus.Running
 //    private var winLine: Int = 0
 //    private var shouldShowWinLine: Boolean = false
 
@@ -33,11 +32,7 @@ class MarathonPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
         numOfTotalFrames = numOfFrames
     }
 
-    fun statusChanged(status: GameStatus) {
-        currentStatus = status
-    }
-
-    override fun getSubclassHeightOffset(): Int = if (doesStatusAllowAnimation) risingAnimationOffset else 0
+    override fun getSubclassHeightOffset(): Int = risingAnimationOffset
 
     override fun drawAfterBackground() {
         updateRiseAnimationCountIfNeeded()
@@ -48,20 +43,14 @@ class MarathonPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
 //      drawLine(canvas)
     }
 
-    override fun shouldAllowSwitcherToTheTop(): Boolean =
-        currentStatus !== GameStatus.Running && currentStatus !== GameStatus.Panic
-
-
     private fun drawNewRow(canvas: Canvas) {
-        if (doesStatusAllowAnimation) {
-            val y = 12 * blockSize + heightOffset
-            val bitmapRation = risingAnimationOffset.toFloat() / blockSize
+        val y = 12 * blockSize + heightOffset
+        val bitmapRation = risingAnimationOffset.toFloat() / blockSize
 
-            for (i in newRowBlocks.indices) {
-                val x = i * blockSize + widthOffset
-                blockRect.set(x, y - risingAnimationOffset, x + blockSize, y)
-                drawBlock(canvas, newRowBlocks[i], blockRect, bitmapRation)
-            }
+        for (i in newRowBlocks.indices) {
+            val x = i * blockSize + widthOffset
+            blockRect.set(x, y - risingAnimationOffset, x + blockSize, y)
+            drawBlock(canvas, newRowBlocks[i], blockRect, bitmapRation)
         }
     }
 
@@ -86,8 +75,4 @@ class MarathonPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
             risingAnimationCounter++
         }
     }
-
-    private val doesStatusAllowAnimation: Boolean
-        get() = currentStatus === GameStatus.Running || currentStatus === GameStatus.Panic
-
 }

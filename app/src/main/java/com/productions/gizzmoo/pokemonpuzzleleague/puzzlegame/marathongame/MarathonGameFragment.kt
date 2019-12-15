@@ -73,7 +73,6 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
         gameLoop.setMarathonGameProperties(tempNewBlockRow, tempBlockMatchAnimating, tempLinesUntilSpeedIncrease, tempCurrentFrameCount, tempFrameCountInWarning)
 //        drawLineIfNeeded(tempNumOfLinesLeft)
         boardView.setGameSpeed(gameLoop.getNumOfFramesForCurrentLevel())
-        boardView.startAnimatingUp()
         boardView.newRowBlocks = gameLoop.newRow
         boardView.risingAnimationCounter = tempCurrentFrameCount
     }
@@ -143,8 +142,6 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
             return
         }
 
-        boardView.statusChanged(newStatus)
-
         if (prevGameStatus == GameStatus.Warning && (newStatus == GameStatus.Running || newStatus == GameStatus.Panic)) {
             gameLoop.moveBlockSwitcherFromTop()
         }
@@ -154,6 +151,8 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
         } else if ((newStatus == GameStatus.Warning || newStatus == GameStatus.Panic) && prevGameStatus != GameStatus.Warning && prevGameStatus != GameStatus.Panic) {
             listener?.changeSong(true)
         }
+
+        setAnimationPropertiesByStatus()
 
         prevGameStatus = newStatus
     }
@@ -176,8 +175,10 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
         listener?.updateGameTimeAndSpeed(timeInMilli, gameSpeed, delayInSeconds)
     }
 
-    override fun startAnimatingUp() {
-        boardView.startAnimatingUp()
+    override fun tryToStartAnimatingUp() {
+        if (gameLoop.status != GameStatus.Warning || gameLoop.status != GameStatus.Stopped) {
+            boardView.startAnimatingUp()
+        }
     }
 
     override fun stopAnimatingUp() {
@@ -185,15 +186,18 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
     }
 
     override fun startGame() {
-        boardView.statusChanged(gameLoop.status)
-
         if (!gameCounterExecuted) {
             readyContainerView?.visibility = View.VISIBLE
             gameCountDownTimer = GameCountDownTimer(onFinishTimer(), onTimerUpdate())
             gameCountDownTimer?.start()
         } else {
             super.startGame()
+            listener?.onGameStarted()
         }
+    }
+
+    override fun gameIsPrepared() {
+        setAnimationPropertiesByStatus()
     }
 
     private fun getGameBoard(): Array<Array<Block>> {
@@ -230,12 +234,23 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
             gameCounterExecuted = true
             readyContainerView?.visibility = View.GONE
             super.startGame()
+            listener?.onGameStarted()
         }
     }
 
     private fun onTimerUpdate(): (Int) -> Unit {
         return { value ->
             countDownView?.text = value.toString()
+        }
+    }
+
+    private fun setAnimationPropertiesByStatus() {
+        if (gameLoop.status == GameStatus.Warning || gameLoop.status == GameStatus.Stopped) {
+            boardView.stopAnimatingUp()
+            gameLoop.blockSwitcher.allowedToBeOnTop = true
+        } else {
+            boardView.startAnimatingUp()
+            gameLoop.blockSwitcher.allowedToBeOnTop = false
         }
     }
 
@@ -248,6 +263,7 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
     interface MarathonFragmentInterface {
         fun changeSong(isPanic: Boolean)
         fun updateGameTimeAndSpeed(timeInMilli: Long, gameSpeed: Int, delayInSeconds: Int)
+        fun onGameStarted()
     }
 
     companion object {
