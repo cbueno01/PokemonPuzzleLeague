@@ -9,8 +9,6 @@ import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
 import android.preference.PreferenceManager
-import androidx.core.view.MotionEventCompat
-import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.MotionEvent.INVALID_POINTER_ID
 import android.view.View
@@ -18,28 +16,25 @@ import com.productions.gizzmoo.pokemonpuzzleleague.PokemonResources
 import com.productions.gizzmoo.pokemonpuzzleleague.R
 import com.productions.gizzmoo.pokemonpuzzleleague.Trainer
 import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame.TimeZoneGameLoop
 import com.productions.gizzmoo.pokemonpuzzleleague.settings.PokemonPreference
 import com.productions.gizzmoo.pokemonpuzzleleague.settings.TrainerPreference
-import java.util.*
 
-class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, attrs) {
+open class PuzzleBoardView(context: Context) : View(context) {
 
     private var blocks: Array<Array<Block>>? = null
     private var blockSwitcher: SwitchBlocks? = null
 
     private var boardWidth: Int = 0
     private var boardHeight: Int = 0
-    private var widthOffset: Int = 0
-    private var heightOffset: Int = 0
-    private var blockSize: Int = 0
+    protected var widthOffset: Int = 0
+    protected var heightOffset: Int = 0
+    protected var blockSize: Int = 0
 
-    private val blockRect = Rect()
+    protected val blockRect = Rect()
     private val blockRectScale = Rect()
     private val boardRect = Rect()
     private val pokemonBackgroundRect = Rect()
 
-    var newRowBlocks = TimeZoneGameLoop.createNewRowBlocks(Random())
     private var boardPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.BLACK
         style = Paint.Style.FILL_AND_STROKE
@@ -56,7 +51,6 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
 
     private var trainerBitmap: Bitmap
     private var pokemonBitmap: Bitmap? = null
-    private var numOfTotalFrames: Int = 1
 
     private var activePointerId = INVALID_POINTER_ID
     private var lastTouch: Point? = null
@@ -64,15 +58,6 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
     private var leftBlockSwitcherIsBeingMoved: Boolean = false
     private var rightBlockSwitcherIsBeingMoved: Boolean = false
     var listener: IBoard? = null
-
-    var risingAnimationCounter: Int = 1
-    private var risingAnimationOffset: Int = 0
-    private var shouldAnimatingUp: Boolean = false
-    var showNewBlocks: Boolean = false
-
-    private var currentStatus: GameStatus = GameStatus.Running
-    private var winLine: Int = 0
-    private var shouldShowWinLine: Boolean = false
 
     init {
         BoardResources.createImageBitmaps(context)
@@ -129,11 +114,10 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
         super.onDraw(canvas)
 
         drawBackground(canvas)
-        updateRiseAnimationCountIfNeeded()
+        drawAfterBackground()
         drawGrid(canvas)
-        drawNewRow(canvas)
+        drawAfterGrid(canvas)
         drawBlockSwitcher(canvas)
-        drawLine(canvas)
         drawRectBoarder(canvas)
     }
 
@@ -161,32 +145,11 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
         setGrid(grid)
     }
 
-    fun setGameSpeed(numOfFrames: Int) {
-        numOfTotalFrames = numOfFrames
-    }
+    protected open fun getSubclassHeightOffset(): Int = 0
 
-    fun resetRisingAnimationCount() {
-        risingAnimationCounter = 1
-    }
+    protected open fun drawAfterGrid(canvas: Canvas) {}
 
-    fun startAnimatingUp() {
-        shouldAnimatingUp = true
-    }
-
-    fun stopAnimatingUp() {
-        shouldAnimatingUp = false
-    }
-
-    fun statusChanged(status: GameStatus) {
-        currentStatus = status
-    }
-
-    fun winLineAt(line: Int) {
-        if (line <= 12) {
-            shouldShowWinLine = true
-            winLine = line
-        }
-    }
+    protected open fun drawAfterBackground() {}
 
     private fun drawBackground(canvas: Canvas) {
         canvas.drawRect(boardRect, boardPaint)
@@ -201,7 +164,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
             for (row in it.indices.reversed()) {
                 for (blockIndex in 0 until it[row].size) {
                     val widthStartPosition = blockIndex * blockSize + widthOffset
-                    val heightStartPosition = row * blockSize + heightOffset - (if (doesStatusAllowAnimation && showNewBlocks) risingAnimationOffset else 0)
+                    val heightStartPosition = row * blockSize + heightOffset - getSubclassHeightOffset()
                     handleDrawingBlock(canvas, it[row][blockIndex], widthStartPosition, heightStartPosition, row, blockIndex)
                 }
             }
@@ -311,7 +274,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
         drawBlock(canvas, block, blockRect, 1f)
     }
 
-    private fun drawBlock(canvas: Canvas, block: Block, position: Rect, heightRatio: Float) {
+    protected fun drawBlock(canvas: Canvas, block: Block, position: Rect, heightRatio: Float) {
         if (!block.isBlockEmpty) {
             val heightRatioWithGuards = when {
                 heightRatio > 1 -> 1f
@@ -325,28 +288,11 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
         }
     }
 
-    private fun drawNewRow(canvas: Canvas) {
-        if (showNewBlocks && doesStatusAllowAnimation) {
-            val y = 12 * blockSize + heightOffset
-            val bitmapRation = risingAnimationOffset.toFloat() / blockSize
-
-            for (i in newRowBlocks.indices) {
-                val x = i * blockSize + widthOffset
-                blockRect.set(x, y - risingAnimationOffset, x + blockSize, y)
-                drawBlock(canvas, newRowBlocks[i], blockRect, bitmapRation)
-            }
-        }
-    }
-
     private fun drawBlockSwitcher(canvas: Canvas) {
         blockSwitcher?.let {
             val leftBlock = it.leftBlock
             val x = leftBlock.x * blockSize + widthOffset
-            var y = leftBlock.y * blockSize + heightOffset
-
-            if (doesStatusAllowAnimation) {
-                y -= risingAnimationOffset
-            }
+            var y = leftBlock.y * blockSize + heightOffset - getSubclassHeightOffset()
 
             canvas.drawLine(x.toFloat(), y.toFloat(), (x + blockSize / 4).toFloat(), y.toFloat(), blockSwitcherPaint)
             canvas.drawLine(x.toFloat(), y.toFloat(), x.toFloat(), (y + blockSize / 4).toFloat(), blockSwitcherPaint)
@@ -362,13 +308,6 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
             canvas.drawLine((x + 2 * blockSize).toFloat(), y.toFloat(), (x + 2 * blockSize).toFloat(), (y + blockSize / 4).toFloat(), blockSwitcherPaint)
             canvas.drawLine((x + 2 * blockSize).toFloat(), (y + 3 * blockSize / 4).toFloat(), (x + 2 * blockSize).toFloat(), (y + blockSize).toFloat(), blockSwitcherPaint)
             canvas.drawLine((x + 7 * blockSize / 4).toFloat(), (y + blockSize).toFloat(), (x + 2 * blockSize).toFloat(), (y + blockSize).toFloat(), blockSwitcherPaint)
-        }
-    }
-
-    private fun drawLine(canvas: Canvas) {
-        if (shouldShowWinLine) {
-            val y = if (winLine != 0 && doesStatusAllowAnimation) winLine * blockSize - risingAnimationOffset else winLine * blockSize
-            canvas.drawLine(widthOffset.toFloat(), (y + heightOffset).toFloat(), (boardWidth + widthOffset).toFloat(), (y + heightOffset).toFloat(), blockSwitcherPaint)
         }
     }
 
@@ -398,16 +337,6 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
         }
     }
 
-    private val doesStatusAllowAnimation: Boolean
-        get() = currentStatus === GameStatus.Running || currentStatus === GameStatus.Panic
-
-    private fun updateRiseAnimationCountIfNeeded() {
-        val bitmapBlockSize = (BoardResources.getBlockHeights() * (risingAnimationCounter.toFloat() / numOfTotalFrames)).toInt()
-        risingAnimationOffset = (blockSize * (bitmapBlockSize / BoardResources.getBlockHeights().toFloat())).toInt()
-        if (shouldAnimatingUp) {
-            risingAnimationCounter++
-        }
-    }
 
     private fun getGridCoordinatesOffXY(x: Float, y: Float): Point {
         var posX = Math.abs((x - BOARD_PADDING.toFloat() - widthOffset.toFloat()) / blockSize).toInt()
@@ -429,7 +358,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
         val pointerIndex = event.actionIndex
         val x = event.getX(pointerIndex)
         val y = event.getY(pointerIndex)
-        val p = getGridCoordinatesOffXY(x, y + risingAnimationOffset)
+        val p = getGridCoordinatesOffXY(x, y + getSubclassHeightOffset())
 
         // Remember where we started (for dragging)
         lastTouch = p
@@ -450,7 +379,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
 
         val x = event.getX(pointerIndex)
         val y = event.getY(pointerIndex)
-        val newP = getGridCoordinatesOffXY(x, y + risingAnimationOffset)
+        val newP = getGridCoordinatesOffXY(x, y + getSubclassHeightOffset())
 
         blockSwitcher?.let {
             if (it.switcherIsBeingMoved) {
@@ -461,7 +390,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
                         isReallyMoving = false
                     }
 
-                    if ((currentStatus === GameStatus.Running || currentStatus === GameStatus.Panic) && newP.y == 0) {
+                    if (!shouldAllowSwitcherToTheTop() && newP.y == 0) {
                         newP.y = 1
                         isReallyMoving = false
                     }
@@ -477,7 +406,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
                         isReallyMoving = false
                     }
 
-                    if ((currentStatus === GameStatus.Running || currentStatus === GameStatus.Panic) && newP.y == 0) {
+                    if (!shouldAllowSwitcherToTheTop() && newP.y == 0) {
                         newP.y = 1
                         isReallyMoving = false
                     }
@@ -501,7 +430,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
             if (!blockSwitcher.switcherIsBeingMoved) {
                 val currentX = event.x
                 val currentY = event.y
-                val p = getGridCoordinatesOffXY(currentX, currentY + risingAnimationOffset)
+                val p = getGridCoordinatesOffXY(currentX, currentY + getSubclassHeightOffset())
                 val deltaY = if (lastTouch != null) lastTouch!!.y - p.y else 0
 
                 if (deltaY >= MIN_SWIPE_DISTANCE) {
@@ -527,7 +456,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
 
         val currentX = event.getX(pointerIndex)
         val currentY = event.getY(pointerIndex)
-        val p = getGridCoordinatesOffXY(currentX, currentY + risingAnimationOffset)
+        val p = getGridCoordinatesOffXY(currentX, currentY + getSubclassHeightOffset())
 
         if (p.x == lastTouchPointer?.x && p.y == lastTouchPointer?.y) {
              blockSwitcher?.let {
@@ -550,7 +479,7 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
         val pointerIndex = event.actionIndex
         val x = event.getX(pointerIndex)
         val y = event.getY(pointerIndex)
-        lastTouchPointer = getGridCoordinatesOffXY(x, y + risingAnimationOffset)
+        lastTouchPointer = getGridCoordinatesOffXY(x, y + getSubclassHeightOffset())
     }
 
     private fun tryToSwitch(leftBlockSwitch: Point) {
@@ -577,6 +506,8 @@ class PuzzleBoardView(context: Context, attrs: AttributeSet) : View(context, att
 
         return false
     }
+
+    protected open fun shouldAllowSwitcherToTheTop(): Boolean = true
 
     companion object {
         const val BOARD_PADDING = 16

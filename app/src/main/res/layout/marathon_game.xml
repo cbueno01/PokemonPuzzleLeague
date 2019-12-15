@@ -94,7 +94,7 @@
 
     </LinearLayout>
 
-    <fragment android:name="com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame.TimeZoneGameFragment"
+    <fragment android:name="com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame.MarathonGameFragment"
         android:id="@+id/puzzleGame"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

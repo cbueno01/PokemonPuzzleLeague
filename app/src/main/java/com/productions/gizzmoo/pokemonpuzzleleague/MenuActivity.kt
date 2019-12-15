@@ -9,7 +9,7 @@ import android.widget.Button
 import com.productions.gizzmoo.pokemonpuzzleleague.PanningLoop.Companion.MAX_FPS
 import com.productions.gizzmoo.pokemonpuzzleleague.PanningLoop.Companion.NUM_OF_SECS_TO_PAN_VIEW
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame.PuzzleAcademySelectionActivity
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame.TimeZoneActivity
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame.MarathonActivity
 import com.productions.gizzmoo.pokemonpuzzleleague.settings.SettingsActivity
 
 class MenuActivity : AppCompatActivity(), PanningLoopListener {
@@ -26,15 +26,15 @@ class MenuActivity : AppCompatActivity(), PanningLoopListener {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
-        val mTimeZoneButton = findViewById<Button>(R.id.timeZoneButton)
-        mTimeZoneButton.setOnClickListener {
-            val intent = Intent(this@MenuActivity, TimeZoneActivity::class.java)
+        val marathonButton = findViewById<Button>(R.id.marathonButton)
+        marathonButton.setOnClickListener {
+            val intent = Intent(this@MenuActivity, MarathonActivity::class.java)
             startActivity(intent)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
-        val mPuzzleAcademy = findViewById<Button>(R.id.puzzleAcademy)
-        mPuzzleAcademy.setOnClickListener {
+        val puzzleAcademyButton = findViewById<Button>(R.id.puzzleAcademy)
+        puzzleAcademyButton.setOnClickListener {
             val intent = Intent(this@MenuActivity, PuzzleAcademySelectionActivity::class.java)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_out_left, R.anim.slide_in_right)

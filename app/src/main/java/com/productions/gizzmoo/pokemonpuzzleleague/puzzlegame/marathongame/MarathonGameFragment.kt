@@ -1,13 +1,14 @@
-package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame
 
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.productions.gizzmoo.pokemonpuzzleleague.R
+import com.productions.gizzmoo.pokemonpuzzleleague.ViewUtils
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameCountDownTimer
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameDialogFragment
@@ -17,15 +18,15 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.Companion
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
 import java.util.Random
 
-class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGameLoop>(), TimeZoneGameLoopListener {
-    var listener: TimeZoneFragmentInterface? = null
-    private var tempNumOfLinesLeft: Int = 0
+class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGameLoop, MarathonPuzzleBoardView>(), MarathonGameLoopListener {
+    var listener: MarathonFragmentInterface? = null
+//    private var tempNumOfLinesLeft: Int = 0
     private var tempGameSpeed: Int = 0
     private var tempBlockMatchAnimating: Int = 0
     private var tempLinesUntilSpeedIncrease: Int = -1 // -1 so game loop knows to get the full amount of rows needed
     private var tempCurrentFrameCount: Int = 0
     private var tempFrameCountInWarning: Int = 0
-    private var tempNewBlockRow = TimeZoneGameLoop.createNewRowBlocks(Random())
+    private var tempNewBlockRow = MarathonGameLoop.createNewRowBlocks(Random())
     private var prevGameStatus: GameStatus = GameStatus.Stopped
 
     private var readyContainerView: RelativeLayout? = null
@@ -40,7 +41,7 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
         super.onCreate(savedInstanceState)
         if (savedInstanceState != null) {
             tempBlockMatchAnimating = savedInstanceState.getInt(matchAnimationCountKey)
-            tempNumOfLinesLeft = savedInstanceState.getInt(linesToWinKey)
+//            tempNumOfLinesLeft = savedInstanceState.getInt(linesToWinKey)
             tempGameSpeed = savedInstanceState.getInt(gameSpeedKey)
             tempLinesUntilSpeedIncrease = savedInstanceState.getInt(linesUntilSpeedIncreaseKey)
             tempCurrentFrameCount = savedInstanceState.getInt(frameCountKey)
@@ -49,14 +50,14 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
             gameCounterExecuted = savedInstanceState.getBoolean(gameCounterExecutedKey)
         } else {
             val settings = PreferenceManager.getDefaultSharedPreferences(activity!!.applicationContext)
-            tempNumOfLinesLeft = settings.getInt("pref_lines_key", 15) + NUM_OF_ROWS
+//            tempNumOfLinesLeft = settings.getInt("pref_lines_key", 15) + NUM_OF_ROWS
             tempGameSpeed = settings.getInt("pref_game_speed", 10)
         }
     }
 
     override fun onStop() {
         super.onStop()
-        tempNumOfLinesLeft = gameLoop.numOfLinesLeft
+//        tempNumOfLinesLeft = gameLoop.numOfLinesLeft
         tempGameSpeed = gameLoop.gameSpeedLevel
         tempBlockMatchAnimating = gameLoop.blockMatchAnimating
         tempLinesUntilSpeedIncrease = gameLoop.linesToNewLevel
@@ -69,19 +70,18 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
     override fun onStart() {
         super.onStart()
         prevGameStatus = gameLoop.status
-        gameLoop.setTimeZoneGameProperties(tempNewBlockRow, tempBlockMatchAnimating, tempLinesUntilSpeedIncrease, tempCurrentFrameCount, tempFrameCountInWarning)
+        gameLoop.setMarathonGameProperties(tempNewBlockRow, tempBlockMatchAnimating, tempLinesUntilSpeedIncrease, tempCurrentFrameCount, tempFrameCountInWarning)
 //        drawLineIfNeeded(tempNumOfLinesLeft)
         boardView.setGameSpeed(gameLoop.getNumOfFramesForCurrentLevel())
         boardView.startAnimatingUp()
         boardView.newRowBlocks = gameLoop.newRow
         boardView.risingAnimationCounter = tempCurrentFrameCount
-        boardView.showNewBlocks = true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(matchAnimationCountKey, gameLoop.blockMatchAnimating)
-        outState.putInt(linesToWinKey, gameLoop.numOfLinesLeft)
+//        outState.putInt(linesToWinKey, gameLoop.numOfLinesLeft)
         outState.putInt(gameSpeedKey, gameLoop.gameSpeedLevel)
         outState.putInt(linesUntilSpeedIncreaseKey, gameLoop.linesToNewLevel)
         outState.putInt(frameCountKey, gameLoop.currentFrameCount)
@@ -90,13 +90,33 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
         outState.putBoolean(gameCounterExecutedKey, gameCounterExecuted)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val mainView = super.onCreateView(inflater, container, savedInstanceState)
-        readyContainerView = mainView?.findViewById(R.id.readyContainer)
-        countDownView = mainView?.findViewById(R.id.countDown)
-        // Don't let user click through view
-        readyContainerView?.setOnClickListener {}
-        return mainView
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        readyContainerView = RelativeLayout(activity).apply {
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            visibility = View.GONE
+            setBackgroundColor(ContextCompat.getColor(context, R.color.game_shadow))
+            setOnClickListener {}
+        }
+        val readyTextView = TextView(context).apply {
+            layoutParams = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE)
+                setMargins(0, 0, 0, ViewUtils.pxFromDp(context, 8).toInt())
+            }
+            text = resources.getString(R.string.ready)
+            id = View.generateViewId()
+        }
+        countDownView = TextView(context).apply {
+            layoutParams = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                addRule(RelativeLayout.BELOW, readyTextView.id)
+                addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE)
+            }
+        }
+
+        readyContainerView?.addView(readyTextView)
+        readyContainerView?.addView(countDownView)
+        (view as ViewGroup).addView(readyContainerView)
     }
 
     override fun boardSwipedUp() {
@@ -110,9 +130,12 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
         gameLoop.aBlockFinishedAnimating()
     }
 
-    override fun createGameLoop(): TimeZoneGameLoop {
-        return TimeZoneGameLoop(getGameBoard(), tempNumOfLinesLeft, tempGameSpeed)
+    override fun createGameLoop(): MarathonGameLoop {
+        return MarathonGameLoop(getGameBoard(), tempGameSpeed)
     }
+
+    override fun createPuzzleBoardView(): MarathonPuzzleBoardView =
+            MarathonPuzzleBoardView(activity!!)
 
     override fun gameStatusChanged(newStatus: GameStatus) {
         // Check if game status actually changed
@@ -142,7 +165,7 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
         newFragment.show(activity?.supportFragmentManager, "postDialog")
     }
 
-    override fun newBlockWasAdded(numOfLinesLeft: Int) {
+    override fun newBlockWasAdded() {
 //        drawLineIfNeeded(numOfLinesLeft)
         boardView.resetRisingAnimationCount()
         boardView.newRowBlocks = gameLoop.newRow
@@ -162,6 +185,8 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
     }
 
     override fun startGame() {
+        boardView.statusChanged(gameLoop.status)
+
         if (!gameCounterExecuted) {
             readyContainerView?.visibility = View.VISIBLE
             gameCountDownTimer = GameCountDownTimer(onFinishTimer(), onTimerUpdate())
@@ -220,7 +245,7 @@ class TimeZoneGameFragment : GameFragment<TimeZoneGameLoopListener, TimeZoneGame
 //        }
 //    }
 
-    interface TimeZoneFragmentInterface {
+    interface MarathonFragmentInterface {
         fun changeSong(isPanic: Boolean)
         fun updateGameTimeAndSpeed(timeInMilli: Long, gameSpeed: Int, delayInSeconds: Int)
     }

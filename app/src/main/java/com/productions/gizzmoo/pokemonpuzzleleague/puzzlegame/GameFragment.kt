@@ -16,8 +16,8 @@ import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources
 import com.productions.gizzmoo.pokemonpuzzleleague.settings.PokemonPreference
 import com.productions.gizzmoo.pokemonpuzzleleague.settings.TrainerPreference
 
-abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(), IBoard, GameLoopListener {
-    protected lateinit var boardView: PuzzleBoardView
+abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>, V : PuzzleBoardView> : Fragment(), IBoard, GameLoopListener {
+    protected lateinit var boardView: V
     lateinit var gameLoop: T
         protected set
 
@@ -53,10 +53,15 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(),
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val mainView = inflater.inflate(R.layout.game_fragment_layout, container, false)
-        boardView = mainView.findViewById(R.id.puzzleBoard)
-        return mainView
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.game_fragment_layout, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        boardView = createPuzzleBoardView().apply {
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        }
+        (view as ViewGroup).addView(boardView)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -79,7 +84,6 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(),
         }
 
         boardView.setGrid(gameLoop.grid, gameLoop.blockSwitcher)
-        boardView.statusChanged(gameLoop.status)
         startGame()
     }
 
@@ -195,6 +199,8 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>> : Fragment(),
     }
 
     protected abstract fun createGameLoop(): T
+
+    protected abstract fun createPuzzleBoardView(): V
 
     companion object {
         private const val BOARD_KEY = "BOARD_KEY"

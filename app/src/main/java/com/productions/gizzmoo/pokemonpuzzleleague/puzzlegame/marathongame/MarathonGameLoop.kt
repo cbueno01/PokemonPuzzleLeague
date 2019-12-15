@@ -1,16 +1,16 @@
-package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame
 
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
 import java.util.*
 
-class TimeZoneGameLoop(grid: Array<Array<Block>>, numOfLines: Int, gameSpeedLevelParam: Int) : GameLoop<TimeZoneGameLoopListener>(grid) {
+class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : GameLoop<MarathonGameLoopListener>(grid) {
     private val rand: Random = Random()
     var newRow: Array<Block> = createNewRowBlocks(rand)
         private set
-    var numOfLinesLeft = numOfLines
-        private set
+//    var numOfLinesLeft = numOfLines
+//        private set
     var gameSpeedLevel = gameSpeedLevelParam
         private set
     private var numOfFramesToStall: Int = 0
@@ -80,7 +80,7 @@ class TimeZoneGameLoop(grid: Array<Array<Block>>, numOfLines: Int, gameSpeedLeve
             grid[NUM_OF_ROWS - 1][i] = newRow[i]
         }
 
-        numOfLinesLeft--
+//        numOfLinesLeft--
         currentFrameCount = 0
 
         if (!blockSwitcher.isAtTop || doesRowContainBlock(0)) {
@@ -89,7 +89,7 @@ class TimeZoneGameLoop(grid: Array<Array<Block>>, numOfLines: Int, gameSpeedLeve
 
         increaseGameSpeedIfNeeded()
         newRow = createNewRowBlocks(rand)
-        listener?.newBlockWasAdded(numOfLinesLeft)
+        listener?.newBlockWasAdded()
         lock.unlock()
     }
 
@@ -117,20 +117,20 @@ class TimeZoneGameLoop(grid: Array<Array<Block>>, numOfLines: Int, gameSpeedLeve
     }
 
     private fun checkIfUserWon() {
-        if (numOfLinesLeft > 11 || isBoardAnimating()) {
-            return
-        }
-
-        for (i in 0 until numOfLinesLeft) {
-            for (j in 0 until NUM_OF_COLS) {
-                if (!grid[i][j].isBlockEmpty) {
-                    return
-                }
-            }
-        }
-
-        didWin = true
-        changeGameStatus(GameStatus.Stopped)
+//        if (numOfLinesLeft > 11 || isBoardAnimating()) {
+//            return
+//        }
+//
+//        for (i in 0 until numOfLinesLeft) {
+//            for (j in 0 until NUM_OF_COLS) {
+//                if (!grid[i][j].isBlockEmpty) {
+//                    return
+//                }
+//            }
+//        }
+//
+//        didWin = true
+//        changeGameStatus(GameStatus.Stopped)
     }
 
     private fun increaseGameSpeedIfNeeded() {
@@ -148,7 +148,7 @@ class TimeZoneGameLoop(grid: Array<Array<Block>>, numOfLines: Int, gameSpeedLeve
         blockMatchAnimating--
     }
 
-    fun setTimeZoneGameProperties(newRowParam: Array<Block>, numOfBlocksAnimating: Int, linesUntilSpeedIncrease: Int, frameCount: Int, frameCountInWarning: Int) {
+    fun setMarathonGameProperties(newRowParam: Array<Block>, numOfBlocksAnimating: Int, linesUntilSpeedIncrease: Int, frameCount: Int, frameCountInWarning: Int) {
         newRow = newRowParam
         blockMatchAnimating = numOfBlocksAnimating
         linesToNewLevel = if (linesUntilSpeedIncrease < 0) getNumOfRowsForLevel() else linesUntilSpeedIncrease

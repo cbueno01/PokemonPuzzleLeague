@@ -1,4 +1,4 @@
-package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame
 
 import android.os.Bundle
 import android.view.View
@@ -14,22 +14,22 @@ import java.util.*
  * Created by Chrystian on 1/23/2018.
  */
 
-class TimeZoneActivity : GameActivity(), GameEndingDialogListener, TimeZoneGameFragment.TimeZoneFragmentInterface {
+class MarathonActivity : GameActivity(), GameEndingDialogListener, MarathonGameFragment.MarathonFragmentInterface {
     private lateinit var timeView: TextView
     private lateinit var speedView: TextView
     private lateinit var speedGroup: LinearLayout
     private lateinit var stallTimeView: TextView
-    private lateinit var gameFragment: TimeZoneGameFragment
+    private lateinit var gameFragment: MarathonGameFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.time_zone_game)
+        setContentView(R.layout.marathon_game)
         timeView = findViewById(R.id.timerValue)
         speedView = findViewById(R.id.speedValue)
         speedGroup = findViewById(R.id.speedGroup)
         stallTimeView = findViewById(R.id.stallTime)
-        gameFragment = supportFragmentManager.findFragmentById(R.id.puzzleGame) as TimeZoneGameFragment
+        gameFragment = supportFragmentManager.findFragmentById(R.id.puzzleGame) as MarathonGameFragment
         gameFragment.listener = this
     }
 

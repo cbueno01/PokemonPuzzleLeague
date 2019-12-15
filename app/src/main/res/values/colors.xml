@@ -13,6 +13,8 @@
     <color name="yellow_speed_select">#FCFE00</color>
     <color name="red_speed_select">#F10100</color>
 
+    <color name="game_shadow">#A4000000</color>
+
     <!--App Them Colors-->
     <color name="primary">#455A64</color>
     <color name="primary_dark">#1C313A</color>

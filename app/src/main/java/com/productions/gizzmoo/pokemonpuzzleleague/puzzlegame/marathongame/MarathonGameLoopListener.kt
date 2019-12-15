@@ -1,9 +1,9 @@
-package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.timezonegame
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame
 
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoopListener
 
-interface TimeZoneGameLoopListener : GameLoopListener {
-    fun newBlockWasAdded(numOfLinesLeft: Int)
+interface MarathonGameLoopListener : GameLoopListener {
+    fun newBlockWasAdded()
     fun updateGameTimeAndSpeed(timeInMilli: Long, gameSpeed: Int, delayInSeconds: Int)
     fun startAnimatingUp()
     fun stopAnimatingUp()

@@ -16,10 +16,10 @@
         android:layout_centerInParent="true">
 
         <Button
-            android:id="@+id/timeZoneButton"
+            android:id="@+id/marathonButton"
             android:layout_width="128dp"
             android:layout_height="wrap_content"
-            android:text="@string/time_zone"
+            android:text="@string/marathon"
             android:background="@drawable/app_button_drawable"
             android:textColor="@color/primary_text_color"
             android:layout_marginBottom="16dp"

@@ -3,32 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView
-        android:id="@+id/puzzleBoard"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <!--Add PuzzleBoardView and Contents Dynamically-->
 
-    <RelativeLayout
-        android:id="@+id/readyContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        android:background="#A4000000">
-
-        <TextView
-            android:id="@+id/readyText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/ready"
-            android:layout_centerInParent="true"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView
-            android:id="@+id/countDown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/readyText"
-            android:layout_centerHorizontal="true"/>
-
-    </RelativeLayout>
 </RelativeLayout>

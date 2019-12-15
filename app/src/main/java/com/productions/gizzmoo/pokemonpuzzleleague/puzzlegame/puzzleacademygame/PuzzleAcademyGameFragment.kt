@@ -6,9 +6,10 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameDialogFragment
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameFragment
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView
 import java.util.*
 
-class PuzzleAcademyGameFragment : GameFragment<PuzzleAcademyGameLoopListener, PuzzleAcademyGameLoop>(), PuzzleAcademyGameLoopListener {
+class PuzzleAcademyGameFragment : GameFragment<PuzzleAcademyGameLoopListener, PuzzleAcademyGameLoop, PuzzleBoardView>(), PuzzleAcademyGameLoopListener {
     var listener: PuzzleAcademyFragmentInterface? = null
     var puzzleId = 0
     var gameEnded = false
@@ -24,6 +25,9 @@ class PuzzleAcademyGameFragment : GameFragment<PuzzleAcademyGameLoopListener, Pu
         listener?.updateNumOfSwaps(moves)
         return PuzzleAcademyGameLoop(grid, moves)
     }
+
+    override fun createPuzzleBoardView(): PuzzleBoardView =
+            PuzzleBoardView(activity!!)
 
     override fun blocksMatched() {}
 
