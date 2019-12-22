@@ -40,6 +40,10 @@ class PuzzleAcademyGameActivity : GameActivity(), PuzzleAcademyGameFragment.Puzz
         return false
     }
 
+    override fun onGameFinished() {
+        musicService?.stopMusic()
+    }
+
     private fun getPuzzleID(): Int =
         intent.getIntExtra(PUZZLE_ID_KEY, 0)
 }

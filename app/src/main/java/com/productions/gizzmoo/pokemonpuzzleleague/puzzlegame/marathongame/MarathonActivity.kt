@@ -76,4 +76,8 @@ class MarathonActivity : GameActivity(), GameEndingDialogListener, MarathonGameF
             super.playMusicOnStartUp()
         }
     }
+
+    override fun onGameFinished() {
+        musicService?.stopMusic()
+    }
 }

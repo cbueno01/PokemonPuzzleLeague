@@ -5,6 +5,7 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Binder
 import android.os.IBinder
+import java.lang.IllegalStateException
 
 abstract class MusicService : Service(), MediaPlayer.OnCompletionListener {
     private lateinit var binder: Binder
@@ -60,7 +61,7 @@ abstract class MusicService : Service(), MediaPlayer.OnCompletionListener {
     abstract fun getResource(): Int
 
     fun startMusic(position: Int) {
-        // initialize and set listener to three mediaplayers
+        // initialize and set listener to three media players
         for (i in mp.indices) {
             mp[i] = MediaPlayer.create(this, getResource())
             mp[i]?.setOnCompletionListener(this)
@@ -69,6 +70,7 @@ abstract class MusicService : Service(), MediaPlayer.OnCompletionListener {
         // set nextMediaPlayers
         mp[0]?.setNextMediaPlayer(mp[1])
         mp[1]?.setNextMediaPlayer(mp[2])
+        mp[2]?.setNextMediaPlayer(mp[0])
 
         mp[mediaPlayerIndex]?.seekTo(position)
         mp[mediaPlayerIndex]?.setVolume(.7f, .7f)
@@ -79,10 +81,12 @@ abstract class MusicService : Service(), MediaPlayer.OnCompletionListener {
         var retValue = 0
         for (mediaPlayer in mp) {
             if (mediaPlayer != null) {
-                if (mediaPlayer.isPlaying) {
-                    retValue = mediaPlayer.currentPosition
-                    mediaPlayer.stop()
-                }
+                try {
+                    if (mediaPlayer.isPlaying) {
+                        retValue = mediaPlayer.currentPosition
+                        mediaPlayer.stop()
+                    }
+                } catch (ex: IllegalStateException) { retValue = 0 }
                 mediaPlayer.release()
             }
         }

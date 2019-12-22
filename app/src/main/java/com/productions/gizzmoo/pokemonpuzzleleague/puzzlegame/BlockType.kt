@@ -7,6 +7,6 @@ enum class BlockType constructor(val value: Int) {
     HEART(3),
     WATER(4),
     COIN(5),
-    TRAINER(6),
-    DIAMOND(7)
+    DIAMOND(6),
+    TRAINER(7)
 }

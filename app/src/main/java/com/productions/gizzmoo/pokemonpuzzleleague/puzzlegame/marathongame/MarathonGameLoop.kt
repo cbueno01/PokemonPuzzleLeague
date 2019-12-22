@@ -1,5 +1,6 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame
 
+import android.util.Log
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
@@ -7,7 +8,7 @@ import java.util.*
 
 class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : GameLoop<MarathonGameLoopListener>(grid) {
     private val rand: Random = Random()
-    var newRow: Array<Block> = createNewRowBlocks(rand)
+    var newRow: Array<Block> = createEmptyBlocksRow()
         private set
 //    var numOfLinesLeft = numOfLines
 //        private set
@@ -51,6 +52,7 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
 
     override fun notifyBlocksMatched() {
         blockMatchAnimating += blockMatch.size
+        Log.d("cbueno", "Adding: ${blockMatch.size} total: $blockMatchAnimating")
 
         if (comboCount > 0) {
             numOfFramesToStall = MAX_FPS * 4
@@ -98,7 +100,7 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
         }
 
         increaseGameSpeedIfNeeded()
-        newRow = createNewRowBlocks(rand)
+        newRow = createNewRowBlocks(rand, shouldShowDiamonds(gameSpeedLevel))
         listener?.newBlockWasAdded()
         lock.unlock()
     }
@@ -121,7 +123,7 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
     private fun checkIfUserLost() {
         when {
             framesInWarning >= getNumOfFramesForCurrentLevel() -> changeGameStatus(GameStatus.Stopped)
-            status === GameStatus.Warning -> framesInWarning++
+            status === GameStatus.Warning -> if (canAnimateUp()) { framesInWarning++ }
             else -> framesInWarning = 0
         }
     }
@@ -156,6 +158,11 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
 
     fun aBlockFinishedAnimating() {
         blockMatchAnimating--
+        Log.d("cbueno", "Removing 1 total: $blockMatchAnimating")
+    }
+
+    fun resetCurrentFrameCount() {
+        currentFrameCount = 0
     }
 
     fun setMarathonGameProperties(newRowParam: Array<Block>, numOfBlocksAnimating: Int, linesUntilSpeedIncrease: Int, frameCount: Int, frameCountInWarning: Int) {
@@ -171,6 +178,16 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
     fun canAnimateUp(): Boolean = blockMatchAnimating <= 0 && numOfFramesToStall <= 0
 
     companion object {
-        fun createNewRowBlocks(rng: Random) : Array<Block> = Array(NUM_OF_COLS) { i -> Block(rng.nextInt(7) + 1, i, NUM_OF_ROWS - 1) }
+        fun createEmptyBlocksRow() : Array<Block> = Array(NUM_OF_COLS) { i -> Block(0, i, NUM_OF_ROWS - 2) }
+
+        fun createNewRowBlocks(rng: Random, includeDiamonds: Boolean) : Array<Block> = Array(NUM_OF_COLS) { i -> getRandomBlock(rng, i, NUM_OF_ROWS - 1, includeDiamonds) }
+
+        fun getRandomBlock(rng: Random, x: Int, y: Int, includeDiamonds: Boolean): Block {
+            val numOfBlockType = if (includeDiamonds) 6 else 5
+            return Block(rng.nextInt(numOfBlockType) + 1, x, y)
+        }
+
+        fun shouldShowDiamonds(currentLevel: Int): Boolean =
+            currentLevel >= 25
     }
 }

@@ -16,6 +16,10 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameFragment
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.Companion.NUM_OF_COLS
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop.Companion.NUM_OF_ROWS
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame.MarathonGameLoop.Companion.createEmptyBlocksRow
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame.MarathonGameLoop.Companion.createNewRowBlocks
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame.MarathonGameLoop.Companion.getRandomBlock
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame.MarathonGameLoop.Companion.shouldShowDiamonds
 import java.util.Random
 
 class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGameLoop, MarathonPuzzleBoardView>(), MarathonGameLoopListener {
@@ -26,7 +30,7 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
     private var tempLinesUntilSpeedIncrease: Int = -1 // -1 so game loop knows to get the full amount of rows needed
     private var tempCurrentFrameCount: Int = 0
     private var tempFrameCountInWarning: Int = 0
-    private var tempNewBlockRow = MarathonGameLoop.createNewRowBlocks(Random())
+    private var tempNewBlockRow = createEmptyBlocksRow()
     private var prevGameStatus: GameStatus = GameStatus.Stopped
 
     private var readyContainerView: RelativeLayout? = null
@@ -52,6 +56,7 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
             val settings = PreferenceManager.getDefaultSharedPreferences(activity!!.applicationContext)
 //            tempNumOfLinesLeft = settings.getInt("pref_lines_key", 15) + NUM_OF_ROWS
             tempGameSpeed = settings.getInt("pref_game_speed", 10)
+            tempNewBlockRow = createNewRowBlocks(rand, shouldShowDiamonds(tempGameSpeed))
         }
     }
 
@@ -130,7 +135,7 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
     }
 
     override fun createGameLoop(): MarathonGameLoop {
-        return MarathonGameLoop(getGameBoard(), tempGameSpeed)
+        return MarathonGameLoop(getGameBoard(tempGameSpeed), tempGameSpeed)
     }
 
     override fun createPuzzleBoardView(): MarathonPuzzleBoardView =
@@ -144,6 +149,7 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
 
         if (prevGameStatus == GameStatus.Warning && (newStatus == GameStatus.Running || newStatus == GameStatus.Panic)) {
             gameLoop.moveBlockSwitcherFromTop()
+            gameLoop.resetCurrentFrameCount()
         }
 
         if (newStatus == GameStatus.Running && prevGameStatus != GameStatus.Running) {
@@ -162,6 +168,7 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
     override fun gameFinished(didWin: Boolean) {
         val newFragment = GameDialogFragment.newInstance(didWin)
         newFragment.show(activity?.supportFragmentManager, "postDialog")
+        listener?.onGameFinished()
     }
 
     override fun newBlockWasAdded() {
@@ -176,7 +183,7 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
     }
 
     override fun tryToStartAnimatingUp() {
-        if (gameLoop.status != GameStatus.Warning || gameLoop.status != GameStatus.Stopped) {
+        if (gameLoop.status != GameStatus.Warning && gameLoop.status != GameStatus.Stopped) {
             boardView.startAnimatingUp()
         }
     }
@@ -200,7 +207,7 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
         setAnimationPropertiesByStatus()
     }
 
-    private fun getGameBoard(): Array<Array<Block>> {
+    private fun getGameBoard(gameSpeedLevel: Int): Array<Array<Block>> {
         val grid = Array(NUM_OF_ROWS) { i -> Array(NUM_OF_COLS) { j -> Block(0, j, i)} }
         val columnCounter = IntArray(NUM_OF_COLS)
 
@@ -209,7 +216,7 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
         // Populate first 3 rows
         for (i in NUM_OF_ROWS - 1 downTo NUM_OF_ROWS - 4 + 1) {
             for (j in 0 until NUM_OF_COLS) {
-                grid[i][j] = Block(rand.nextInt(7) + 1, j, i)
+                grid[i][j] = getRandomBlock(rand, j, i, shouldShowDiamonds(gameSpeedLevel))
                 columnCounter[j]++
                 numberNumberOfBLocksLeft--
             }
@@ -219,14 +226,13 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
         while (x < numberNumberOfBLocksLeft) {
             val position = rand.nextInt(NUM_OF_COLS)
             if (columnCounter[position] < NUM_OF_ROWS - 1) {
-                grid[NUM_OF_ROWS - 1 - columnCounter[position]][position] = Block(rand.nextInt(7) + 1, position, NUM_OF_ROWS - 1 - columnCounter[position])
+                grid[NUM_OF_ROWS - 1 - columnCounter[position]][position] = getRandomBlock(rand, position, NUM_OF_ROWS - 1 - columnCounter[position], shouldShowDiamonds(gameSpeedLevel))
                 columnCounter[position]++
                 x++
             }
         }
 
         return grid
-
     }
 
     private fun onFinishTimer(): () -> Unit {
@@ -264,10 +270,11 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
         fun changeSong(isPanic: Boolean)
         fun updateGameTimeAndSpeed(timeInMilli: Long, gameSpeed: Int, delayInSeconds: Int)
         fun onGameStarted()
+        fun onGameFinished()
     }
 
     companion object {
-        private const val linesToWinKey = "LINES_TO_WIN_KEY"
+//        private const val linesToWinKey = "LINES_TO_WIN_KEY"
         private const val linesUntilSpeedIncreaseKey = "LINES_UNTIL_SPEED_INCREASE_KEY"
         private const val matchAnimationCountKey = "MATCH_ANIMATION_COUNT_KEY"
         private const val gameSpeedKey = "GAME_SPEED_KEY"

@@ -8,7 +8,7 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView
 import java.util.*
 
 class MarathonPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
-    var newRowBlocks = MarathonGameLoop.createNewRowBlocks(Random())
+    var newRowBlocks = MarathonGameLoop.createEmptyBlocksRow()
     var risingAnimationCounter: Int = 0
     private var risingAnimationOffset: Int = 0
     private var shouldAnimatingUp: Boolean = false

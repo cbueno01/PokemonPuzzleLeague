@@ -86,5 +86,6 @@ class PuzzleAcademyGameFragment : GameFragment<PuzzleAcademyGameLoopListener, Pu
     interface PuzzleAcademyFragmentInterface {
         fun updateGameTime(timeInMilli: Long)
         fun updateNumOfSwaps(swapsLeft: Int)
+        fun onGameFinished()
     }
 }

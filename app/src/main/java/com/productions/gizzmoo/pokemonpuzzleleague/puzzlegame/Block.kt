@@ -62,8 +62,8 @@ class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
             3 -> BlockType.HEART
             4 -> BlockType.WATER
             5 -> BlockType.COIN
-            6 -> BlockType.TRAINER
-            7 -> BlockType.DIAMOND
+            6 -> BlockType.DIAMOND
+            7 -> BlockType.TRAINER
             else -> BlockType.EMPTY
         }
 
