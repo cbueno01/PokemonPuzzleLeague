@@ -15,6 +15,8 @@ class PuzzleAcademyGameLoop(grid: Array<Array<Block>>, var numOfSwapsLeft: Int) 
         checkIfWon()
     }
 
+    override fun getUpdatedGameStatus() {}
+
     private fun checkIfGameIsFinished() {
         if (isBoardAnimating()) {
             return

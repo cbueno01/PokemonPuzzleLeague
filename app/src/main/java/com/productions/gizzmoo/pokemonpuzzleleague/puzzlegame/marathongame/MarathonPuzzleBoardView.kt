@@ -2,28 +2,35 @@ package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Rect
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.BoardResources
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView
-import java.util.*
 
 class MarathonPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
     var newRowBlocks = MarathonGameLoop.createEmptyBlocksRow()
     var risingAnimationCounter: Int = 0
+        private set
     private var risingAnimationOffset: Int = 0
     private var shouldAnimatingUp: Boolean = false
     private var numOfTotalFrames: Int = 1
+    private val blockRectScale = Rect()
+    private var jumpAnimationCounter: Int = 0
+    var isInDanger: Boolean = false
+    var isInWarning: Boolean = false
 //    private var winLine: Int = 0
 //    private var shouldShowWinLine: Boolean = false
 
     fun resetRisingAnimationCount() {
-        risingAnimationCounter = 1
+        setRisingAnimationCounter(1)
     }
 
+    @Synchronized
     fun startAnimatingUp() {
         shouldAnimatingUp = true
     }
 
+    @Synchronized
     fun stopAnimatingUp() {
         shouldAnimatingUp = false
     }
@@ -40,7 +47,30 @@ class MarathonPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
 
     override fun drawAfterGrid(canvas: Canvas) {
         drawNewRow(canvas)
+        updateJumpAnimationCountIfNeeded()
 //      drawLine(canvas)
+    }
+
+    override fun drawBlock(canvas: Canvas, block: Block, position: Rect) {
+        if (!block.isBlockEmpty && !block.isAnimating) {
+            when {
+                isInDanger -> drawBlockWithBitmap(canvas, BoardResources.getJumpAnimationBlock(block.type, jumpAnimationCounter / JUMP_ANIMATION_MULTIPLIER), null, position)
+                isInWarning -> drawBlockWithBitmap(canvas, BoardResources.getSquishedBlock(block.type), null, position)
+                else -> super.drawBlock(canvas, block, position)
+            }
+        } else {
+            super.drawBlock(canvas, block, position)
+        }
+    }
+
+    @Synchronized
+    fun setRisingAnimationCounter(num: Int) {
+        risingAnimationCounter = num
+    }
+
+    @Synchronized
+    private fun addToRisingAnimationCounter() {
+        risingAnimationCounter++
     }
 
     private fun drawNewRow(canvas: Canvas) {
@@ -50,7 +80,16 @@ class MarathonPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
         for (i in newRowBlocks.indices) {
             val x = i * blockSize + widthOffset
             blockRect.set(x, y - risingAnimationOffset, x + blockSize, y)
-            drawBlock(canvas, newRowBlocks[i], blockRect, bitmapRation)
+
+            val bitmapRationWithGuard = when {
+                bitmapRation > 1 -> 1f
+                bitmapRation < 0 -> 0f
+                else -> bitmapRation
+            }
+
+            val currentBitmap = BoardResources.getDarkBlock(newRowBlocks[i].type)
+            blockRectScale.set(0, 0, currentBitmap.width, (currentBitmap.height * bitmapRationWithGuard).toInt())
+            drawBlockWithBitmap(canvas, currentBitmap, blockRectScale, blockRect)
         }
     }
 
@@ -72,7 +111,16 @@ class MarathonPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
         val bitmapBlockSize = (BoardResources.getBlockHeights() * (risingAnimationCounter.toFloat() / numOfTotalFrames)).toInt()
         risingAnimationOffset = (blockSize * (bitmapBlockSize / BoardResources.getBlockHeights().toFloat())).toInt()
         if (shouldAnimatingUp) {
-            risingAnimationCounter++
+            addToRisingAnimationCounter()
         }
+    }
+
+    private fun updateJumpAnimationCountIfNeeded() {
+        jumpAnimationCounter = if (isInDanger && jumpAnimationCounter < JUMP_ANIMATION_FRAMES) jumpAnimationCounter + 1 else 0
+    }
+
+    companion object {
+        const val JUMP_ANIMATION_MULTIPLIER = 4
+        const val JUMP_ANIMATION_FRAMES = 2 * JUMP_ANIMATION_MULTIPLIER
     }
 }

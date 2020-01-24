@@ -7,7 +7,6 @@ import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
 abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : AsyncTask<Void, Void, Void>() {
-    protected val lock: Lock = ReentrantLock()
     protected var didWin: Boolean = false
     protected var comboCount: Int = 0
     protected var elapsedTime: Long = 0
@@ -106,23 +105,8 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
         }
     }
 
-    private fun getUpdatedGameStatus() {
-        if (didWin) {
-            changeGameStatus(GameStatus.Stopped)
-        } else if (doesRowContainBlock(0)) {
-            if (status != GameStatus.Warning) {
-                changeGameStatus(GameStatus.Warning)
-            }
-        } else if (doesRowContainBlock(3)) {
-            if (status != GameStatus.Panic) {
-                changeGameStatus(GameStatus.Panic)
-            }
-        } else {
-            if (status != GameStatus.Running) {
-                changeGameStatus(GameStatus.Running)
-            }
-        }
-    }
+    abstract fun getUpdatedGameStatus()
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // 0 - Up/Down
@@ -238,15 +222,14 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
         return false
     }
 
+    @Synchronized
     fun swapBlocks(x1: Int, y1: Int, x2: Int, y2: Int) {
-        lock.lock()
         val blockHolder = grid[y1][x1]
         grid[y1][x1] = grid[y2][x2]
         grid[y2][x2] = blockHolder
 
         grid[y1][x1].changeCoords(x1, y1)
         grid[y2][x2].changeCoords(x2, y2)
-        lock.unlock()
     }
 
     fun blockFinishedMatchAnimation(row: Int, column: Int) {

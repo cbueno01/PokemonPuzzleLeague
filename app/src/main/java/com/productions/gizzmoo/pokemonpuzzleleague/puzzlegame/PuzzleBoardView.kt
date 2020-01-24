@@ -32,7 +32,6 @@ open class PuzzleBoardView(context: Context) : View(context) {
     protected var blockSize: Int = 0
 
     protected val blockRect = Rect()
-    private val blockRectScale = Rect()
     private val boardRect = Rect()
     private val pokemonBackgroundRect = Rect()
 
@@ -219,18 +218,18 @@ open class PuzzleBoardView(context: Context) : View(context) {
     }
 
     private fun drawMatchedBlockHelper(canvas: Canvas, block: Block, position: Rect, isInverted: Boolean, animationCount: Int) {
-        val currentBitmap: Bitmap? = if (isInverted) BoardResources.getInvertedBlock(block.type) else BoardResources.getPopAnimationBlock(block.type, animationCount)
-        canvas.drawBitmap(currentBitmap!!, null, position, null)
+        val currentBitmap: Bitmap = if (isInverted) BoardResources.getInvertedBlock(block.type) else BoardResources.getPopAnimationBlock(block.type, animationCount)
+        drawBlockWithBitmap(canvas, currentBitmap, null, position)
     }
 
     private fun drawSwitchingBlock(canvas: Canvas, block: Block, widthStartPosition: Int, heightStartPosition: Int) {
         val switchAnimationOffset = (blockSize - block.switchAnimationCount / ANIMATION_SWITCH_FRAMES_NEEDED.toFloat() * blockSize).toInt()
         if (block.isAnimatingLeft) {
             blockRect.set(widthStartPosition + switchAnimationOffset, heightStartPosition, widthStartPosition + blockSize + switchAnimationOffset, heightStartPosition + blockSize)
-            drawBlock(canvas, block, blockRect, 1f)
+            drawBlock(canvas, block, blockRect)
         } else {
             blockRect.set(widthStartPosition - switchAnimationOffset, heightStartPosition, widthStartPosition + blockSize - switchAnimationOffset, heightStartPosition + blockSize)
-            drawBlock(canvas, block, blockRect, 1f)
+            drawBlock(canvas, block, blockRect)
         }
 
         block.incrementSwitchAnimationFrame()
@@ -243,13 +242,10 @@ open class PuzzleBoardView(context: Context) : View(context) {
     private fun drawFallingBlock(canvas: Canvas, block: Block, widthStartPosition: Int, heightStartPosition: Int, row: Int, blockIndex: Int) {
         val fallingAnimationOffset = ((ANIMATION_FALLING_FRAMES_NEEDED - block.downAnimatingCount) / ANIMATION_FALLING_FRAMES_NEEDED.toFloat() * blockSize).toInt()
         blockRect.set(widthStartPosition, heightStartPosition - fallingAnimationOffset, widthStartPosition + blockSize, heightStartPosition + blockSize - fallingAnimationOffset)
-        drawBlock(canvas, block, blockRect, 1f)
+        drawBlock(canvas, block, blockRect)
 
         var blockNeedsToSwap = false
         if (block.downAnimatingCount >= ANIMATION_FALLING_FRAMES_NEEDED) {
-            if (block.downAnimatingCount > ANIMATION_FALLING_FRAMES_NEEDED) {
-                Log.d("cbueno", "blockAnimation count is higher that $ANIMATION_FALLING_FRAMES_NEEDED: ${block.downAnimatingCount}")
-            }
             if (row < blocks!!.size - 1 && (blocks!![row + 1][blockIndex].isBlockEmpty || blocks!![row + 1][blockIndex].isAnimatingDown) && !(blocks!![row + 1][blockIndex].isBeingSwitched || blocks!![row + 1][blockIndex].hasMatched)) {
                 blockNeedsToSwap = true
             } else {
@@ -275,21 +271,17 @@ open class PuzzleBoardView(context: Context) : View(context) {
         }
 
         blockRect.set(widthStartPosition, heightStartPosition, widthStartPosition + blockSize, heightStartPosition + blockSize)
-        drawBlock(canvas, block, blockRect, 1f)
+        drawBlock(canvas, block, blockRect)
     }
 
-    protected fun drawBlock(canvas: Canvas, block: Block, position: Rect, heightRatio: Float) {
+    protected open fun drawBlock(canvas: Canvas, block: Block, position: Rect) {
         if (!block.isBlockEmpty) {
-            val heightRatioWithGuards = when {
-                heightRatio > 1 -> 1f
-                heightRatio < 0 -> 0f
-                else -> heightRatio
-            }
-
-            val currentBitmap: Bitmap? = if (heightRatioWithGuards == 1f) BoardResources.getNormalBlock(block.type) else BoardResources.getDarkBlock(block.type)
-            blockRectScale.set(0, 0, currentBitmap!!.width, (currentBitmap.height * heightRatioWithGuards).toInt())
-            canvas.drawBitmap(currentBitmap, blockRectScale, position, null)
+            drawBlockWithBitmap(canvas, BoardResources.getNormalBlock(block.type), null, position)
         }
+    }
+
+    protected fun drawBlockWithBitmap(canvas: Canvas, bitmap: Bitmap, src: Rect?, dst: Rect) {
+        canvas.drawBitmap(bitmap, src, dst, null)
     }
 
     private fun drawBlockSwitcher(canvas: Canvas) {

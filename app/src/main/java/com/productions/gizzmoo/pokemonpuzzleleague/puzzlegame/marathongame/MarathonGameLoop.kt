@@ -1,6 +1,5 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame
 
-import android.util.Log
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
@@ -43,23 +42,22 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
                 currentFrameCount++
             }
 
-            numOfFramesToStall = 0
+            setNumOfFramesToStall(0)
         } else {
-            numOfFramesToStall--
+            subtractFrameToStall()
             hasUpdatedRisingAnimationStatus = false
         }
     }
 
     override fun notifyBlocksMatched() {
-        blockMatchAnimating += blockMatch.size
-        Log.d("cbueno", "Adding: ${blockMatch.size} total: $blockMatchAnimating")
+        addToBlockMatch(blockMatch.size)
 
         if (comboCount > 0) {
-            numOfFramesToStall = MAX_FPS * 4
+            setNumOfFramesToStall(MAX_FPS * 4)
         } else if (blockMatch.size >= 5) {
-            numOfFramesToStall = (MAX_FPS * 1.5).toInt()
+            setNumOfFramesToStall((MAX_FPS * 1.5).toInt())
         } else if (blockMatch.size == 4) {
-            numOfFramesToStall = MAX_FPS
+            setNumOfFramesToStall(MAX_FPS)
         }
         listener?.stopAnimatingUp()
     }
@@ -75,13 +73,34 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
         listener?.gameIsPrepared()
     }
 
+    override fun getUpdatedGameStatus() {
+        if (didWin) {
+            changeGameStatus(GameStatus.Stopped)
+        } else if (doesRowContainBlock(0)) {
+            if (status != GameStatus.Warning) {
+                changeGameStatus(GameStatus.Warning)
+            }
+        } else if (doesRowContainBlock(1)) {
+            if (status != GameStatus.InDanger) {
+                changeGameStatus(GameStatus.InDanger)
+            }
+        } else if (doesRowContainBlock(3)) {
+            if (status != GameStatus.Panic) {
+                changeGameStatus(GameStatus.Panic)
+            }
+        } else {
+            if (status != GameStatus.Running) {
+                changeGameStatus(GameStatus.Running)
+            }
+        }
+    }
+
     fun addNewRow() {
         if (doesRowContainBlock(0)) {
             changeGameStatus(GameStatus.Stopped)
             return
         }
 
-        lock.lock()
         for (i in 1 until NUM_OF_ROWS) {
             for (j in 0 until NUM_OF_COLS) {
                 swapBlocks(j, i, j, i - 1)
@@ -102,7 +121,6 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
         increaseGameSpeedIfNeeded()
         newRow = createNewRowBlocks(rand, shouldShowDiamonds(gameSpeedLevel))
         listener?.newBlockWasAdded()
-        lock.unlock()
     }
 
     fun getNumOfFramesForCurrentLevel(): Int {
@@ -156,9 +174,9 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
         }
     }
 
+    @Synchronized
     fun aBlockFinishedAnimating() {
         blockMatchAnimating--
-        Log.d("cbueno", "Removing 1 total: $blockMatchAnimating")
     }
 
     fun resetCurrentFrameCount() {
@@ -173,9 +191,24 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
         framesInWarning = frameCountInWarning
     }
 
+    fun canAnimateUp(): Boolean = blockMatchAnimating <= 0 && numOfFramesToStall <= 0
+
     private fun getNumOfRowsForLevel(): Int = (gameSpeedLevel * 1.25).toInt() + 3
 
-    fun canAnimateUp(): Boolean = blockMatchAnimating <= 0 && numOfFramesToStall <= 0
+    @Synchronized
+    private fun addToBlockMatch(num: Int) {
+        blockMatchAnimating += num
+    }
+
+    @Synchronized
+    private fun setNumOfFramesToStall(num: Int) {
+        numOfFramesToStall = num
+    }
+
+    @Synchronized
+    private fun subtractFrameToStall() {
+        numOfFramesToStall--
+    }
 
     companion object {
         fun createEmptyBlocksRow() : Array<Block> = Array(NUM_OF_COLS) { i -> Block(0, i, NUM_OF_ROWS - 2) }

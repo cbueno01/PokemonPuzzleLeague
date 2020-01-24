@@ -4,5 +4,6 @@ enum class GameStatus {
     Stopped,
     Running,
     Warning,
-    Panic
+    Panic,
+    InDanger
 }

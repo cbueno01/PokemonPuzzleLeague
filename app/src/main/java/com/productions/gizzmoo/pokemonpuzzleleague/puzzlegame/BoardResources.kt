@@ -76,12 +76,40 @@ object BoardResources {
             BlockType.TRAINER to R.drawable.metallic_pop_animation_5,
             BlockType.DIAMOND to R.drawable.diamond_pop_animation_5)
 
+    private val jumpAnimation1Resources = hashMapOf(
+            BlockType.LEAF to R.drawable.leaf_jump_1,
+            BlockType.FIRE to R.drawable.fire_jump_1,
+            BlockType.HEART to R.drawable.heart_jump_1,
+            BlockType.WATER to R.drawable.water_jump_1,
+            BlockType.COIN to R.drawable.coin_jump_1,
+            BlockType.TRAINER to R.drawable.metallic_jump_1,
+            BlockType.DIAMOND to R.drawable.diamond_jump_1)
+
+    private val jumpAnimation2Resources = hashMapOf(
+            BlockType.LEAF to R.drawable.leaf_jump_2,
+            BlockType.FIRE to R.drawable.fire_jump_2,
+            BlockType.HEART to R.drawable.heart_jump_2,
+            BlockType.WATER to R.drawable.water_jump_2,
+            BlockType.COIN to R.drawable.coin_jump_2,
+            BlockType.TRAINER to R.drawable.metallic_jump_2,
+            BlockType.DIAMOND to R.drawable.diamond_jump_2)
+
+    private val jumpAnimation3Resources = hashMapOf(
+            BlockType.LEAF to R.drawable.leaf_jump_3,
+            BlockType.FIRE to R.drawable.fire_jump_3,
+            BlockType.HEART to R.drawable.heart_jump_3,
+            BlockType.WATER to R.drawable.water_jump_3,
+            BlockType.COIN to R.drawable.coin_jump_3,
+            BlockType.TRAINER to R.drawable.metallic_jump_3,
+            BlockType.DIAMOND to R.drawable.diamond_jump_3)
+
     private val normalBitmaps: HashMap<BlockType, Bitmap> = HashMap()
     private val darkBitmaps: HashMap<BlockType, Bitmap> = HashMap()
     private val invertedBitmaps: HashMap<BlockType, Bitmap> = HashMap()
     private val popAnimationBitmaps: HashMap<BlockType, Array<Bitmap>> = HashMap()
+    private val jumpAnimationBitmaps: HashMap<BlockType, Array<Bitmap>> = HashMap()
 
-    private var blankBitmap: Bitmap? = null
+    private lateinit var blankBitmap: Bitmap
 
     fun createImageBitmaps(context: Context) {
         for (type in BlockType.values().filter { type -> type !== BlockType.EMPTY }) {
@@ -95,27 +123,48 @@ object BoardResources {
                 BitmapFactory.decodeResource(context.resources, popAnimation4Resources[type]!!),
                 BitmapFactory.decodeResource(context.resources, popAnimation5Resources[type]!!)
             )
+
+            jumpAnimationBitmaps[type] = arrayOf(
+                BitmapFactory.decodeResource(context.resources, jumpAnimation1Resources[type]!!),
+                BitmapFactory.decodeResource(context.resources, jumpAnimation2Resources[type]!!),
+                BitmapFactory.decodeResource(context.resources, jumpAnimation3Resources[type]!!)
+            )
         }
 
         blankBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.blank_block)
     }
 
-    fun getNormalBlock(type: BlockType): Bitmap? = normalBitmaps[type]
+    fun getNormalBlock(type: BlockType): Bitmap = normalBitmaps[type] ?: blankBitmap
 
-    fun getDarkBlock(type: BlockType): Bitmap? = darkBitmaps[type]
+    fun getDarkBlock(type: BlockType): Bitmap = darkBitmaps[type] ?: blankBitmap
 
-    fun getInvertedBlock(type: BlockType): Bitmap? = invertedBitmaps[type]
+    fun getInvertedBlock(type: BlockType): Bitmap = invertedBitmaps[type] ?: blankBitmap
 
-    fun getPopAnimationBlock(type: BlockType, animationSection: Int): Bitmap? {
-        val arr = popAnimationBitmaps[type]!!
-        return when (animationSection) {
-            0, 2 -> arr[0]
-            1 -> arr[1]
-            3 -> arr[2]
-            4 -> arr[3]
-            else -> blankBitmap
-        }
-    }
+    fun getPopAnimationBlock(type: BlockType, animationSection: Int): Bitmap =
+        popAnimationBitmaps[type]?.let {
+            when (animationSection) {
+                0, 2 -> it[0]
+                1 -> it[1]
+                3 -> it[2]
+                4 -> it[3]
+                else -> blankBitmap
+            }
+        } ?: blankBitmap
+
+    fun getJumpAnimationBlock(type: BlockType, animationSection: Int): Bitmap =
+        jumpAnimationBitmaps[type]?.let {
+            when (animationSection) {
+                0 -> it[0]
+                1 -> it[1]
+                2 -> it[2]
+                else -> blankBitmap
+            }
+        } ?: blankBitmap
+
+    fun getSquishedBlock(type: BlockType): Bitmap =
+        jumpAnimationBitmaps[type]?.let {
+            it[0]
+        } ?: blankBitmap
 
     fun getBlockHeights(): Int = normalBitmaps[defaultType]?.width ?: 0
 }

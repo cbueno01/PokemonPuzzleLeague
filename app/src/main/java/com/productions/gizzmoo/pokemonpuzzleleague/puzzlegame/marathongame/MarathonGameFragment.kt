@@ -79,7 +79,7 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
 //        drawLineIfNeeded(tempNumOfLinesLeft)
         boardView.setGameSpeed(gameLoop.getNumOfFramesForCurrentLevel())
         boardView.newRowBlocks = gameLoop.newRow
-        boardView.risingAnimationCounter = tempCurrentFrameCount
+        boardView.setRisingAnimationCounter(tempCurrentFrameCount)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -147,17 +147,12 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
             return
         }
 
-        if (prevGameStatus == GameStatus.Warning && (newStatus == GameStatus.Running || newStatus == GameStatus.Panic)) {
+        if (prevGameStatus == GameStatus.Warning && (newStatus == GameStatus.Running || newStatus == GameStatus.Panic || newStatus == GameStatus.InDanger)) {
             gameLoop.moveBlockSwitcherFromTop()
             gameLoop.resetCurrentFrameCount()
         }
 
-        if (newStatus == GameStatus.Running && prevGameStatus != GameStatus.Running) {
-            listener?.changeSong(false)
-        } else if ((newStatus == GameStatus.Warning || newStatus == GameStatus.Panic) && prevGameStatus != GameStatus.Warning && prevGameStatus != GameStatus.Panic) {
-            listener?.changeSong(true)
-        }
-
+        setGameMusicByStatus(newStatus)
         setAnimationPropertiesByStatus()
 
         prevGameStatus = newStatus
@@ -250,6 +245,14 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
         }
     }
 
+    private fun setGameMusicByStatus(newStatus: GameStatus) {
+        if (newStatus == GameStatus.Running && prevGameStatus != GameStatus.Running) {
+            listener?.changeSong(false)
+        } else if ((newStatus == GameStatus.Warning || newStatus == GameStatus.Panic || newStatus == GameStatus.InDanger) && prevGameStatus != GameStatus.Warning && prevGameStatus != GameStatus.Panic && prevGameStatus != GameStatus.InDanger) {
+            listener?.changeSong(true)
+        }
+    }
+
     private fun setAnimationPropertiesByStatus() {
         if (gameLoop.status == GameStatus.Warning || gameLoop.status == GameStatus.Stopped) {
             boardView.stopAnimatingUp()
@@ -258,6 +261,9 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
             boardView.startAnimatingUp()
             gameLoop.blockSwitcher.allowedToBeOnTop = false
         }
+
+        boardView.isInDanger = gameLoop.status == GameStatus.InDanger
+        boardView.isInWarning = gameLoop.status == GameStatus.Warning
     }
 
 //    private fun drawLineIfNeeded(numOfLines: Int) {
