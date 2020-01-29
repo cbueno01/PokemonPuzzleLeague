@@ -254,7 +254,7 @@ class MarathonGameFragment : GameFragment<MarathonGameLoopListener, MarathonGame
     }
 
     private fun setAnimationPropertiesByStatus() {
-        if (gameLoop.status == GameStatus.Warning || gameLoop.status == GameStatus.Stopped) {
+        if ((gameLoop.status == GameStatus.Warning || gameLoop.status == GameStatus.Stopped) || !gameLoop.canAnimateUp()) {
             boardView.stopAnimatingUp()
             gameLoop.blockSwitcher.allowedToBeOnTop = true
         } else {

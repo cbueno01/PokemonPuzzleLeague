@@ -61,6 +61,10 @@ abstract class MusicService : Service(), MediaPlayer.OnCompletionListener {
     abstract fun getResource(): Int
 
     fun startMusic(position: Int) {
+        for (mediaPlayer in mp) {
+            mediaPlayer?.release()
+        }
+
         // initialize and set listener to three media players
         for (i in mp.indices) {
             mp[i] = MediaPlayer.create(this, getResource())

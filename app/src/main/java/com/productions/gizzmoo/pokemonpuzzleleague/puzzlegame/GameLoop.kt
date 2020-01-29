@@ -3,14 +3,13 @@ package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame
 import android.os.AsyncTask
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.Companion.ANIMATION_MATCH_INVERT_FRAMES_NEEDED
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.Companion.ANIMATION_MATCH_POP_FRAMES_NEEDED
-import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 
 abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : AsyncTask<Void, Void, Void>() {
     protected var didWin: Boolean = false
-    protected var comboCount: Int = 0
     protected var elapsedTime: Long = 0
     protected val blockMatch: ArrayList<Block> = ArrayList()
+    protected val gridLock = ReentrantLock(true)
     var listener: T? = null
     var grid: Array<Array<Block>> = gameGrid
     var blockSwitcher: SwitchBlocks = SwitchBlocks(2, 9, 3, 9)
@@ -30,7 +29,6 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
 
             applyGravity()
             checkForMatchesAndCombos()
-            checkToResetCombo()
             postGameMechanicHook()
             getUpdatedGameStatus()
             checkIfGameEnded()
@@ -60,28 +58,18 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
     // Gets called on every frame
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private fun applyGravity() {
+        gridLock.lock()
         for (y in NUM_OF_ROWS - 2 downTo 0) {
             for (x in 0 until NUM_OF_COLS) {
                 if (grid[y][x].canInteract) {
                     if ((grid[y + 1][x].isBlockEmpty || grid[y + 1][x].isAnimatingDown) && !(grid[y + 1][x].isBeingSwitched || grid[y + 1][x].hasMatched)) {
                         grid[y][x].startFallingAnimation()
-                        swapBlocks(x, y, x, y + 1)
+                        swapBlocksInternal(x, y, x, y + 1)
                     }
                 }
             }
         }
-    }
-
-    private fun checkToResetCombo() {
-        for (row in grid) {
-            for (block in row) {
-                if (block.canCombo || block.removeComboFlagOnNextFrame) {
-                    return
-                }
-            }
-        }
-
-        comboCount = 0
+        gridLock.unlock()
     }
 
     private fun checkForMatchesAndCombos() {
@@ -98,7 +86,7 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
             blockMatch.sort()
             removeDuplicateBlocks()
             startMatchAnimation()
-            addToComboIfApplicable()
+            addMaxComboToBlocks()
             playSoundIfNecessary()
             notifyBlocksMatched()
             blockMatch.clear()
@@ -155,22 +143,41 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
         return tempList
     }
 
-    private fun addToComboIfApplicable() {
-        for (b in blockMatch) {
-            if (b.canCombo) {
-                comboCount++
-                return
-            }
+    private fun addMaxComboToBlocks() {
+        val maxComboCount = getComboCountMax(blockMatch)
+        for (block in blockMatch) {
+            block.setMaxComboForMatch(maxComboCount)
         }
     }
 
+//    private fun addToComboIfApplicable() {
+//        for (b in blockMatch) {
+//            if (b.canCombo) {
+//                comboCount++
+//                return
+//            }
+//        }
+//    }
+
     private fun playSoundIfNecessary() {
+        val comboCount = getComboCountMax(blockMatch)
         val playPokemonSound = comboCount > 0
         if (playPokemonSound) {
             listener?.playPokemonSound(comboCount)
         } else if (blockMatch.size > 3) {
             listener?.playTrainerSound(false)
         }
+    }
+
+    protected fun getComboCountMax(blockList: ArrayList<Block>): Int {
+        var maxComboCount = 0
+        for (block in blockList) {
+            if (block.canCombo) {
+                maxComboCount = maxOf(block.comboCount, maxComboCount)
+            }
+        }
+
+        return maxComboCount
     }
 
     private fun startMatchAnimation() {
@@ -222,8 +229,14 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
         return false
     }
 
-    @Synchronized
     fun swapBlocks(x1: Int, y1: Int, x2: Int, y2: Int) {
+        gridLock.lock()
+        swapBlocksInternal(x1, y1, x2, y2)
+        gridLock.unlock()
+    }
+
+    @Synchronized
+    protected fun swapBlocksInternal(x1: Int, y1: Int, x2: Int, y2: Int) {
         val blockHolder = grid[y1][x1]
         grid[y1][x1] = grid[y2][x2]
         grid[y2][x2] = blockHolder
@@ -234,9 +247,10 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
 
     fun blockFinishedMatchAnimation(row: Int, column: Int) {
         var rowToUpdate = row - 1
-        while (rowToUpdate >= 0 && !grid[rowToUpdate][column].isBlockEmpty) {
-            if (grid[rowToUpdate][column].canInteract) {
-                grid[rowToUpdate][column].setCanComboFlag(true)
+        while (rowToUpdate >= 0 && grid[rowToUpdate][column].canInteract) {
+            grid[rowToUpdate][column].setCanComboFlag(true)
+            if (grid[rowToUpdate][column].comboCount <= grid[row][column].maxComboInMatch) {
+                grid[rowToUpdate][column].setComboCount(grid[row][column].maxComboInMatch + 1)
             }
             rowToUpdate--
         }

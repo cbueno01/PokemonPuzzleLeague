@@ -42,6 +42,11 @@ class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
         private set
     var removeComboFlagOnNextFrame: Boolean = false
         private set
+    var comboCount = 0
+        private set
+
+    var maxComboInMatch = 0
+        private set
 
     val canInteract: Boolean
         get() = !isBlockEmpty && !isAnimating
@@ -175,6 +180,21 @@ class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
         removeComboFlagOnNextFrame = flag
     }
 
+    @Synchronized
+    fun resetComboCount() {
+        comboCount = 0
+    }
+
+    @Synchronized
+    fun setComboCount(count: Int) {
+        comboCount = count
+    }
+
+    @Synchronized
+    fun setMaxComboForMatch(count: Int) {
+        maxComboInMatch = count
+    }
+
     private fun resetBlockValues() {
         isBeingSwitched = false
         switchAnimationCount = 0
@@ -193,5 +213,7 @@ class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
 
         canCombo = false
         removeComboFlagOnNextFrame = false
+        comboCount = 0
+        maxComboInMatch = 0
     }
 }

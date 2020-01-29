@@ -39,7 +39,7 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
             if (currentFrameCount >= getNumOfFramesForCurrentLevel()) {
                 addNewRow()
             } else {
-                currentFrameCount++
+                incrementCurrentFrameCount()
             }
 
             setNumOfFramesToStall(0)
@@ -50,6 +50,7 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
     }
 
     override fun notifyBlocksMatched() {
+        val comboCount = getComboCountMax(blockMatch)
         addToBlockMatch(blockMatch.size)
 
         if (comboCount > 0) {
@@ -95,24 +96,27 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
         }
     }
 
+    @Synchronized
     fun addNewRow() {
         if (doesRowContainBlock(0)) {
             changeGameStatus(GameStatus.Stopped)
             return
         }
 
+        gridLock.lock()
         for (i in 1 until NUM_OF_ROWS) {
             for (j in 0 until NUM_OF_COLS) {
-                swapBlocks(j, i, j, i - 1)
+                swapBlocksInternal(j, i, j, i - 1)
             }
         }
+        gridLock.unlock()
 
         for (i in 0 until NUM_OF_COLS) {
             grid[NUM_OF_ROWS - 1][i] = newRow[i]
         }
 
 //        numOfLinesLeft--
-        currentFrameCount = 0
+        resetCurrentFrameCount()
 
         if (!blockSwitcher.isAtTop || doesRowContainBlock(0)) {
             blockSwitcher.moveUp()
@@ -138,6 +142,7 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
         return ((invertNormSpeed * 9 + 1) * 30).toInt()
     }
 
+    @Synchronized
     private fun checkIfUserLost() {
         when {
             framesInWarning >= getNumOfFramesForCurrentLevel() -> changeGameStatus(GameStatus.Stopped)
@@ -163,6 +168,7 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
 //        changeGameStatus(GameStatus.Stopped)
     }
 
+    @Synchronized
     private fun increaseGameSpeedIfNeeded() {
         if (gameSpeedLevel < 50) {
             if (linesToNewLevel <= 0) {
@@ -179,6 +185,7 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
         blockMatchAnimating--
     }
 
+    @Synchronized
     fun resetCurrentFrameCount() {
         currentFrameCount = 0
     }
@@ -208,6 +215,11 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
     @Synchronized
     private fun subtractFrameToStall() {
         numOfFramesToStall--
+    }
+
+    @Synchronized
+    private fun incrementCurrentFrameCount() {
+        currentFrameCount++
     }
 
     companion object {

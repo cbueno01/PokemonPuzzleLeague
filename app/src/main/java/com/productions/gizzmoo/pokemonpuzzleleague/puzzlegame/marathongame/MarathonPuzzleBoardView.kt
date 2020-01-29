@@ -9,8 +9,7 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView
 
 class MarathonPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
     var newRowBlocks = MarathonGameLoop.createEmptyBlocksRow()
-    var risingAnimationCounter: Int = 0
-        private set
+    private var risingAnimationCounter: Int = 0
     private var risingAnimationOffset: Int = 0
     private var shouldAnimatingUp: Boolean = false
     private var numOfTotalFrames: Int = 1
@@ -35,6 +34,7 @@ class MarathonPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
         shouldAnimatingUp = false
     }
 
+    @Synchronized
     fun setGameSpeed(numOfFrames: Int) {
         numOfTotalFrames = numOfFrames
     }
@@ -108,7 +108,8 @@ class MarathonPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
 //    }
 
     private fun updateRiseAnimationCountIfNeeded() {
-        val bitmapBlockSize = (BoardResources.getBlockHeights() * (risingAnimationCounter.toFloat() / numOfTotalFrames)).toInt()
+        val risingAnimationRatio = risingAnimationCounter.toFloat() / numOfTotalFrames
+        val bitmapBlockSize = (BoardResources.getBlockHeights() * risingAnimationRatio).toInt()
         risingAnimationOffset = (blockSize * (bitmapBlockSize / BoardResources.getBlockHeights().toFloat())).toInt()
         if (shouldAnimatingUp) {
             addToRisingAnimationCounter()

@@ -268,6 +268,8 @@ open class PuzzleBoardView(context: Context) : View(context) {
         if (block.removeComboFlagOnNextFrame) {
             block.setRemoveComboFlagOnNextFrame(false)
             block.setCanComboFlag(false)
+            block.resetComboCount()
+            block.setMaxComboForMatch(0)
         }
 
         blockRect.set(widthStartPosition, heightStartPosition, widthStartPosition + blockSize, heightStartPosition + blockSize)

@@ -56,6 +56,7 @@ class SwitchBlocks(private var leftColumn: Int, private var leftRow: Int, privat
     private val isSwitcherStable: Boolean
         get() = leftRow == rightRow && leftColumn == rightColumn - 1
 
+    @Synchronized
     private fun setCoordinates(leftC: Int, leftR: Int, rightC: Int, rightR: Int) {
         leftRow = leftR
         leftColumn = leftC
