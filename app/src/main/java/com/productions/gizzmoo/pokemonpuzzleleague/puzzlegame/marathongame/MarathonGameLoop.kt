@@ -139,7 +139,7 @@ class MarathonGameLoop(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : Ga
 
         val normalizedSpeed = (gameSpeedLevel - minSpeed) / (maxSpeed - minSpeed)
         val invertNormSpeed = 1 - normalizedSpeed
-        return ((invertNormSpeed * 9 + 1) * 30).toInt()
+        return ((invertNormSpeed * 5 + 1) * 30).toInt()
     }
 
     @Synchronized
