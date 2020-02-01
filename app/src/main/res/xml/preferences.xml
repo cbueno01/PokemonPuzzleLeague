@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="@string/settings">
 
@@ -36,5 +35,14 @@
             android:title="@string/game_sound"
             android:defaultValue="true" />
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Game Data">
+        <com.productions.gizzmoo.pokemonpuzzleleague.settings.TextPreference
+            android:key="data_deletion_row"
+            android:title="Delete Game Data"
+            android:dialogTitle="Delete Game Data"/>
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

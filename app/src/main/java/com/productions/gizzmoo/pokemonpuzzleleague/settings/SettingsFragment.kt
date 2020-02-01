@@ -24,6 +24,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             is TrainerPreference -> showFragmentDialog(TrainerDialog.newInstance(preference))
             is PokemonPreference -> showFragmentDialog(PokemonDialog.newInstance(preference))
             is NumberPreference -> showFragmentDialog(NumberDialog.newInstance(preference))
+            is TextPreference -> showFragmentDialog(TextDialog.newInstance(preference))
             else -> super.onDisplayPreferenceDialog(preference)
         }
     }

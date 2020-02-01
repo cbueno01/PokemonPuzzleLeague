@@ -18,8 +18,7 @@ class JSONReaderWriter(context: Context, stage: Int) {
 
     init {
         try {
-            jsonFile = getJSONObjectFromFile(context)
-            jsonStage = getStageObject(jsonFile, stage)
+            updateJsonFileAndStage(context, stage)
         } catch (ex: IOException) {}
     }
 
@@ -95,6 +94,11 @@ class JSONReaderWriter(context: Context, stage: Int) {
 
     fun didWinLevel(level: Int): Boolean =
         getLevelJSONObject(level).getBoolean(JSON_DID_COMPLETE_KEY)
+
+    fun deleteJSONFile(context: Context, stage: Int) {
+        context.deleteFile(FILENAME)
+        updateJsonFileAndStage(context, stage)
+    }
 
     private fun getJSONObjectFromFile(context: Context): JSONObject {
         var jsonString = ""
@@ -198,6 +202,11 @@ class JSONReaderWriter(context: Context, stage: Int) {
         }
 
         return true
+    }
+
+    private fun updateJsonFileAndStage(context: Context, stage: Int) {
+        jsonFile = getJSONObjectFromFile(context)
+        jsonStage = getStageObject(jsonFile, stage)
     }
 
     class CannotReadFileException(message: String) : Exception(message)
