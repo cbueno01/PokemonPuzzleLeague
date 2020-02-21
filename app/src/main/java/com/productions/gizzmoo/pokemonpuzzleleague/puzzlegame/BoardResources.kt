@@ -166,5 +166,5 @@ object BoardResources {
             it[0]
         } ?: blankBitmap
 
-    fun getBlockHeights(): Int = normalBitmaps[defaultType]?.width ?: 0
+    fun getBlockHeights(): Int = normalBitmaps[defaultType]?.height ?: 0
 }

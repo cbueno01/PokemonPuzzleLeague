@@ -1,8 +1,8 @@
-package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.risinggame
 
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoopListener
 
-interface MarathonGameLoopListener : GameLoopListener {
+interface RisingGameLoopListener : GameLoopListener {
     fun newBlockWasAdded()
     fun updateGameTimeAndSpeed(timeInMilli: Long, gameSpeed: Int, delayInSeconds: Int)
     fun gameIsPrepared()

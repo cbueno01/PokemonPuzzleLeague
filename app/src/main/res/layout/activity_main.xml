@@ -32,6 +32,16 @@
             android:text="@string/puzzle_academy"
             android:background="@drawable/app_button_drawable"
             android:textColor="@color/primary_text_color"
+            android:layout_marginBottom="16dp"
+            android:padding="8dp"/>
+
+        <Button
+            android:id="@+id/spaService"
+            android:layout_width="128dp"
+            android:layout_height="wrap_content"
+            android:text="@string/spa_service"
+            android:background="@drawable/app_button_drawable"
+            android:textColor="@color/primary_text_color"
             android:padding="8dp"/>
     </LinearLayout>
 

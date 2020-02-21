@@ -10,6 +10,7 @@ import com.productions.gizzmoo.pokemonpuzzleleague.PanningLoop.Companion.MAX_FPS
 import com.productions.gizzmoo.pokemonpuzzleleague.PanningLoop.Companion.NUM_OF_SECS_TO_PAN_VIEW
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame.PuzzleAcademySelectionActivity
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame.MarathonActivity
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.spaservicegame.SpaServiceGameActivity
 import com.productions.gizzmoo.pokemonpuzzleleague.settings.SettingsActivity
 
 class MenuActivity : AppCompatActivity(), PanningLoopListener {
@@ -38,6 +39,13 @@ class MenuActivity : AppCompatActivity(), PanningLoopListener {
             val intent = Intent(this@MenuActivity, PuzzleAcademySelectionActivity::class.java)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_out_left, R.anim.slide_in_right)
+        }
+
+        val spaServiceButton = findViewById<Button>(R.id.spaService)
+        spaServiceButton.setOnClickListener {
+            val intent = Intent(this@MenuActivity, SpaServiceGameActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
         panningImage = findViewById(R.id.backgroundPanning)

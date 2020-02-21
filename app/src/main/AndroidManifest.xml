@@ -35,6 +35,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/GameTheme"/>
 
+        <activity android:name=".puzzlegame.spaservicegame.SpaServiceGameActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/GameTheme"/>
+
         <activity
             android:name=".settings.SettingsActivity"
             android:screenOrientation="portrait"
