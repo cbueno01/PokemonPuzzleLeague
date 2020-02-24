@@ -112,14 +112,6 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>, V : PuzzleBoa
         }
     }
 
-    override fun blockFinishedMatchAnimation(row: Int, column: Int) {
-        gameLoop.blockFinishedMatchAnimation(row, column)
-    }
-
-    override fun needsBlockSwap(block1X: Int, block1Y: Int, block2X: Int, block2Y: Int) {
-        gameLoop.swapBlocks(block1X, block1Y, block2X, block2Y)
-    }
-
     override fun switchBlockMoved() {
         if (loadedSoundPool && moveSoundID != 0 && isGameSoundEnabled) {
             soundPool.play(moveSoundID, 1f, 1f, MOVE_SOUND_PRIORITY, 0, 1f)

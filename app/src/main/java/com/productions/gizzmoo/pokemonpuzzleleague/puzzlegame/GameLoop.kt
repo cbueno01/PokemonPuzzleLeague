@@ -1,8 +1,10 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame
 
 import android.os.AsyncTask
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.Companion.ANIMATION_FALLING_FRAMES_NEEDED
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.Companion.ANIMATION_MATCH_INVERT_FRAMES_NEEDED
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.Companion.ANIMATION_MATCH_POP_FRAMES_NEEDED
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.Companion.ANIMATION_SWITCH_FRAMES_NEEDED
 import java.util.concurrent.locks.ReentrantLock
 
 abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : AsyncTask<Void, Void, Void>() {
@@ -27,6 +29,7 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
                 Thread.sleep(FRAME_PERIOD.toLong())
             } catch (e: InterruptedException) {}
 
+            updateBoardAnimations()
             applyGravity()
             checkForMatchesAndCombos()
             postGameMechanicHook()
@@ -93,6 +96,25 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
         }
     }
 
+    private fun updateBoardAnimations() {
+        for (row in grid.indices.reversed()) {
+            for (blockIndex in 0 until grid[row].size) {
+                val block = grid[row][blockIndex]
+                if (!block.isBlockEmpty) {
+                    when {
+                        block.hasMatched -> updateMatchedBlock(block, row, blockIndex)
+                        block.isBeingSwitched -> updateSwitchedBlock(block)
+                        block.isAnimatingDown -> updateBlockFalling(block, row, blockIndex)
+                        else -> updateComboIfNeeded(block)
+                    }
+                } else {
+                    // Handle blanks that are being switched
+                    handleEmptySwitchBlock(block)
+                }
+            }
+        }
+    }
+
     abstract fun getUpdatedGameStatus()
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,15 +172,6 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
         }
     }
 
-//    private fun addToComboIfApplicable() {
-//        for (b in blockMatch) {
-//            if (b.canCombo) {
-//                comboCount++
-//                return
-//            }
-//        }
-//    }
-
     private fun playSoundIfNecessary() {
         val comboCount = getComboCountMax(blockMatch)
         val playPokemonSound = comboCount > 0
@@ -187,6 +200,74 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
             val delayedMatchAnimation = i * ANIMATION_MATCH_POP_FRAMES_NEEDED
             b.blockMatched(delayedMatchAnimation, ANIMATION_MATCH_INVERT_FRAMES_NEEDED, (blockMatch.size - 1) * ANIMATION_MATCH_POP_FRAMES_NEEDED - delayedMatchAnimation + ANIMATION_MATCH_INVERT_FRAMES_NEEDED, i, matchSize)
         }
+    }
+
+    private fun updateMatchedBlock(block: Block, row: Int, blockIndex: Int) {
+        if (block.matchInvertedAnimationCount > 0) {
+            block.decrementInvertedAnimationFrame()
+        } else if (block.delayMatchAnimationCount > 0) {
+            block.decrementDelayedMatchAnimationFrame()
+        } else if (block.matchPopAnimationCount < ANIMATION_MATCH_POP_FRAMES_NEEDED) {
+            block.incrementPopAnimationFrame()
+        } else if (block.clearMatchCount > 0) {
+            block.decrementClearFrame()
+            if (!block.hasPopped) {
+                listener?.blockIsPopping(block.popPosition, block.matchTotalCount)
+                block.blockPopped()
+            }
+        } else {
+            blockFinishedMatchAnimation(row, blockIndex)
+            block.clear()
+        }
+    }
+
+    private fun updateBlockFalling(currentBlock: Block, row: Int, blockIndex: Int) {
+        var blockNeedsToSwap = false
+        if (currentBlock.downAnimatingCount >= ANIMATION_FALLING_FRAMES_NEEDED) {
+            val belowBlock = if (row < grid.size - 1) grid[row + 1][blockIndex] else null
+            if (belowBlock != null && (belowBlock.isBlockEmpty || belowBlock.isAnimatingDown) && !(belowBlock.isBeingSwitched || belowBlock.hasMatched)) {
+                blockNeedsToSwap = true
+            } else {
+                if (currentBlock.canCombo) {
+                    currentBlock.setRemoveComboFlagOnNextFrame(true)
+                }
+                currentBlock.stopFallingAnimation()
+            }
+        } else {
+            currentBlock.incrementDownAnimationFrame()
+        }
+
+        if (blockNeedsToSwap) {
+            currentBlock.startFallingAnimation()
+            swapBlocks(blockIndex, row, blockIndex, row + 1)
+        }
+    }
+
+    private fun updateComboIfNeeded(block: Block) {
+        if (block.removeComboFlagOnNextFrame) {
+            block.setRemoveComboFlagOnNextFrame(false)
+            block.setCanComboFlag(false)
+            block.resetComboCount()
+            block.setMaxComboForMatch(0)
+        }
+    }
+
+    private fun updateSwitchedBlock(block: Block) {
+        block.incrementSwitchAnimationFrame()
+
+        if (block.switchAnimationCount >= ANIMATION_SWITCH_FRAMES_NEEDED) {
+            block.stopSwitchAnimation()
+        }
+    }
+
+    private fun handleEmptySwitchBlock(block: Block) {
+            if (block.isBeingSwitched) {
+                block.incrementSwitchAnimationFrame()
+
+                if (block.switchAnimationCount >= ANIMATION_SWITCH_FRAMES_NEEDED) {
+                    block.clear()
+                }
+            }
     }
 
     protected open fun notifyBlocksMatched() {
@@ -245,7 +326,7 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
         grid[y2][x2].changeCoords(x2, y2)
     }
 
-    fun blockFinishedMatchAnimation(row: Int, column: Int) {
+    protected open fun blockFinishedMatchAnimation(row: Int, column: Int) {
         var rowToUpdate = row - 1
         while (rowToUpdate >= 0 && grid[rowToUpdate][column].canInteract) {
             grid[rowToUpdate][column].setCanComboFlag(true)

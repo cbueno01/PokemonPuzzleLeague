@@ -9,7 +9,6 @@ import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
 import android.preference.PreferenceManager
-import android.util.Log
 import android.view.MotionEvent
 import android.view.MotionEvent.INVALID_POINTER_ID
 import android.view.View
@@ -165,55 +164,32 @@ open class PuzzleBoardView(context: Context) : View(context) {
                 for (blockIndex in 0 until it[row].size) {
                     val widthStartPosition = blockIndex * blockSize + widthOffset
                     val heightStartPosition = row * blockSize + heightOffset - getSubclassHeightOffset()
-                    handleDrawingBlock(canvas, it[row][blockIndex], widthStartPosition, heightStartPosition, row, blockIndex)
+                    handleDrawingBlock(canvas, it[row][blockIndex], widthStartPosition, heightStartPosition)
                 }
             }
         }
     }
 
-    private fun handleDrawingBlock(canvas: Canvas, block: Block, widthStartPosition: Int, heightStartPosition: Int, row: Int, blockIndex: Int) {
+    private fun handleDrawingBlock(canvas: Canvas, block: Block, widthStartPosition: Int, heightStartPosition: Int) {
         if (!block.isBlockEmpty) {
             when {
-                block.hasMatched -> drawMatchedBlock(canvas, block, widthStartPosition, heightStartPosition, row, blockIndex)
+                block.hasMatched -> drawMatchedBlock(canvas, block, widthStartPosition, heightStartPosition)
                 block.isBeingSwitched -> drawSwitchingBlock(canvas, block, widthStartPosition, heightStartPosition)
-                block.isAnimatingDown -> drawFallingBlock(canvas, block, widthStartPosition, heightStartPosition, row, blockIndex)
-                else -> removeComboAndDrawBlock(canvas, block, widthStartPosition, heightStartPosition)
-            }
-        } else {
-            // Handle blanks that are being switched
-            if (block.isBeingSwitched) {
-                block.incrementSwitchAnimationFrame()
-
-                if (block.switchAnimationCount >= ANIMATION_SWITCH_FRAMES_NEEDED) {
-                    block.clear()
-                }
+                block.isAnimatingDown -> drawFallingBlock(canvas, block, widthStartPosition, heightStartPosition)
+                else -> drawNormalBlock(canvas, block, widthStartPosition, heightStartPosition)
             }
         }
     }
 
-    private fun drawMatchedBlock(canvas: Canvas, block: Block, widthStartPosition: Int, heightStartPosition: Int, row: Int, blockIndex: Int) {
+    private fun drawMatchedBlock(canvas: Canvas, block: Block, widthStartPosition: Int, heightStartPosition: Int) {
         blockRect.set(widthStartPosition, heightStartPosition, widthStartPosition + blockSize, heightStartPosition + blockSize)
 
-        if (block.matchInvertedAnimationCount > 0) {
-            drawMatchedBlockHelper(canvas, block, blockRect, true, 0)
-            block.decrementInvertedAnimationFrame()
-        } else if (block.delayMatchAnimationCount > 0) {
-            drawMatchedBlockHelper(canvas, block, blockRect, false, 0)
-            block.decrementDelayedMatchAnimationFrame()
-        } else if (block.matchPopAnimationCount < ANIMATION_MATCH_POP_FRAMES_NEEDED) {
-            drawMatchedBlockHelper(canvas, block, blockRect, false, block.matchPopAnimationCount)
-            block.incrementPopAnimationFrame()
-        } else if (block.clearMatchCount > 0) {
-            drawMatchedBlockHelper(canvas, block, blockRect, false, ANIMATION_MATCH_POP_FRAMES_NEEDED + 1)
-            block.decrementClearFrame()
-            if (!block.hasPopped) {
-                listener?.blockIsPopping(block.popPosition, block.matchTotalCount)
-                block.blockPopped()
-            }
-        } else {
-            drawMatchedBlockHelper(canvas, block, blockRect, false, ANIMATION_MATCH_POP_FRAMES_NEEDED + 1)
-            listener?.blockFinishedMatchAnimation(row, blockIndex)
-            block.clear()
+        when {
+            block.matchInvertedAnimationCount > 0 -> drawMatchedBlockHelper(canvas, block, blockRect, true, 0)
+            block.delayMatchAnimationCount > 0 -> drawMatchedBlockHelper(canvas, block, blockRect, false, 0)
+            block.matchPopAnimationCount < ANIMATION_MATCH_POP_FRAMES_NEEDED -> drawMatchedBlockHelper(canvas, block, blockRect, false, block.matchPopAnimationCount)
+            block.clearMatchCount > 0 -> drawMatchedBlockHelper(canvas, block, blockRect, false, ANIMATION_MATCH_POP_FRAMES_NEEDED + 1)
+            else -> drawMatchedBlockHelper(canvas, block, blockRect, false, ANIMATION_MATCH_POP_FRAMES_NEEDED + 1)
         }
     }
 
@@ -231,47 +207,15 @@ open class PuzzleBoardView(context: Context) : View(context) {
             blockRect.set(widthStartPosition - switchAnimationOffset, heightStartPosition, widthStartPosition + blockSize - switchAnimationOffset, heightStartPosition + blockSize)
             drawBlock(canvas, block, blockRect)
         }
-
-        block.incrementSwitchAnimationFrame()
-
-        if (block.switchAnimationCount >= ANIMATION_SWITCH_FRAMES_NEEDED) {
-            block.stopSwitchAnimation()
-        }
     }
 
-    private fun drawFallingBlock(canvas: Canvas, block: Block, widthStartPosition: Int, heightStartPosition: Int, row: Int, blockIndex: Int) {
+    private fun drawFallingBlock(canvas: Canvas, block: Block, widthStartPosition: Int, heightStartPosition: Int) {
         val fallingAnimationOffset = ((ANIMATION_FALLING_FRAMES_NEEDED - block.downAnimatingCount) / ANIMATION_FALLING_FRAMES_NEEDED.toFloat() * blockSize).toInt()
         blockRect.set(widthStartPosition, heightStartPosition - fallingAnimationOffset, widthStartPosition + blockSize, heightStartPosition + blockSize - fallingAnimationOffset)
         drawBlock(canvas, block, blockRect)
-
-        var blockNeedsToSwap = false
-        if (block.downAnimatingCount >= ANIMATION_FALLING_FRAMES_NEEDED) {
-            if (row < blocks!!.size - 1 && (blocks!![row + 1][blockIndex].isBlockEmpty || blocks!![row + 1][blockIndex].isAnimatingDown) && !(blocks!![row + 1][blockIndex].isBeingSwitched || blocks!![row + 1][blockIndex].hasMatched)) {
-                blockNeedsToSwap = true
-            } else {
-                if (block.canCombo) {
-                    block.setRemoveComboFlagOnNextFrame(true)
-                }
-                block.stopFallingAnimation()
-            }
-        } else {
-            block.incrementDownAnimationFrame()
-        }
-
-        if (blockNeedsToSwap) {
-            block.startFallingAnimation()
-            listener?.needsBlockSwap(blockIndex, row, blockIndex, row + 1)
-        }
     }
 
-    private fun removeComboAndDrawBlock(canvas: Canvas, block: Block, widthStartPosition: Int, heightStartPosition: Int) {
-        if (block.removeComboFlagOnNextFrame) {
-            block.setRemoveComboFlagOnNextFrame(false)
-            block.setCanComboFlag(false)
-            block.resetComboCount()
-            block.setMaxComboForMatch(0)
-        }
-
+    private fun drawNormalBlock(canvas: Canvas, block: Block, widthStartPosition: Int, heightStartPosition: Int) {
         blockRect.set(widthStartPosition, heightStartPosition, widthStartPosition + blockSize, heightStartPosition + blockSize)
         drawBlock(canvas, block, blockRect)
     }

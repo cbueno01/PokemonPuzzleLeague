@@ -149,8 +149,8 @@ abstract class RisingGameLoop<T : RisingGameLoopListener>(grid: Array<Array<Bloc
         }
     }
 
-    @Synchronized
-    fun aBlockFinishedAnimating() {
+    override fun blockFinishedMatchAnimation(row: Int, column: Int) {
+        super.blockFinishedMatchAnimation(row, column)
         blockMatchAnimating--
     }
 

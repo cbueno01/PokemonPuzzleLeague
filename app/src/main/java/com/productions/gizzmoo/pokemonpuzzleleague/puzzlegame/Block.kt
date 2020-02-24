@@ -10,17 +10,20 @@ class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
     var type: BlockType
         private set
 
+    // Handle switch animation
     var isBeingSwitched: Boolean = false
         private set
     var switchAnimationCount: Int = 0
         private set
-    var leftRightAnimationDirection: Direction = Direction.None
-        private set
+    private var leftRightAnimationDirection: Direction = Direction.None
 
+    // Handle falling animation
     var isAnimatingDown: Boolean = false
         private set
     var downAnimatingCount: Int = 0
         private set
+
+    // Handle matched animation
     var hasMatched: Boolean = false
         private set
     var delayMatchAnimationCount: Int = 0
@@ -44,7 +47,6 @@ class Block(t: Int, x: Int, y: Int) :  Comparable<Block>, Serializable {
         private set
     var comboCount = 0
         private set
-
     var maxComboInMatch = 0
         private set
 

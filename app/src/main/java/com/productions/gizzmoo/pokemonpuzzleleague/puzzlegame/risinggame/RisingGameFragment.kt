@@ -130,11 +130,6 @@ abstract class RisingGameFragment<T : RisingGameLoopListener, U : RisingGameLoop
         }
     }
 
-    override fun blockFinishedMatchAnimation(row: Int, column: Int) {
-        super.blockFinishedMatchAnimation(row, column)
-        gameLoop.aBlockFinishedAnimating()
-    }
-
     override fun gameStatusChanged(newStatus: GameStatus) {
         // Check if game status actually changed
         if (prevGameStatus == newStatus || newStatus == GameStatus.Stopped || prevGameStatus == GameStatus.Stopped) {
