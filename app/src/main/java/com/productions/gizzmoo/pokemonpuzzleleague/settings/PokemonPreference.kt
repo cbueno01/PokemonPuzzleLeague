@@ -89,7 +89,7 @@ class PokemonPreference(context: Context, attrs: AttributeSet? = null) : DialogP
         pokemonArr = PokemonResources.getPokemonForTrainer(currentTrainer)
 
         bitmaps = Array(pokemonArr.size) {
-            i -> BitmapFactory.decodeResource(context.resources, PokemonResources.getPokemonPortrait(pokemonArr[i]))
+            i -> PokemonResources.getPokemonPortrait(pokemonArr[i])
         }
 
         pokemonNames = Array(pokemonArr.size) {

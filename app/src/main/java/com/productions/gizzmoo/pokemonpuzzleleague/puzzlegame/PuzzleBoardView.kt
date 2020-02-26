@@ -59,19 +59,15 @@ open class PuzzleBoardView(context: Context) : View(context) {
     var listener: IBoard? = null
 
     init {
-        BoardResources.createImageBitmaps(context)
         val settings = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
 
         val currentTrainer = Trainer.getTypeByID(settings.getInt("pref_trainer_key", TrainerPreference.DEFAULT_ID))
         val pokemonIndex = settings.getInt("pref_pokemon_key", PokemonPreference.DEFAULT_ID)
         val currentPokemon = PokemonResources.getPokemonForTrainer(currentTrainer)[pokemonIndex]
 
-        val trainerResource = TrainerResources.getTrainerFullBody(currentTrainer, PokemonResources.isEvolvedGary(currentPokemon))
-        val pokemonResource = PokemonResources.getPokemonBackground(currentTrainer, currentPokemon)
-
-        trainerBitmap = BitmapFactory.decodeResource(context.resources, trainerResource)
+        trainerBitmap = TrainerResources.getTrainerFullBody(currentTrainer, PokemonResources.isEvolvedGary(currentPokemon))
         if (currentTrainer !== Trainer.MEWTWO) {
-            pokemonBitmap = BitmapFactory.decodeResource(context.resources, pokemonResource)
+            pokemonBitmap = PokemonResources.getPokemonBackground(currentTrainer, currentPokemon)
         }
     }
 

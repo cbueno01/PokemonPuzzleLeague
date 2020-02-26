@@ -1,6 +1,8 @@
 package com.productions.gizzmoo.pokemonpuzzleleague
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 
 object PokemonResources {
     private val portraitResources = hashMapOf(
@@ -17,6 +19,8 @@ object PokemonResources {
             Pokemon.TANGELA to R.drawable.tangela_portrait, Pokemon.VENOMOTH to R.drawable.venomoth_portrait, Pokemon.VENONAT to R.drawable.venonat_portrait, Pokemon.VOLTORB to R.drawable.voltorb_portrait,
             Pokemon.VULPIX to R.drawable.vulpix_portrait, Pokemon.WEEPINBELL to R.drawable.weepinbell_portrait, Pokemon.WEEZING to R.drawable.weezing_portrait, Pokemon.ZIPPO to R.drawable.zippo_portrait,
             Pokemon.ZUBAT to R.drawable.zubat_portrait)
+
+    private val portraitResourceBitmaps: HashMap<Pokemon, Bitmap> = HashMap()
 
     private val pokemonNames = hashMapOf(
             Pokemon.ABRA to R.string.abra, Pokemon.ALAKAZAM to R.string.alakazam, Pokemon.ARBOK to R.string.arbok, Pokemon.ARCANINE to R.string.arcanine,
@@ -139,15 +143,15 @@ object PokemonResources {
             Trainer.TRACY to hashMapOf(Pokemon.MARILL to R.drawable.tracey_marill, Pokemon.VENONAT to R.drawable.tracey_venonat, Pokemon.SCYTHER to R.drawable.tracey_scyther)
     )
 
-
+    private val pokemonTrainerBackgroundBitmaps: HashMap<Trainer, HashMap<Pokemon, Bitmap>> = HashMap()
 
     private val garyEvolvedPokemon = arrayListOf(Pokemon.NIDOQUEEN, Pokemon.ARCANINE, Pokemon.KINGLER)
 
     fun getPokemonForTrainer(trainer: Trainer): Array<Pokemon> =
         trainerToPokemonMap[trainer].let { it } ?: trainerToPokemonMap[Trainer.ASH]!!
 
-    fun getPokemonPortrait(pokemon: Pokemon): Int =
-        portraitResources[pokemon].let { it } ?: portraitResources[Pokemon.PIKACHU]!!
+    fun getPokemonPortrait(pokemon: Pokemon): Bitmap =
+        portraitResourceBitmaps[pokemon].let { it } ?: portraitResourceBitmaps[Pokemon.PIKACHU]!!
 
     fun getPokemonName(pokemon: Pokemon, context: Context): String =
         context.resources.getString(pokemonNames[pokemon].let { it } ?: pokemonNames[Pokemon.PIKACHU]!!)
@@ -158,9 +162,26 @@ object PokemonResources {
     fun getPokemonSelectionSound(pokemon: Pokemon): Int =
        pokemonSelectionSound[pokemon].let { it } ?: pokemonSelectionSound[Pokemon.PIKACHU]!!
 
-    fun getPokemonBackground(trainer: Trainer, pokemon: Pokemon): Int =
-        pokemonTrainerBackground[trainer]?.let { i -> i[pokemon]?.let { it } ?: -1 } ?: -1
+    fun getPokemonBackground(trainer: Trainer, pokemon: Pokemon): Bitmap? =
+        pokemonTrainerBackgroundBitmaps[trainer]?.let { i ->
+            i[pokemon]?.let {
+                it
+            }
+        }
 
     fun isEvolvedGary(pokemon: Pokemon): Boolean =
         garyEvolvedPokemon.contains(pokemon)
+
+    fun createImageBitmaps(context: Context) {
+        for (pokemon in Pokemon.values()) {
+            portraitResourceBitmaps[pokemon] = BitmapFactory.decodeResource(context.resources, portraitResources[pokemon]!!)
+        }
+
+        pokemonTrainerBackground.forEach { (trainer, pokemonMap) ->
+            pokemonTrainerBackgroundBitmaps[trainer] = HashMap()
+            pokemonMap.forEach { (pokemon, resourceID) ->
+                pokemonTrainerBackgroundBitmaps[trainer]!![pokemon] = BitmapFactory.decodeResource(context.resources, resourceID)
+            }
+        }
+    }
 }

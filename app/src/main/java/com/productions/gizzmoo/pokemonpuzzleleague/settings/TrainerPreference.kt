@@ -9,16 +9,10 @@ import android.util.AttributeSet
 import com.productions.gizzmoo.pokemonpuzzleleague.TrainerResources
 
 class TrainerPreference(context: Context, attrs: AttributeSet? = null) : DialogPreference(context, attrs) {
-    val bitmaps: Array<Bitmap>
+    val bitmaps: Array<Bitmap> = TrainerResources.getAllTrainerPortraits()
+    private var trainerNames: Array<String> = TrainerResources.getTrainerNames(context)
     var trainerID = DEFAULT_ID
         private set
-    private var trainerNames: Array<String>
-
-    init {
-        val imageResources = TrainerResources.getAllTrainerPortraits()
-        bitmaps = Array(imageResources.size) { i -> BitmapFactory.decodeResource(context.resources, imageResources[i])}
-        trainerNames = TrainerResources.getTrainerNames(context)
-    }
 
     override fun onSetInitialValue(restorePersistedValue: Boolean, defaultValue: Any?) {
         if (restorePersistedValue) {

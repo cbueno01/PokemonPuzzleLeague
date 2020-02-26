@@ -1,9 +1,11 @@
 package com.productions.gizzmoo.pokemonpuzzleleague
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 
 object TrainerResources {
-    private val mTrainerSongs: HashMap<Trainer, IntArray> = hashMapOf(
+    private val trainerSongs: HashMap<Trainer, IntArray> = hashMapOf(
             Trainer.ASH to intArrayOf(R.raw.ash_normal, R.raw.ash_panic),
             Trainer.BLAINE to intArrayOf(R.raw.blaine_normal, R.raw.blaine_panic),
             Trainer.BROCK to intArrayOf(R.raw.brock_normal, R.raw.brock_panic),
@@ -21,7 +23,7 @@ object TrainerResources {
             Trainer.TEAM_ROCKET to intArrayOf(R.raw.team_rocket_normal, R.raw.team_rocket_panic),
             Trainer.TRACY to intArrayOf(R.raw.tracey_normal, R.raw.tracey_panic))
 
-    private val mTrainerCombos: HashMap<Trainer, Int> = hashMapOf(
+    private val trainerCombos: HashMap<Trainer, Int> = hashMapOf(
             Trainer.ASH to R.raw.ash_combo,
             Trainer.BLAINE to R.raw.blaine_combo,
             Trainer.BROCK to R.raw.brock_combo,
@@ -40,7 +42,7 @@ object TrainerResources {
             Trainer.TRACY to R.raw.tracey_combo
     )
 
-    private val mTrainerPortraits: HashMap<Trainer, Int> = hashMapOf(
+    private val trainerPortraits: HashMap<Trainer, Int> = hashMapOf(
             Trainer.ASH to R.drawable.ash_portrait,
             Trainer.BLAINE to R.drawable.blaine_portrait,
             Trainer.BROCK to R.drawable.brock_portrait,
@@ -59,7 +61,9 @@ object TrainerResources {
             Trainer.TRACY to R.drawable.tracey_portrait
     )
 
-    private val mTrainerFullBody : HashMap<Trainer, Int> = hashMapOf(
+    private val trainerPortraitBitmaps: HashMap<Trainer, Bitmap> = HashMap()
+
+    private val trainerFullBody : HashMap<Trainer, Int> = hashMapOf(
             Trainer.ASH to R.drawable.ash_full_body,
             Trainer.BLAINE to R.drawable.blaine_full_body,
             Trainer.BROCK to R.drawable.brock_full_body,
@@ -78,7 +82,10 @@ object TrainerResources {
             Trainer.TRACY to R.drawable.tracey_full_body
     )
 
-    private val mTrainerNames : HashMap<Trainer, Int> = hashMapOf(
+    private val trainerFullBodyBitmaps: HashMap<Trainer, Bitmap> = HashMap()
+    private lateinit var evolvedGaryFullBodyBitmap: Bitmap
+
+    private val trainerNames : HashMap<Trainer, Int> = hashMapOf(
             Trainer.ASH to R.string.ash,
             Trainer.BLAINE to R.string.blaine,
             Trainer.BROCK to R.string.brock,
@@ -98,32 +105,40 @@ object TrainerResources {
     )
 
     fun getTrainerSong(trainer: Trainer) : IntArray =
-        mTrainerSongs[trainer].let { it } ?: mTrainerSongs[Trainer.ASH]!!
+        trainerSongs[trainer].let { it } ?: trainerSongs[Trainer.ASH]!!
 
     fun getTrainerComboSound(trainer: Trainer) : Int =
-        mTrainerCombos[trainer].let { it } ?: mTrainerCombos[Trainer.ASH]!!
+        trainerCombos[trainer].let { it } ?: trainerCombos[Trainer.ASH]!!
 
     fun getTrainerPortrait(trainer: Trainer) : Int =
-        mTrainerPortraits[trainer].let { it } ?: mTrainerPortraits[Trainer.ASH]!!
+        trainerPortraits[trainer].let { it } ?: trainerPortraits[Trainer.ASH]!!
 
-    fun getAllTrainerPortraits() : IntArray =
-        mTrainerPortraits.toSortedMap().values.toIntArray()
+    fun getAllTrainerPortraits() : Array<Bitmap> =
+        trainerPortraitBitmaps.toSortedMap().values.toTypedArray()
 
-    fun getTrainerFullBody(trainer: Trainer, isGaryEvolved: Boolean) : Int {
+    fun getTrainerFullBody(trainer: Trainer, isGaryEvolved: Boolean) : Bitmap {
         if (trainer == Trainer.GARY && isGaryEvolved) {
-            return R.drawable.gary_evolved_full_body
+            return evolvedGaryFullBodyBitmap
         }
 
-        return mTrainerFullBody[trainer].let { it } ?: mTrainerFullBody[Trainer.ASH]!!
+        return trainerFullBodyBitmaps[trainer].let { it } ?: trainerFullBodyBitmaps[Trainer.ASH]!!
     }
 
     fun getTrainerName(trainer : Trainer, context: Context) : String =
-        context.resources.getString(mTrainerNames[trainer].let { it } ?: mTrainerNames[Trainer.ASH]!!)
+        context.resources.getString(trainerNames[trainer].let { it } ?: trainerNames[Trainer.ASH]!!)
 
     fun getTrainerNames(context : Context) : Array<String> {
-        val resourceArray = mTrainerNames.toSortedMap().values.toIntArray()
+        val resourceArray = trainerNames.toSortedMap().values.toIntArray()
         return Array(resourceArray.size) {
             i -> context.resources.getString(resourceArray[i])
         }
+    }
+
+    fun createImageBitmaps(context: Context) {
+        for (trainer in Trainer.values()) {
+            trainerFullBodyBitmaps[trainer] = BitmapFactory.decodeResource(context.resources, trainerFullBody[trainer]!!)
+            trainerPortraitBitmaps[trainer] = BitmapFactory.decodeResource(context.resources, trainerPortraits[trainer]!!)
+        }
+        evolvedGaryFullBodyBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.gary_evolved_full_body)
     }
 }
