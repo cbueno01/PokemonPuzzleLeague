@@ -21,9 +21,10 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>, V : PuzzleBoa
     lateinit var gameLoop: T
         protected set
 
-    private var tempGrid: Array<Array<Block>>? = null
-    private var tempSwitcher: SwitchBlocks? = null
-    private var gameStartTime: Long = 0
+    // These three should only be used to initialize game loop.
+    private lateinit var grid: Array<Array<Block>>
+    private lateinit var switcher: SwitchBlocks
+    protected var previousGameTime: Long = 0
 
     private lateinit var soundPool: SoundPool
     private var loadedSoundPool: Boolean = false
@@ -47,9 +48,13 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>, V : PuzzleBoa
         pokemonSoundResources = PokemonResources.getPokemonComboResources(PokemonResources.getPokemonForTrainer(trainer)[pokemonIndex])
 
         if (savedInstanceState != null) {
-            tempGrid = savedInstanceState.getSerializable(BOARD_KEY) as Array<Array<Block>>
-            tempSwitcher = savedInstanceState.getSerializable(BLOCK_SWITCHER_KEY) as SwitchBlocks
-            gameStartTime = savedInstanceState.getLong(GAME_START_TIME_KEY)
+            grid = savedInstanceState.getSerializable(BOARD_KEY) as Array<Array<Block>>
+            switcher = savedInstanceState.getSerializable(BLOCK_SWITCHER_KEY) as SwitchBlocks
+            previousGameTime = savedInstanceState.getLong(GAME_START_TIME_KEY)
+        } else {
+            grid = createNewGrid()
+            switcher = SwitchBlocks(2, 9, 3, 9)
+            previousGameTime = 0
         }
     }
 
@@ -77,12 +82,7 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>, V : PuzzleBoa
         boardView.listener = this
         gameLoop.listener = this as U
 
-        if (tempSwitcher != null || tempGrid != null) {
-            gameLoop.setGameProperties(tempGrid!!, tempSwitcher!!, gameStartTime)
-            tempGrid = null
-            tempSwitcher = null
-        }
-
+        gameLoop.setGameProperties(grid, switcher, previousGameTime)
         boardView.setGrid(gameLoop.grid, gameLoop.blockSwitcher)
         startGame()
     }
@@ -90,9 +90,9 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>, V : PuzzleBoa
     override fun onStop() {
         super.onStop()
 
-        tempGrid = gameLoop.grid
-        tempSwitcher = gameLoop.blockSwitcher
-        gameStartTime = gameLoop.startTime
+        grid = gameLoop.grid
+        switcher = gameLoop.blockSwitcher
+        previousGameTime = gameLoop.elapsedTime
         gameLoop.cancel(true)
     }
 
@@ -100,7 +100,7 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>, V : PuzzleBoa
         super.onSaveInstanceState(outState)
         outState.putSerializable(BOARD_KEY, gameLoop.grid)
         outState.putSerializable(BLOCK_SWITCHER_KEY, gameLoop.blockSwitcher)
-        outState.putLong(GAME_START_TIME_KEY, gameLoop.startTime)
+        outState.putLong(GAME_START_TIME_KEY, gameLoop.elapsedTime)
     }
 
     override fun switchBlock(switcherLeftBlock: Point) {
@@ -193,6 +193,8 @@ abstract class GameFragment<U : GameLoopListener, T : GameLoop<U>, V : PuzzleBoa
     protected abstract fun createGameLoop(): T
 
     protected abstract fun createPuzzleBoardView(): V
+
+    protected abstract fun createNewGrid(): Array<Array<Block>>
 
     companion object {
         private const val BOARD_KEY = "BOARD_KEY"

@@ -10,15 +10,13 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView
 open class RisingPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
     var newRowBlocks = RisingGameLoop.createEmptyBlocksRow()
     private var risingAnimationCounter: Int = 0
-    private var risingAnimationOffset: Int = 0
+    protected var risingAnimationOffset: Int = 0
     private var shouldAnimatingUp: Boolean = false
     private var numOfTotalFrames: Int = 1
     private val blockRectScale = Rect()
     private var jumpAnimationCounter: Int = 0
     var isInDanger: Boolean = false
     var isInWarning: Boolean = false
-//    private var winLine: Int = 0
-//    private var shouldShowWinLine: Boolean = false
 
     fun resetRisingAnimationCount() {
         setRisingAnimationCounter(1)
@@ -48,7 +46,6 @@ open class RisingPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
     override fun drawAfterGrid(canvas: Canvas) {
         drawNewRow(canvas)
         updateJumpAnimationCountIfNeeded()
-//      drawLine(canvas)
     }
 
     override fun drawBlock(canvas: Canvas, block: Block, position: Rect) {
@@ -92,20 +89,6 @@ open class RisingPuzzleBoardView(context: Context) : PuzzleBoardView(context) {
             drawBlockWithBitmap(canvas, currentBitmap, blockRectScale, blockRect)
         }
     }
-
-//    fun winLineAt(line: Int) {
-//        if (line <= 12) {
-//            shouldShowWinLine = true
-//            winLine = line
-//        }
-//    }
-
-//    private fun drawLine(canvas: Canvas) {
-//        if (shouldShowWinLine) {
-//            val y = if (winLine != 0 && doesStatusAllowAnimation) winLine * blockSize - risingAnimationOffset else winLine * blockSize
-//            canvas.drawLine(widthOffset.toFloat(), (y + heightOffset).toFloat(), (boardWidth + widthOffset).toFloat(), (y + heightOffset).toFloat(), blockSwitcherPaint)
-//        }
-//    }
 
     private fun updateRiseAnimationCountIfNeeded() {
         val risingAnimationRatio = risingAnimationCounter.toFloat() / numOfTotalFrames

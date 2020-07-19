@@ -2,7 +2,6 @@ package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -24,7 +23,7 @@ open class PuzzleBoardView(context: Context) : View(context) {
     private var blocks: Array<Array<Block>>? = null
     private var blockSwitcher: SwitchBlocks? = null
 
-    private var boardWidth: Int = 0
+    protected var boardWidth: Int = 0
     private var boardHeight: Int = 0
     protected var widthOffset: Int = 0
     protected var heightOffset: Int = 0
@@ -42,7 +41,7 @@ open class PuzzleBoardView(context: Context) : View(context) {
     private var boardBoarderPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
     }
-    private var blockSwitcherPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    protected var blockSwitcherPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
         style = Paint.Style.STROKE
         strokeWidth = 7f

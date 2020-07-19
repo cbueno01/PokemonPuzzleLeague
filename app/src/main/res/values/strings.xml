@@ -18,6 +18,8 @@
     <string name="lose">You lose!</string>
     <string name="okay">Okay</string>
     <string name="moves">Moves:</string>
+    <string name="stage_text">Stage: %1$d</string>
+    <string name="round_text">Round: %1$d</string>
 
     <!--Trainers-->
     <string name="ash">Ash</string>

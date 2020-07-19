@@ -7,23 +7,27 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.Co
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView.Companion.ANIMATION_SWITCH_FRAMES_NEEDED
 import java.util.concurrent.locks.ReentrantLock
 
-abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : AsyncTask<Void, Void, Void>() {
-    protected var didWin: Boolean = false
-    protected var elapsedTime: Long = 0
+abstract class GameLoop<T : GameLoopListener> : AsyncTask<Void, Void, Void>() {
+    var elapsedTime: Long = 0
+        private set
+    private var startTime = 0L
+    private var previousElapsedTime = 0L
+
     protected val blockMatch: ArrayList<Block> = ArrayList()
     protected val gridLock = ReentrantLock(true)
-    var listener: T? = null
-    var grid: Array<Array<Block>> = gameGrid
-    var blockSwitcher: SwitchBlocks = SwitchBlocks(2, 9, 3, 9)
-        protected set
-    var startTime: Long = System.nanoTime() / 1000000
+    lateinit var grid: Array<Array<Block>>
         private set
+    lateinit var blockSwitcher: SwitchBlocks
+        private set
+    var listener: T? = null
+
+    protected var didWin: Boolean = false
     var status: GameStatus = GameStatus.Running
         private set
 
     override fun doInBackground(vararg voids: Void): Void? {
         while (status != GameStatus.Stopped && !isCancelled) {
-            elapsedTime = System.nanoTime() / 1000000 - startTime
+            elapsedTime = System.nanoTime() / 1000000 - (startTime - previousElapsedTime)
 
             try {
                 Thread.sleep(FRAME_PERIOD.toLong())
@@ -44,6 +48,7 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
     override fun onPreExecute() {
         getUpdatedGameStatus()
         blockMatch.clear()
+        startTime = System.nanoTime() / 1000000
     }
 
     override fun onProgressUpdate(vararg values: Void?) {
@@ -270,9 +275,7 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
             }
     }
 
-    protected open fun notifyBlocksMatched() {
-        listener?.blocksMatched()
-    }
+    abstract fun notifyBlocksMatched()
 
     private fun removeDuplicateBlocks() {
         val list = ArrayList<Block>()
@@ -355,10 +358,10 @@ abstract class GameLoop<T : GameLoopListener>(gameGrid: Array<Array<Block>>) : A
         return false
     }
 
-    fun setGameProperties(gameGrid: Array<Array<Block>>, switcher: SwitchBlocks, gameStartTime: Long) {
+    fun setGameProperties(gameGrid: Array<Array<Block>>, switcher: SwitchBlocks, previousElapsedTimeInSec: Long) {
         grid = gameGrid
         blockSwitcher = switcher
-        startTime = gameStartTime
+        previousElapsedTime = previousElapsedTimeInSec
     }
 
     companion object {

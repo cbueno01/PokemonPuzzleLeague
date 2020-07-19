@@ -7,6 +7,7 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameDialogFragment
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameFragment
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.PuzzleBoardView
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame.PuzzleAcademySelectionAdapter.Companion.PUZZLE_ID_KEY
 import java.util.*
 
 class PuzzleAcademyGameFragment : GameFragment<PuzzleAcademyGameLoopListener, PuzzleAcademyGameLoop, PuzzleBoardView>(), PuzzleAcademyGameLoopListener {
@@ -15,21 +16,28 @@ class PuzzleAcademyGameFragment : GameFragment<PuzzleAcademyGameLoopListener, Pu
     var gameEnded = false
     private var boardHistory: Stack<Array<Array<Int>>> = Stack()
 
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        puzzleId = activity?.intent?.getIntExtra(PUZZLE_ID_KEY, 0) ?: 0
+    }
+
     override fun gameStatusChanged(newStatus: GameStatus) {}
 
     override fun createGameLoop(): PuzzleAcademyGameLoop {
         val jsonReaderWriter = FileManager.getJSONReaderWriter(getActivityContext(), 1)
-        val grid: Array<Array<Block>> = jsonReaderWriter.getGridFromLevel(puzzleId)
         val moves: Int = jsonReaderWriter.getMovesFromLevel(puzzleId)
         boardHistory = jsonReaderWriter.getHistoryFromLevel(puzzleId)
         listener?.updateNumOfSwaps(moves)
-        return PuzzleAcademyGameLoop(grid, moves)
+        return PuzzleAcademyGameLoop(moves)
     }
 
     override fun createPuzzleBoardView(): PuzzleBoardView =
             PuzzleBoardView(activity!!)
 
-    override fun blocksMatched() {}
+    override fun createNewGrid(): Array<Array<Block>> {
+        val jsonReaderWriter = FileManager.getJSONReaderWriter(getActivityContext(), 1)
+        return jsonReaderWriter.getGridFromLevel(puzzleId)
+    }
 
     override fun gameFinished(didWin: Boolean) {
         val newFragment = GameDialogFragment.newInstance(didWin)
@@ -52,7 +60,7 @@ class PuzzleAcademyGameFragment : GameFragment<PuzzleAcademyGameLoopListener, Pu
     override fun boardSwipedUp() {
         if (!boardHistory.empty()) {
             val currentHistoryGrid = boardHistory.pop()
-            gameLoop.grid = intGridToBlockGrid(currentHistoryGrid)
+            gameLoop.setGameProperties(intGridToBlockGrid(currentHistoryGrid), gameLoop.blockSwitcher, previousGameTime)
             boardView.setGrid(gameLoop.grid, gameLoop.blockSwitcher)
             gameLoop.numOfSwapsLeft++
             listener?.updateNumOfSwaps(gameLoop.numOfSwapsLeft)

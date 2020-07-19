@@ -24,7 +24,6 @@ class MarathonActivity : RisingGameActivity(), GameEndingDialogListener {
 
         setContentView(R.layout.marathon_game)
         gameFragment = supportFragmentManager.findFragmentById(R.id.puzzleGame) as MarathonGameFragment
-        gameFragment.listener = this
         timeView = findViewById(R.id.timerValue)
         speedView = findViewById(R.id.speedValue)
         speedGroup = findViewById(R.id.speedGroup)

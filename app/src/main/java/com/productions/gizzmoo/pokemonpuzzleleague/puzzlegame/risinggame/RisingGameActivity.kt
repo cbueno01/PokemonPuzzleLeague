@@ -2,7 +2,6 @@ package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.risinggame
 
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameActivity
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame.RisingGameFragment
 
 abstract class RisingGameActivity : GameActivity(), RisingFragmentInterface {
     protected lateinit var gameFragment: RisingGameFragment<*, *, *>

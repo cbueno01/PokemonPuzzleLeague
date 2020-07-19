@@ -1,7 +1,7 @@
-package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.marathongame
+package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.risinggame
 
+import android.content.Context
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
@@ -13,25 +13,18 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameCountDownTimer
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameDialogFragment
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameFragment
+import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.risinggame.RisingFragmentInterface
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.risinggame.RisingGameLoop
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.risinggame.RisingGameLoop.Companion.createEmptyBlocksRow
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.risinggame.RisingGameLoop.Companion.createNewRowBlocks
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.risinggame.RisingGameLoop.Companion.shouldShowDiamonds
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.risinggame.RisingGameLoopListener
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.risinggame.RisingPuzzleBoardView
 import java.util.Random
 
 abstract class RisingGameFragment<T : RisingGameLoopListener, U : RisingGameLoop<T>, V : RisingPuzzleBoardView> : GameFragment<T, U, V>(), RisingGameLoopListener {
     var listener: RisingFragmentInterface? = null
-//    private var tempNumOfLinesLeft: Int = 0
     protected var tempGameSpeed: Int = 0
     private var tempBlockMatchAnimating: Int = 0
     private var tempLinesUntilSpeedIncrease: Int = -1 // -1 so game loop knows to get the full amount of rows needed
     private var tempCurrentFrameCount: Int = 0
     private var tempFrameCountInWarning: Int = 0
-    private var tempNewBlockRow = createEmptyBlocksRow()
+    private var tempNewBlockRow = RisingGameLoop.createEmptyBlocksRow()
     private var prevGameStatus: GameStatus = GameStatus.Stopped
 
     private var readyContainerView: RelativeLayout? = null
@@ -41,12 +34,16 @@ abstract class RisingGameFragment<T : RisingGameLoopListener, U : RisingGameLoop
 
     protected var rand: Random = Random()
 
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        listener = activity as RisingFragmentInterface
+    }
+
     @Suppress("UNCHECKED_CAST")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState != null) {
             tempBlockMatchAnimating = savedInstanceState.getInt(matchAnimationCountKey)
-//            tempNumOfLinesLeft = savedInstanceState.getInt(linesToWinKey)
             tempGameSpeed = savedInstanceState.getInt(gameSpeedKey)
             tempLinesUntilSpeedIncrease = savedInstanceState.getInt(linesUntilSpeedIncreaseKey)
             tempCurrentFrameCount = savedInstanceState.getInt(frameCountKey)
@@ -54,16 +51,13 @@ abstract class RisingGameFragment<T : RisingGameLoopListener, U : RisingGameLoop
             tempNewBlockRow = savedInstanceState.getSerializable(newRowKey) as Array<Block>
             gameCounterExecuted = savedInstanceState.getBoolean(gameCounterExecutedKey)
         } else {
-            val settings = PreferenceManager.getDefaultSharedPreferences(activity!!.applicationContext)
-//            tempNumOfLinesLeft = settings.getInt("pref_lines_key", 15) + NUM_OF_ROWS
-            tempGameSpeed = settings.getInt("pref_game_speed", 10)
-            tempNewBlockRow = createNewRowBlocks(rand, shouldShowDiamonds(tempGameSpeed))
+            tempGameSpeed = getGameSpeed()
+            tempNewBlockRow = RisingGameLoop.createNewRowBlocks(rand, RisingGameLoop.shouldShowDiamonds(tempGameSpeed))
         }
     }
 
     override fun onStop() {
         super.onStop()
-//        tempNumOfLinesLeft = gameLoop.numOfLinesLeft
         tempGameSpeed = gameLoop.gameSpeedLevel
         tempBlockMatchAnimating = gameLoop.blockMatchAnimating
         tempLinesUntilSpeedIncrease = gameLoop.linesToNewLevel
@@ -77,7 +71,6 @@ abstract class RisingGameFragment<T : RisingGameLoopListener, U : RisingGameLoop
         super.onStart()
         prevGameStatus = gameLoop.status
         gameLoop.setMarathonGameProperties(tempNewBlockRow, tempBlockMatchAnimating, tempLinesUntilSpeedIncrease, tempCurrentFrameCount, tempFrameCountInWarning)
-//        drawLineIfNeeded(tempNumOfLinesLeft)
         boardView.setGameSpeed(gameLoop.getNumOfFramesForCurrentLevel())
         boardView.newRowBlocks = gameLoop.newRow
         boardView.setRisingAnimationCounter(tempCurrentFrameCount)
@@ -86,7 +79,6 @@ abstract class RisingGameFragment<T : RisingGameLoopListener, U : RisingGameLoop
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(matchAnimationCountKey, gameLoop.blockMatchAnimating)
-//        outState.putInt(linesToWinKey, gameLoop.numOfLinesLeft)
         outState.putInt(gameSpeedKey, gameLoop.gameSpeedLevel)
         outState.putInt(linesUntilSpeedIncreaseKey, gameLoop.linesToNewLevel)
         outState.putInt(frameCountKey, gameLoop.currentFrameCount)
@@ -147,8 +139,6 @@ abstract class RisingGameFragment<T : RisingGameLoopListener, U : RisingGameLoop
         prevGameStatus = newStatus
     }
 
-    override fun blocksMatched() {}
-
     override fun gameFinished(didWin: Boolean) {
         val newFragment = GameDialogFragment.newInstance(didWin)
         newFragment.show(activity?.supportFragmentManager, "postDialog")
@@ -156,7 +146,6 @@ abstract class RisingGameFragment<T : RisingGameLoopListener, U : RisingGameLoop
     }
 
     override fun newBlockWasAdded() {
-//        drawLineIfNeeded(numOfLinesLeft)
         boardView.resetRisingAnimationCount()
         boardView.newRowBlocks = gameLoop.newRow
         boardView.setGameSpeed(gameLoop.getNumOfFramesForCurrentLevel())
@@ -227,14 +216,9 @@ abstract class RisingGameFragment<T : RisingGameLoopListener, U : RisingGameLoop
         boardView.isInWarning = gameLoop.status == GameStatus.Warning
     }
 
-//    private fun drawLineIfNeeded(numOfLines: Int) {
-//        if (numOfLines <= NUM_OF_ROWS) {
-//            boardView.winLineAt(numOfLines)
-//        }
-//    }
+    abstract fun getGameSpeed(): Int
 
     companion object {
-//        private const val linesToWinKey = "LINES_TO_WIN_KEY"
         private const val linesUntilSpeedIncreaseKey = "LINES_UNTIL_SPEED_INCREASE_KEY"
         private const val matchAnimationCountKey = "MATCH_ANIMATION_COUNT_KEY"
         private const val gameSpeedKey = "GAME_SPEED_KEY"
@@ -242,5 +226,33 @@ abstract class RisingGameFragment<T : RisingGameLoopListener, U : RisingGameLoop
         private const val frameCountInWarningKey = "FRAME_COUNT_IN_WARNING_KEY"
         private const val newRowKey = "NEW_BLOCK_ROW_KEY"
         private const val gameCounterExecutedKey = "COUNTER_EXECUTED_KEY"
+
+        fun getGameBoard(rand: Random, gameSpeedLevel: Int, numOfBlocks: Int, numOfFullRows: Int): Array<Array<Block>> {
+            val grid = Array(GameLoop.NUM_OF_ROWS) { i -> Array(GameLoop.NUM_OF_COLS) { j -> Block(0, j, i) } }
+            val columnCounter = IntArray(GameLoop.NUM_OF_COLS)
+
+            var numberNumberOfBLocksLeft = numOfBlocks
+
+            // Populate first 3 rows
+            for (i in GameLoop.NUM_OF_ROWS - 1 downTo GameLoop.NUM_OF_ROWS - numOfFullRows) {
+                for (j in 0 until GameLoop.NUM_OF_COLS) {
+                    grid[i][j] = RisingGameLoop.getRandomBlock(rand, j, i, RisingGameLoop.shouldShowDiamonds(gameSpeedLevel))
+                    columnCounter[j]++
+                    numberNumberOfBLocksLeft--
+                }
+            }
+
+            var x = 0
+            while (x < numberNumberOfBLocksLeft) {
+                val position = rand.nextInt(GameLoop.NUM_OF_COLS)
+                if (columnCounter[position] < GameLoop.NUM_OF_ROWS - 1) {
+                    grid[GameLoop.NUM_OF_ROWS - 1 - columnCounter[position]][position] = RisingGameLoop.getRandomBlock(rand, position, GameLoop.NUM_OF_ROWS - 1 - columnCounter[position], RisingGameLoop.shouldShowDiamonds(gameSpeedLevel))
+                    columnCounter[position]++
+                    x++
+                }
+            }
+
+            return grid
+        }
     }
 }

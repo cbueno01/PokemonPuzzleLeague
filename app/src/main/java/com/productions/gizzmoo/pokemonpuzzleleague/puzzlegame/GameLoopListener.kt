@@ -5,7 +5,6 @@ interface GameLoopListener {
     fun playPokemonSound(comboNumber: Int)
     fun playTrainerSound(isMetallic: Boolean)
     fun updateBoardView()
-    fun blocksMatched()
     fun gameFinished(didWin: Boolean)
     fun blockIsPopping(position: Int, total: Int)
 }

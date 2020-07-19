@@ -19,7 +19,6 @@ class PuzzleAcademyGameActivity : GameActivity(), PuzzleAcademyGameFragment.Puzz
         swapsView = findViewById(R.id.movesLeftValue)
         gameFragment = supportFragmentManager.findFragmentById(R.id.puzzleGame) as PuzzleAcademyGameFragment
         gameFragment.listener = this
-        gameFragment.puzzleId = getPuzzleID()
     }
 
     override fun updateGameTime(timeInMilli: Long) {

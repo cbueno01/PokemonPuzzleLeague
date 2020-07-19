@@ -5,12 +5,10 @@ import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
 import java.util.*
 
-abstract class RisingGameLoop<T : RisingGameLoopListener>(grid: Array<Array<Block>>, gameSpeedLevelParam: Int) : GameLoop<T>(grid) {
+abstract class RisingGameLoop<T : RisingGameLoopListener>(gameSpeedLevelParam: Int) : GameLoop<T>() {
     private val rand: Random = Random()
     var newRow: Array<Block> = createEmptyBlocksRow()
         private set
-//    var numOfLinesLeft = numOfLines
-//        private set
     var gameSpeedLevel = gameSpeedLevelParam
         private set
     private var numOfFramesToStall: Int = 0
@@ -92,7 +90,7 @@ abstract class RisingGameLoop<T : RisingGameLoopListener>(grid: Array<Array<Bloc
     }
 
     @Synchronized
-    fun addNewRow() {
+    open fun addNewRow() {
         if (doesRowContainBlock(0)) {
             changeGameStatus(GameStatus.Stopped)
             return
@@ -110,7 +108,6 @@ abstract class RisingGameLoop<T : RisingGameLoopListener>(grid: Array<Array<Bloc
             grid[NUM_OF_ROWS - 1][i] = newRow[i]
         }
 
-//        numOfLinesLeft--
         resetCurrentFrameCount()
 
         if (!blockSwitcher.isAtTop || doesRowContainBlock(0)) {
@@ -135,6 +132,15 @@ abstract class RisingGameLoop<T : RisingGameLoopListener>(grid: Array<Array<Bloc
         val normalizedSpeed = (gameSpeedLevel.toFloat() - minSpeed) / (maxSpeed - minSpeed)
         val invertNormSpeed = 1 - normalizedSpeed
         return ((invertNormSpeed * FLAT_FRAME_MULTIPLIER + 1) * MAX_FPS).toInt()
+    }
+
+    @Synchronized
+    protected fun checkIfUserLost() {
+        when {
+            framesInWarning >= getNumOfFramesForCurrentLevel() -> changeGameStatus(GameStatus.Stopped)
+            status === GameStatus.Warning -> if (canAnimateUp()) { framesInWarning++ }
+            else -> framesInWarning = 0
+        }
     }
 
     @Synchronized

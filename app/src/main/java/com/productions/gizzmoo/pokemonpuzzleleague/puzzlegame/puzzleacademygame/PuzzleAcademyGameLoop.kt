@@ -1,10 +1,9 @@
 package com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.puzzleacademygame
 
-import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.Block
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameLoop
 import com.productions.gizzmoo.pokemonpuzzleleague.puzzlegame.GameStatus
 
-class PuzzleAcademyGameLoop(grid: Array<Array<Block>>, var numOfSwapsLeft: Int) : GameLoop<PuzzleAcademyGameLoopListener>(grid) {
+class PuzzleAcademyGameLoop(var numOfSwapsLeft: Int) : GameLoop<PuzzleAcademyGameLoopListener>() {
     override fun onProgressUpdate(vararg values: Void?) {
         super.onProgressUpdate()
         listener?.updateGameTime(elapsedTime)
@@ -16,6 +15,8 @@ class PuzzleAcademyGameLoop(grid: Array<Array<Block>>, var numOfSwapsLeft: Int) 
     }
 
     override fun getUpdatedGameStatus() {}
+
+    override fun notifyBlocksMatched() {}
 
     private fun checkIfGameIsFinished() {
         if (isBoardAnimating()) {
